@@ -1,0 +1,28 @@
+import {Dialect} from "sequelize/types"
+
+export default class Settings {
+  private database: string = ""
+  private username: string = ""
+  private password: string = ""
+  private host: string = ""
+  private dialect: Dialect = ""
+
+  public getDatabase(): string {
+    return this.database
+  }
+
+  public getUsername(): string {
+    return this.username
+  }
+
+  public getPassword(): string {
+    return this.password
+  }
+
+  public getHost(): string {
+    return this.host
+  }
+  public getDialect(): Dialect {
+    return this.dialect
+  }
+}

@@ -1,0 +1,38 @@
+service: serverless-example
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+
+functions:
+  hello:
+    handler: handler.hello
+    events:
+      - http:
+          path: hello
+          method: get
+
+  register:
+    handler: handler.register
+    events:
+      - http:
+          path: user/register
+          method: post
+
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: user/login
+          method: post
+
+  send:
+    handler: handler.send
+    events:
+      - http:
+          path: user/send
+          method: get

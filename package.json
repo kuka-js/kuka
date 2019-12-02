@@ -1,0 +1,27 @@
+{
+  "main": "handler.js",
+  "dependencies": {
+    "@types/bcrypt": "^3.0.0",
+    "aws-sdk": "^2.581.0",
+    "bcrypt": "^3.0.7",
+    "debug": "^4.1.1",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.15",
+    "mysql2": "^2.0.1",
+    "reflect-metadata": "^0.1.13",
+    "sequelize": "^5.21.2",
+    "sqlite3": "^4.1.0",
+    "typeorm": "^0.2.20"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.36",
+    "@types/bluebird": "^3.5.29",
+    "@types/debug": "^4.1.5",
+    "@types/lodash": "4.14.146",
+    "@types/node": "^12.12.7",
+    "@types/validator": "^12.0.0",
+    "serverless-offline": "^5.12.0",
+    "serverless-plugin-typescript": "1.1.9",
+    "typescript": "^3.7.2"
+  }
+}
