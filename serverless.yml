@@ -36,3 +36,14 @@ functions:
       - http:
           path: user/send
           method: get
+
+  hidden:
+    handler: handler.hidden
+    events:
+      - http:
+          path: hidden/page
+          method: get
+          authorizer: auth
+
+  auth:
+    handler: controllers/auth.auth

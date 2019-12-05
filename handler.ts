@@ -2,6 +2,7 @@ import {APIGatewayEvent, Context, Handler, Callback} from "aws-lambda"
 import RegisterResponse from "./responses/RegisterResponse"
 import UserController from "./controllers/User"
 import LoginResponse from "./responses/LoginResponse"
+import HiddenResponse from "./responses/HiddenResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -41,4 +42,9 @@ export const send: Handler = async (event: APIGatewayEvent) => {
   } else {
     return new LoginResponse(400, 0, "Email send fail").response()
   }
+}
+
+export const hidden: Handler = async (event: APIGatewayEvent) => {
+  const username = event.requestContext.authorizer.principalId
+  return new HiddenResponse(200, 1, `Hello, ${username}`).response()
 }

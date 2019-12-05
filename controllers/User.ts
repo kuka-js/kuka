@@ -19,6 +19,7 @@ export default class UserController {
         if (err.name === "AlreadyHasActiveConnectionError") {
           connection = getConnectionManager().get("default")
         } else {
+          console.log(err)
           throw "Cant get active connection"
         }
       }
@@ -125,7 +126,8 @@ export default class UserController {
       if (compareSync(password, user.passwordHash)) {
         const token = sign(
           {
-            data: "foobar"
+            data: "foobar",
+            username
           },
           "secret",
           {expiresIn: "1h"}
