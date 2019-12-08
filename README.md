@@ -25,10 +25,9 @@ A Typescript jwt boilerplate using the Serverless framework
 - Login endpoint (returns token)
 - Hidden endpoint (endpoint to test that token verification works)
 - Local dev uses sqlite for DB. (no config needed)
-- Deployment works. But deployment instance bugs out (read to do)
+- Deployment works. Connects to the DB. Put your DB settings in the .env._stage_
 
 ## To do
 
-- Currently only local development works because there is some sort of a database issue with typeorm.
 - Reset password
 - Confirmation email
