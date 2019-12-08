@@ -1,4 +1,4 @@
-import User from "../Entities/User"
+import User from "../entities/User"
 import {createConnection, getConnectionManager, Connection} from "typeorm"
 import {hashSync, compareSync} from "bcrypt"
 import UserExistsException from "../exceptions/UserExistsException"
@@ -124,7 +124,7 @@ export default class UserController {
       }
 
       if (compareSync(password, user.passwordHash)) {
-        const token = sign(
+        const token: string = sign(
           {
             data: "foobar",
             username

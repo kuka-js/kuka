@@ -1,7 +1,9 @@
 {
   "main": "handler.js",
+  "scripts": {
+    "rebuild": "rm -rf node_modules/ && rm -rf .build/ && npm i -D"
+  },
   "dependencies": {
-    "@types/bcrypt": "^3.0.0",
     "aws-sdk": "^2.581.0",
     "bcrypt": "^3.0.7",
     "debug": "^4.1.1",
@@ -15,8 +17,10 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.36",
+    "@types/bcrypt": "^3.0.0",
     "@types/bluebird": "^3.5.29",
     "@types/debug": "^4.1.5",
+    "@types/jsonwebtoken": "^8.3.5",
     "@types/lodash": "4.14.146",
     "@types/node": "^12.12.7",
     "@types/validator": "^12.0.0",
