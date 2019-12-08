@@ -4,9 +4,9 @@ A Typescript jwt boilerplate using the Serverless framework
 
 ## Development
 
-- npm i -g serverless
-- npm i
-- sls offline start
+- `npm i -g serverless`
+- `npm i`
+- `sls offline start`
 - Start modifying your ts files. Hot reload AKA Every save will automatically restart the server :)
 
 ## Deployment
@@ -19,7 +19,7 @@ A Typescript jwt boilerplate using the Serverless framework
 * `sls deploy --env staging`
 * `sls deploy --env production`
 
-What works
+## What works
 
 - Register endpoint
 - Login endpoint (returns token)
@@ -27,7 +27,7 @@ What works
 - Local dev uses sqlite for DB. (no config needed)
 - Deployment works. But deployment instance bugs out (read to do)
 
-To do
+## To do
 
 - Currently only local development works because there is some sort of a database issue with typeorm.
 - Reset password
