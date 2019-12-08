@@ -1,28 +1,22 @@
 import User from "../entities/User"
-import {createConnection, getConnectionManager, Connection} from "typeorm"
+// import {createConnection, getConnectionManager, Connection} from "typeorm"
+import {Connection} from "typeorm"
+import ProjectConnection from "../service/connection"
 import {hashSync, compareSync} from "bcrypt"
 import UserExistsException from "../exceptions/UserExistsException"
-import {SES, AWSError} from "aws-sdk"
-import {SendEmailRequest, SendEmailResponse} from "aws-sdk/clients/ses"
+
 import {sign} from "jsonwebtoken"
+import VerificationController from "./verification"
+
 export default class UserController {
   async saveUser(
     username: string,
+    email: string,
     password: string
   ): Promise<saveUserResponse> {
     try {
-      let connection: Connection
-      try {
-        connection = await createConnection()
-      } catch (err) {
-        // If AlreadyHasActiveConnectionError occurs, return already existent connection
-        if (err.name === "AlreadyHasActiveConnectionError") {
-          connection = getConnectionManager().get("default")
-        } else {
-          console.log(err)
-          throw "Cant get active connection"
-        }
-      }
+      let connect = new ProjectConnection()
+      let connection: Connection = await connect.connect()
       if (connection) {
         if (await this.userExists(username)) {
           return {
@@ -38,9 +32,13 @@ export default class UserController {
         const user: User = new User()
         user.username = username
         user.passwordHash = hash
+        user.email = email
         user.emailVerified = false
         user.userType = "regular"
         const userResponse: User = await User.save(user)
+        const verificationController = new VerificationController()
+        await verificationController.createVerificationLink(email)
+
         return {
           ok: 1,
           data: {
@@ -74,17 +72,8 @@ export default class UserController {
   }
 
   async userExists(username: string): Promise<boolean> {
-    let connection: Connection
-    try {
-      connection = await createConnection()
-    } catch (err) {
-      // If AlreadyHasActiveConnectionError occurs, return already existent connection
-      if (err.name === "AlreadyHasActiveConnectionError") {
-        connection = getConnectionManager().get("default")
-      } else {
-        throw "Cant get active connection"
-      }
-    }
+    let connect = new ProjectConnection()
+    let connection: Connection = await connect.connect()
     if (connection) {
       const findUser: User = await User.findOne({username})
       console.log(findUser)
@@ -99,17 +88,8 @@ export default class UserController {
   }
 
   async loginUser(username: string, password: string) {
-    let connection: Connection
-    try {
-      connection = await createConnection()
-    } catch (err) {
-      // If AlreadyHasActiveConnectionError occurs, return already existent connection
-      if (err.name === "AlreadyHasActiveConnectionError") {
-        connection = getConnectionManager().get("default")
-      } else {
-        throw "Cant get active connection"
-      }
-    }
+    let connect = new ProjectConnection()
+    let connection: Connection = await connect.connect()
     if (connection) {
       const user: User = await User.findOne({username})
       if (!user) {
@@ -155,46 +135,18 @@ export default class UserController {
     }
   }
 
-  async sendVerificationMail(email: string): Promise<boolean> {
-    const ses = new SES({region: "eu-central-1"})
-
-    const sender: string = "nake89@gmail.com"
-    const recipient: string = "maiju.kirppu@gmail.com"
-    const subject: string = "The subject"
-    const charset: string = "UTF-8"
-    const body: string = "Well well above excellence"
-    const html: string = "Well well above excellence"
-
-    const params: SendEmailRequest = {
-      Source: sender,
-      Destination: {
-        ToAddresses: [recipient]
-      },
-      Message: {
-        Subject: {
-          Data: subject,
-          Charset: charset
-        },
-        Body: {
-          Text: {
-            Data: body,
-            Charset: charset
-          },
-          Html: {
-            Data: html,
-            Charset: charset
-          }
-        }
+  async emailToUserId(email: string): Promise<number> {
+    let connect = new ProjectConnection()
+    let connection: Connection = await connect.connect()
+    if (connection) {
+      const findUser: User = await User.findOne({email})
+      if (findUser) {
+        return findUser.id
+      } else {
+        throw "Cannot find user id. Email might not exist."
       }
-    }
-    let sesResult: SES.SendEmailResponse
-    try {
-      sesResult = await ses.sendEmail(params).promise()
-      console.log(sesResult)
-      return true
-    } catch (e) {
-      console.log(e)
-      return false
+    } else {
+      throw "Connection problem"
     }
   }
 }

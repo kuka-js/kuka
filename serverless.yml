@@ -13,10 +13,10 @@ provider:
 
 functions:
   hello:
-    handler: handler.hello
+    handler: handler.ping
     events:
       - http:
-          path: hello
+          path: ping
           method: get
 
   register:
@@ -33,12 +33,19 @@ functions:
           path: user/login
           method: post
 
-  send:
-    handler: handler.send
+  verify:
+    handler: handler.verify
     events:
       - http:
-          path: user/send
-          method: get
+          path: user/verify
+          method: post
+
+  reset:
+    handler: handler.reset
+    events:
+      - http:
+          path: user/reset
+          method: post
 
   hidden:
     handler: handler.hidden
