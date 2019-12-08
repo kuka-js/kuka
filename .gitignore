@@ -1,2 +1,9 @@
 .build
 node_modules
+database.sqlite
+.serverless
+.env.local
+.env.development
+.env.staging
+.env.production
+.tmp.*

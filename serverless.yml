@@ -1,12 +1,15 @@
-service: serverless-example
+service: sls-jwt-boilerplate
 
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
+  - serverless-dotenv-plugin
 
 provider:
   name: aws
   runtime: nodejs10.x
+  stage: ${env:STAGE}
+  region: ${env:REGION}
 
 functions:
   hello:
