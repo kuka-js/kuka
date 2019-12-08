@@ -8,6 +8,11 @@ import VerificationController from "./controllers/verification"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
+    try {
+      JSON.parse(event.body)
+    } catch (e) {
+      return new RegisterResponse(500, 0, "JSON invalid").response()
+    }
     const {username, email, password} = JSON.parse(event.body)
     const userController = new UserController()
     const {ok, data} = await userController.saveUser(username, email, password)
