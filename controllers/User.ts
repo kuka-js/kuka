@@ -103,6 +103,16 @@ export default class UserController {
         }
       }
 
+      if (!user.emailVerified) {
+        return {
+          ok: 0,
+          data: {
+            error: "Email not verified.",
+            username,
+            message: "Email not verified."
+          }
+        }
+      }
       if (compareSync(password, user.passwordHash)) {
         const token: string = sign(
           {

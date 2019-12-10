@@ -43,14 +43,12 @@ export const login: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const verify: Handler = async (event: APIGatewayEvent) => {
-  if (event.body != null) {
-    const {verificationId} = JSON.parse(event.body)
-    const verification = new VerificationController()
-    if (verification.markEmailVerified(verificationId)) {
-      return new BaseResponse(200, 1, `Email verified`).response()
-    } else {
-      return new BaseResponse(500, 0, `Unable to verify email`).response()
-    }
+  const {id} = event.pathParameters
+  const verification = new VerificationController()
+  if (verification.markEmailVerified(id)) {
+    return new BaseResponse(200, 1, `Email verified`).response()
+  } else {
+    return new BaseResponse(500, 0, `Unable to verify email`).response()
   }
 }
 

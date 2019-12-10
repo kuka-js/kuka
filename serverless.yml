@@ -37,8 +37,12 @@ functions:
     handler: handler.verify
     events:
       - http:
-          path: user/verify
-          method: post
+          path: user/verify/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
 
   reset:
     handler: handler.reset

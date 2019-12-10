@@ -69,13 +69,14 @@ export default class VerificationController {
     const VER_RECIPIENT = process.env.VER_RECIPIENT
     const VER_SENDER = process.env.VER_SENDER
     const STAGE = process.env.STAGE
+    const BASE_URL = process.env.BASE_URL
     const sender: string = VER_SENDER
     const recipient: string =
       STAGE == "development" || STAGE == "local" ? VER_RECIPIENT : email
     const subject: string = "The subject"
     const charset: string = "UTF-8"
-    const body: string = `Please verify your email address by clicking this link: ${verificationId}`
-    const html: string = `Please verify your email address by clicking this link: ${verificationId}`
+    const body: string = `Please verify your email address by clicking this link: https://${BASE_URL}/user/verify/${verificationId}`
+    const html: string = `Please verify your email address by clicking this link: https://${BASE_URL}/user/verify/${verificationId}`
 
     const params: SendEmailRequest = {
       Source: sender,
