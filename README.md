@@ -30,4 +30,3 @@ A Typescript jwt boilerplate using the Serverless framework
 ## To do
 
 - Reset password
-- Confirmation email
