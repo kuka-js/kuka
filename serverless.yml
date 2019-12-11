@@ -51,6 +51,13 @@ functions:
           path: user/reset
           method: post
 
+  password:
+    handler: handler.password
+    events:
+      - http:
+          path: user/password
+          method: post
+
   hidden:
     handler: handler.hidden
     events:

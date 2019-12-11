@@ -1,13 +1,13 @@
 import {v4 as uuid} from "uuid"
-import Verification from "../entities/Verification"
 import User from "../entities/User"
 import UserController from "./user"
 import {Connection} from "typeorm"
 import ProjectConnection from "../service/connection"
 import Email from "../service/email"
+import PasswordReset from "../entities/PasswordReset"
 
-export default class VerificationController {
-  async markEmailVerified(verifyLinkId: string): Promise<boolean> {
+export default class PasswordResetController {
+  async markPasswordResetDone(passwordResetId: string): Promise<boolean> {
     try {
       let connect = new ProjectConnection()
       let connection: Connection = await connect.connect()
@@ -17,12 +17,12 @@ export default class VerificationController {
     }
 
     try {
-      const verification: Verification = await Verification.findOne({
-        verifyLinkId
+      const passwordReset: PasswordReset = await PasswordReset.findOne({
+        passwordResetId
       })
-      verification.clicked = true
-      let {userId} = verification
-      await Verification.save(verification)
+      passwordReset.clicked = true
+      let {userId} = passwordReset
+      await PasswordReset.save(passwordReset)
       const user = await User.findOne({id: userId})
       user.emailVerified = true
       await User.save(user)
@@ -33,7 +33,7 @@ export default class VerificationController {
     }
   }
 
-  async createVerificationLink(email: string): Promise<boolean> {
+  async createPasswordResetLink(email: string): Promise<boolean> {
     try {
       let connect = new ProjectConnection()
       let connection: Connection = await connect.connect()
@@ -41,24 +41,24 @@ export default class VerificationController {
       console.log(e)
       return false
     }
-    const verificationId = uuid()
+    const passwordResetId = uuid()
 
-    let verification = new Verification()
+    let passwordReset = new PasswordReset()
     let userController = new UserController()
 
-    verification.userId = await userController.emailToUserId(email)
-    verification.verifyLinkId = verificationId
-    verification.email = email
-    verification.clicked = false
+    passwordReset.userId = await userController.emailToUserId(email)
+    passwordReset.passwordResetId = passwordResetId
+    passwordReset.email = email
+    passwordReset.clicked = false
     try {
-      await Verification.save(verification)
-      verification.save()
-      const BASE_URL = process.env.BASE_URL
+      await PasswordReset.save(passwordReset)
+      passwordReset.save()
+      const PW_RESET_LINK_PAGE = process.env.PW_RESET_LINK_PAGE
       const emailInstance = new Email()
       await emailInstance.sendEmail(
         email,
-        "Verify your email address",
-        `Please verify your email address by clicking this link: https://${BASE_URL}/user/verify/${verificationId}`
+        "Reset your password",
+        `You can reset your password from this link: ${PW_RESET_LINK_PAGE}/${passwordResetId}`
       )
       return true
     } catch (e) {

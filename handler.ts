@@ -5,6 +5,7 @@ import LoginResponse from "./responses/LoginResponse"
 import HiddenResponse from "./responses/HiddenResponse"
 import BaseResponse from "./responses/BaseResponse"
 import VerificationController from "./controllers/verification"
+import PasswordResetController from "./controllers/reset"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -45,7 +46,7 @@ export const login: Handler = async (event: APIGatewayEvent) => {
 export const verify: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const verification = new VerificationController()
-  if (verification.markEmailVerified(id)) {
+  if (await verification.markEmailVerified(id)) {
     return new BaseResponse(200, 1, `Email verified`).response()
   } else {
     return new BaseResponse(500, 0, `Unable to verify email`).response()
@@ -53,18 +54,44 @@ export const verify: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const reset: Handler = async (event: APIGatewayEvent) => {
-  // if (event.body != null) {
-  //   const {email} = JSON.parse(event.body)
-  //   const verificationController = new VerificationController()
-  //   verificationController.createVerificationLink(5, email)
-  //   // Create email verification link.
-  //   const userController = new UserController()
-  //   if (await userController.sendVerificationMail(email)) {
-  //     return new BaseResponse(200, 1, "Email send success").response()
-  //   } else {
-  //     return new BaseResponse(400, 0, "Email send fail").response()
-  //   }
-  // }
+  if (event.body != null) {
+    const {email} = JSON.parse(event.body)
+
+    const passwordReset = new PasswordResetController()
+
+    if (await passwordReset.createPasswordResetLink(email)) {
+      return new BaseResponse(200, 1, `Password Reset email sent`).response()
+    } else {
+      return new BaseResponse(
+        500,
+        0,
+        `Unable to send password reset email`
+      ).response()
+    }
+  }
+}
+
+export const password: Handler = async (event: APIGatewayEvent) => {
+  if (event.body != null) {
+    const {passwordResetId, password1, password2} = JSON.parse(event.body)
+
+    const user = new UserController()
+    const changePasswordResult = await user.changePassword(
+      passwordResetId,
+      password1,
+      password2
+    )
+
+    if (changePasswordResult.ok == 0) {
+      return new BaseResponse(
+        500,
+        0,
+        changePasswordResult.data.message
+      ).response()
+    }
+
+    return new BaseResponse(200, 1, `Password reset succesfully`).response()
+  }
 }
 
 export const hidden: Handler = async (event: APIGatewayEvent) => {
