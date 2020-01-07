@@ -5,7 +5,7 @@ A Typescript jwt boilerplate using the Serverless framework
 ## Development
 
 - `npm i -g serverless`
-- `npm i`
+- `npm i -D`
 - `cp .env.local.template .env.local`. Then modify .env.local with your details. Local dev only needs VER_SENDER and VER_RECIPIENT modified. Make sure you have your emails enabled here: https://aws.amazon.com/ses/getting-started/
 - `sls offline start --env local`
 - Start modifying your ts files. Hot reload AKA Every save will automatically restart the server :)
