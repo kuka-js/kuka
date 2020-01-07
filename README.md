@@ -23,8 +23,10 @@ A Typescript jwt boilerplate using the Serverless framework
 ## What works
 
 - Register endpoint
+- Email verification endpoint
 - Login endpoint (returns token)
 - Hidden endpoint (endpoint to test that token verification works)
+- Password reset
 - Local dev uses sqlite for DB. (no config needed)
 - Deployment works. Connects to the DB. Put your DB settings in the .env._stage_
 
