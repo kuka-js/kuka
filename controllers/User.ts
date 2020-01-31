@@ -81,7 +81,11 @@ export default class UserController {
         user.username = username
         user.passwordHash = hash
         user.email = email
-        user.emailVerified = false
+        if (process.env.AUTO_VERIFY_MAIL) {
+          user.emailVerified = true
+        } else {
+          user.emailVerified = false
+        }
         user.userType = "regular"
         const userResponse: User = await User.save(user)
         const verificationController = new VerificationController()

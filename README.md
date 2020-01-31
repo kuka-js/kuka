@@ -1,4 +1,4 @@
-# serverless_jwt_boilerplate - WORK IN PROGRESS
+# serverless_jwt_boilerplate
 
 A Typescript jwt boilerplate using the Serverless framework
 
@@ -6,9 +6,19 @@ A Typescript jwt boilerplate using the Serverless framework
 
 - `npm i -g serverless`
 - `npm i -D`
-- `cp .env.local.template .env.local`. Then modify .env.local with your details. Local dev only needs VER_SENDER and VER_RECIPIENT modified. Make sure you have your emails enabled here: https://aws.amazon.com/ses/getting-started/
+- `cp .env.local.template .env.local`. Then modify .env.local with your details.
 - `sls offline start --env local`
 - Start modifying your ts files. Hot reload AKA Every save will automatically restart the server :)
+
+### .env variables
+
+In local and maybe even in dev you might want to have email addresses to be auto verified.
+In that case, have this in your .env.local: `AUTO_VERIFY_MAIL=true`
+
+### Email
+
+If you want the email sending functionality to work, e.g. sending mail verification link, password reset link. Make sure your .denv has `VER_SENDER` and `VER_RECIPIENT` set. Also set up AWS SES here: https://aws.amazon.com/ses/getting-started/
+Adding general SMTP support is in the to-do list.
 
 ## Deployment
 
@@ -30,6 +40,6 @@ A Typescript jwt boilerplate using the Serverless framework
 - Local dev uses sqlite for DB. (no config needed)
 - Deployment works. Connects to the DB. Put your DB settings in the .env._stage_
 
-## To do
+## Status
 
-- Generate openapi.yaml
+This is still a working progress so the master branch is continually being updated.
