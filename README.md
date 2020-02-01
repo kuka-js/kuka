@@ -14,10 +14,11 @@ A Typescript jwt boilerplate using the Serverless framework
 
 In local and maybe even in dev you might want to have email addresses to be auto verified.
 In that case, have this in your .env.local: `AUTO_VERIFY_MAIL=true`
+To reset passwords in dev without email sending capability. You can put this in .env.local: `AUTO_SEND_PASSWORD_RESET_ID=true`. Then the reset endpoint will return the password reset ID immediately. DO NOT USE THIS IN ANYTHING BUT LOCAL OR DEV MODE! Otherwise anyone can reset your password through this endpoint. This is for testing purposes only.
 
 ### Email
 
-If you want the email sending functionality to work, e.g. sending mail verification link, password reset link. Make sure your .denv has `VER_SENDER` and `VER_RECIPIENT` set. Also set up AWS SES here: https://aws.amazon.com/ses/getting-started/
+If you want the email sending functionality to work, e.g. sending mail verification link, password reset link. Make sure your .env has `VER_SENDER` and `VER_RECIPIENT` set. Also set up AWS SES here: https://aws.amazon.com/ses/getting-started/
 Adding general SMTP support is in the to-do list.
 
 ## Deployment
