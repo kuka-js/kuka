@@ -6,6 +6,7 @@ import HiddenResponse from "./responses/HiddenResponse"
 import BaseResponse from "./responses/BaseResponse"
 import VerificationController from "./controllers/verification"
 import PasswordResetController from "./controllers/reset"
+import ResetResponse from "./responses/ResetResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -59,13 +60,34 @@ export const reset: Handler = async (event: APIGatewayEvent) => {
 
     const passwordReset = new PasswordResetController()
 
-    if (await passwordReset.createPasswordResetLink(email)) {
-      return new BaseResponse(200, 1, `Password Reset email sent`).response()
+    let passwordResetResult: string
+    if (process.env.AUTO_SEND_PASSWORD_RESET_ID) {
+      passwordResetResult = await passwordReset.createPasswordResetLink(
+        email,
+        true
+      )
     } else {
+      passwordResetResult = await passwordReset.createPasswordResetLink(
+        email,
+        false
+      )
+    }
+
+    if (passwordResetResult == "true") {
+      return new BaseResponse(200, 1, `Password Reset email sent`).response()
+    } else if (passwordResetResult == "false") {
       return new BaseResponse(
         500,
         0,
         `Unable to send password reset email`
+      ).response()
+    } else {
+      // If passwordResetResult return resetId
+      return new ResetResponse(
+        200,
+        1,
+        `Returning resetId`,
+        passwordResetResult
       ).response()
     }
   }

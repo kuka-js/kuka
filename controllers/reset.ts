@@ -33,13 +33,16 @@ export default class PasswordResetController {
     }
   }
 
-  async createPasswordResetLink(email: string): Promise<boolean> {
+  async createPasswordResetLink(
+    email: string,
+    return_id: boolean
+  ): Promise<string> {
     try {
       let connect = new ProjectConnection()
       let connection: Connection = await connect.connect()
     } catch (e) {
       console.log(e)
-      return false
+      return "false"
     }
     const passwordResetId = uuid()
 
@@ -54,16 +57,21 @@ export default class PasswordResetController {
       await PasswordReset.save(passwordReset)
       passwordReset.save()
       const PW_RESET_LINK_PAGE = process.env.PW_RESET_LINK_PAGE
-      const emailInstance = new Email()
-      await emailInstance.sendEmail(
-        email,
-        "Reset your password",
-        `You can reset your password from this link: ${PW_RESET_LINK_PAGE}/${passwordResetId}`
-      )
-      return true
+
+      if (return_id) {
+        return passwordResetId
+      } else {
+        const emailInstance = new Email()
+        await emailInstance.sendEmail(
+          email,
+          "Reset your password",
+          `You can reset your password from this link: ${PW_RESET_LINK_PAGE}/${passwordResetId}`
+        )
+        return "true"
+      }
     } catch (e) {
       console.log(e)
-      return false
+      return "false"
     }
   }
 }
