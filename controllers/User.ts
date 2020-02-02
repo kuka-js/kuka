@@ -14,8 +14,8 @@ export default class UserController {
     if (password1 != password2) {
       return {ok: 0, data: {message: "Passwords do not match!"}}
     }
-    let connect = new ProjectConnection()
-    let connection: Connection = await connect.connect()
+    // let connect = new ProjectConnection()
+    let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const passwordReset: PasswordReset = await PasswordReset.findOne({
         passwordResetId
@@ -63,8 +63,8 @@ export default class UserController {
     password: string
   ): Promise<saveUserResponse> {
     try {
-      let connect = new ProjectConnection()
-      let connection: Connection = await connect.connect()
+      // let connect = new ProjectConnection()
+      let connection: Connection = await ProjectConnection.connect()
       if (connection) {
         if (await this.userExists(username)) {
           return {
@@ -88,9 +88,8 @@ export default class UserController {
         }
         user.userType = "regular"
         const userResponse: User = await User.save(user)
-        const verificationController = new VerificationController()
-        await verificationController.createVerificationLink(email)
-
+        // const verificationController = new VerificationController()
+        await VerificationController.createVerificationLink(email)
         return {
           ok: 1,
           data: {
@@ -124,11 +123,10 @@ export default class UserController {
   }
 
   async userExists(username: string): Promise<boolean> {
-    let connect = new ProjectConnection()
-    let connection: Connection = await connect.connect()
+    // let connect = new ProjectConnection()
+    let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const findUser: User = await User.findOne({username})
-      console.log(findUser)
       if (findUser) {
         return true
       } else {
@@ -140,8 +138,8 @@ export default class UserController {
   }
 
   async loginUser(username: string, password: string) {
-    let connect = new ProjectConnection()
-    let connection: Connection = await connect.connect()
+    // let connect = new ProjectConnection()
+    let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const user: User = await User.findOne({username})
       if (!user) {
@@ -198,8 +196,8 @@ export default class UserController {
   }
 
   async emailToUserId(email: string): Promise<number> {
-    let connect = new ProjectConnection()
-    let connection: Connection = await connect.connect()
+    // let connect = new ProjectConnection()
+    let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const findUser: User = await User.findOne({email})
       if (findUser) {
