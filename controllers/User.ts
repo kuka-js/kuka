@@ -14,7 +14,6 @@ export default class UserController {
     if (password1 != password2) {
       return {ok: 0, data: {message: "Passwords do not match!"}}
     }
-    // let connect = new ProjectConnection()
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const passwordReset: PasswordReset = await PasswordReset.findOne({
@@ -88,7 +87,6 @@ export default class UserController {
         }
         user.userType = "regular"
         const userResponse: User = await User.save(user)
-        // const verificationController = new VerificationController()
         await VerificationController.createVerificationLink(email)
         return {
           ok: 1,
@@ -123,7 +121,6 @@ export default class UserController {
   }
 
   async userExists(username: string): Promise<boolean> {
-    // let connect = new ProjectConnection()
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const findUser: User = await User.findOne({username})
@@ -196,7 +193,6 @@ export default class UserController {
   }
 
   async emailToUserId(email: string): Promise<number> {
-    // let connect = new ProjectConnection()
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const findUser: User = await User.findOne({email})

@@ -9,7 +9,6 @@ import Email from "../service/email"
 export default class VerificationController {
   async markEmailVerified(verifyLinkId: string): Promise<boolean> {
     try {
-      // let connect = new ProjectConnection()
       let connection: Connection = await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
@@ -35,7 +34,6 @@ export default class VerificationController {
 
   public static async createVerificationLink(email: string): Promise<boolean> {
     try {
-      // let connect = new ProjectConnection()
       let connection: Connection = await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
