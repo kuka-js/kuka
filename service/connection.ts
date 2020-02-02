@@ -1,7 +1,7 @@
 import {createConnection, getConnectionManager, Connection} from "typeorm"
 
 export default class ProjectConnection {
-  async connect(): Promise<Connection> {
+  public static async connect(): Promise<Connection> {
     let connection: Connection
     try {
       connection = await createConnection()
@@ -10,7 +10,7 @@ export default class ProjectConnection {
       if (err.name === "AlreadyHasActiveConnectionError") {
         connection = getConnectionManager().get("default")
       } else {
-        console.log(err)
+        console.log(err.name)
         throw "Cant get active connection"
       }
     }
