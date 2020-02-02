@@ -1,9 +1,7 @@
 import User from "../entities/User"
-// import {createConnection, getConnectionManager, Connection} from "typeorm"
 import {Connection} from "typeorm"
 import ProjectConnection from "../service/connection"
 import {hashSync, compareSync} from "bcrypt"
-import UserExistsException from "../exceptions/UserExistsException"
 
 import {sign} from "jsonwebtoken"
 import VerificationController from "./verification"
@@ -62,7 +60,6 @@ export default class UserController {
     password: string
   ): Promise<saveUserResponse> {
     try {
-      // let connect = new ProjectConnection()
       let connection: Connection = await ProjectConnection.connect()
       if (connection) {
         if (await this.userExists(username)) {
@@ -135,7 +132,6 @@ export default class UserController {
   }
 
   async loginUser(username: string, password: string) {
-    // let connect = new ProjectConnection()
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const user: User = await User.findOne({username})
