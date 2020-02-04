@@ -9,8 +9,7 @@ import PasswordReset from "../entities/PasswordReset"
 export default class PasswordResetController {
   async markPasswordResetDone(passwordResetId: string): Promise<boolean> {
     try {
-      let connect = new ProjectConnection()
-      let connection: Connection = await connect.connect()
+      let connection: Connection = await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return false
@@ -38,8 +37,7 @@ export default class PasswordResetController {
     return_id: boolean
   ): Promise<string> {
     try {
-      let connect = new ProjectConnection()
-      let connection: Connection = await connect.connect()
+      let connection: Connection = await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return "false"
