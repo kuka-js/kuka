@@ -38,7 +38,6 @@ describe("user tests", () => {
     const password = "asdaAa12aaaa3!!"
     const saveUserResult = await uc.saveUser(username, username, password)
     const loginUserResult = await uc.loginUser(username, password)
-    console.log(loginUserResult)
     expect(saveUserResult.ok).toBe(1)
     expect(saveUserResult.data.userId).toBe(2)
     expect(saveUserResult.data.username).toBe(username)
