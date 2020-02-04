@@ -1,3 +1,5 @@
+![Travis CI](https://travis-ci.org/nake89/serverless-jwt-boilerplate.svg?branch=master)
+
 # serverless_jwt_boilerplate
 
 A Typescript jwt boilerplate using the Serverless framework
