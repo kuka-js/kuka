@@ -1,7 +1,7 @@
 import {v4 as uuid} from "uuid"
 import Verification from "../entities/Verification"
 import User from "../entities/User"
-import UserController from "./user"
+import UserController from "./User"
 import {Connection} from "typeorm"
 import ProjectConnection from "../service/connection"
 import Email from "../service/email"
