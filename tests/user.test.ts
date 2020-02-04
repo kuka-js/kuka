@@ -12,6 +12,9 @@ describe("user tests", () => {
       "nake89@gmail.com",
       "asdaAa12aaaa3!!"
     )
+
+    console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+    console.log(saveUserResult)
     expect(saveUserResult.ok).toBe(1)
     expect(saveUserResult.data.userId).toBe(1)
     expect(saveUserResult.data.username).toBe("nake89@gmail.com")
