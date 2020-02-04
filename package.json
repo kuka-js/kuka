@@ -4,7 +4,8 @@
   "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
   "main": "handler.js",
   "scripts": {
-    "rebuild": "rm -rf node_modules/ && rm -rf .build/ && npm i -D"
+    "rebuild": "rm -rf node_modules/ && rm -rf .build/ && npm i -D",
+    "test": "jest"
   },
   "dependencies": {
     "aws-sdk": "^2.598.0",
