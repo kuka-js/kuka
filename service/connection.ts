@@ -9,6 +9,7 @@ export default class ProjectConnection {
       // If AlreadyHasActiveConnectionError occurs, return already existent connection
       if (err.name === "AlreadyHasActiveConnectionError") {
         connection = getConnectionManager().get("default")
+        return connection
       } else {
         console.log(err.name)
         throw "Cant get active connection"
