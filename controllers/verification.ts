@@ -53,7 +53,10 @@ export default class VerificationController {
       verification.save()
       const BASE_URL = process.env.BASE_URL
       const emailInstance = new Email()
-      if (process.env.STAGE != "test") {
+      if (
+        process.env.STAGE != "test" ||
+        process.env.AUTO_VERIFY_MAIL != "true"
+      ) {
         await emailInstance.sendEmail(
           email,
           "Verify your email address",
