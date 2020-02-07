@@ -5,6 +5,19 @@ require("dotenv").config({path: process.cwd() + "/.env.testing"})
 describe("user tests", () => {
   beforeAll(() => {})
 
+  it("saveUser_password_too_weak", async () => {
+    const uc = new userController()
+    const saveUserResult = await uc.saveUser(
+      "nake89@gmail.com",
+      "nake89@gmail.com",
+      "asdaAa1"
+    )
+
+    expect(saveUserResult.ok).toBe(0)
+    expect(saveUserResult.data.username).toBe("nake89@gmail.com")
+    expect(saveUserResult.data.message).toBe("Password is too weak")
+  })
+
   it("saveUser_success", async () => {
     const uc = new userController()
     const saveUserResult = await uc.saveUser(
