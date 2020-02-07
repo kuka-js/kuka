@@ -2,13 +2,21 @@ import User from "../entities/User"
 import {Connection} from "typeorm"
 import ProjectConnection from "../service/connection"
 import {hashSync, compareSync} from "bcrypt"
-
 import {sign} from "jsonwebtoken"
 import VerificationController from "./verification"
 import PasswordReset from "../entities/PasswordReset"
 
 export default class UserController {
   async changePassword(passwordResetId, password1, password2) {
+    if (!this.passwordStrengthCheck(password1)) {
+      return {
+        ok: 0,
+        data: {
+          error: "Password is too weak",
+          message: "Password is too weak"
+        }
+      }
+    }
     if (password1 != password2) {
       return {ok: 0, data: {message: "Passwords do not match!"}}
     }
@@ -59,6 +67,16 @@ export default class UserController {
     email: string,
     password: string
   ): Promise<saveUserResponse> {
+    if (!this.passwordStrengthCheck(password)) {
+      return {
+        ok: 0,
+        data: {
+          error: "Password is too weak",
+          username,
+          message: "Password is too weak"
+        }
+      }
+    }
     try {
       let connection: Connection = await ProjectConnection.connect()
       if (connection) {
@@ -199,6 +217,17 @@ export default class UserController {
       }
     } else {
       throw "Connection problem"
+    }
+  }
+
+  private passwordStrengthCheck(password: string): boolean {
+    const strongRegex = new RegExp(
+      "^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*])(?=.{8,})"
+    )
+    if (strongRegex.test(password)) {
+      return true
+    } else {
+      return false
     }
   }
 }
