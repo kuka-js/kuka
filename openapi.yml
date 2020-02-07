@@ -1,0 +1,51 @@
+openapi: 3.0.1
+info:
+  title: serverless-jwt-boilerplate
+  description: "Serverless user management system using JWT"
+  license:
+    name: "License: MIT"
+    url: https://github.com/nake89/serverless-jwt-boilerplate/blob/master/LICENSE
+  version: 1.0.0
+externalDocs:
+  description: "Docs: README.md"
+  url: https://github.com/nake89/serverless-jwt-boilerplate/blob/master/README.md
+servers:
+  - url: http://localhost:3000/
+tags:
+  - name: user
+    description: Operations about user
+paths:
+  /user/register:
+    post:
+      tags:
+        - user
+      summary: Register new user
+      description: Creates a new user in the database.
+      operationId: registerUser
+      requestBody:
+        description: Created user object
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+        required: true
+      responses:
+        default:
+          description: successful operation
+          content: {}
+      x-codegen-request-body-name: body
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+  securitySchemes:
+    jwt_auth:
+      type: http
+      scheme: bearer
