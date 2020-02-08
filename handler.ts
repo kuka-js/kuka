@@ -17,7 +17,11 @@ export const register: Handler = async (event: APIGatewayEvent) => {
     }
     const {username, email, password} = JSON.parse(event.body)
     const userController = new UserController()
-    const {ok, data} = await userController.saveUser(username, email, password)
+    const {ok, data} = await userController.registerUser(
+      username,
+      email,
+      password
+    )
 
     if (ok == 0) {
       return new RegisterResponse(500, 0, data.message).response()

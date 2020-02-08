@@ -63,7 +63,7 @@ export default class UserController {
       }
     }
   }
-  async saveUser(
+  async registerUser(
     username: string,
     email: string,
     password: string
