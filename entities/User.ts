@@ -1,4 +1,11 @@
-import {Entity, PrimaryGeneratedColumn, Column, BaseEntity} from "typeorm"
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  BaseEntity,
+  OneToMany
+} from "typeorm"
+import Scope from "./Scope"
 
 @Entity()
 export default class User extends BaseEntity {
@@ -19,4 +26,10 @@ export default class User extends BaseEntity {
 
   @Column()
   userType: string
+
+  @OneToMany(
+    type => Scope,
+    scope => scope.user
+  )
+  scopes: Scope[]
 }
