@@ -180,7 +180,7 @@ export default class UserController {
             data: "foobar",
             username
           },
-          "secret",
+          process.env.JWT_SECRET,
           {expiresIn: "1h"}
         )
         return {
