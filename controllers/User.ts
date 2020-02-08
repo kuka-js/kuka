@@ -1,4 +1,5 @@
 import User from "../entities/User"
+import Scope from "../entities/Scope"
 import {Connection} from "typeorm"
 import ProjectConnection from "../service/connection"
 import {hashSync, compareSync} from "bcrypt"
@@ -101,6 +102,10 @@ export default class UserController {
           user.emailVerified = false
         }
         user.userType = "regular"
+        const scope: Scope = new Scope()
+        scope.scope = "default"
+        await Scope.save(scope)
+        user.scopes = [scope]
         const userResponse: User = await User.save(user)
         await VerificationController.createVerificationLink(email)
         return {
@@ -175,10 +180,15 @@ export default class UserController {
         }
       }
       if (compareSync(password, user.passwordHash)) {
+        const scopeArray: Scope[] = await Scope.find({user})
+        const scopes = scopeArray.map(item => {
+          return item.scope
+        })
+
         const token: string = sign(
           {
-            data: "foobar",
-            username
+            username,
+            scopes
           },
           process.env.JWT_SECRET,
           {expiresIn: "1h"}
