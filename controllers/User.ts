@@ -81,6 +81,14 @@ export default class UserController {
     try {
       let connection: Connection = await ProjectConnection.connect()
       if (connection) {
+        const findCount: [User[], number] = await User.findAndCount()
+        const userCount: number = findCount[1]
+        let firstUser: boolean
+        if (!userCount || userCount == 0) {
+          firstUser = true
+        } else {
+          firstUser = false
+        }
         if (await this.userExists(username)) {
           return {
             ok: 0,
@@ -102,10 +110,17 @@ export default class UserController {
           user.emailVerified = false
         }
         user.userType = "regular"
-        const scope: Scope = new Scope()
-        scope.scope = "default"
-        await Scope.save(scope)
-        user.scopes = [scope]
+        const defaultScope: Scope = new Scope()
+        defaultScope.scope = "default"
+        await Scope.save(defaultScope)
+        user.scopes = [defaultScope]
+        // Give the first user created root scope
+        if (firstUser) {
+          const rootScope: Scope = new Scope()
+          rootScope.scope = "root"
+          await Scope.save(rootScope)
+          user.scopes.push(rootScope)
+        }
         const userResponse: User = await User.save(user)
         await VerificationController.createVerificationLink(email)
         return {
