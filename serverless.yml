@@ -82,6 +82,18 @@ functions:
               paths:
                 id: true
 
+  removeScope:
+    handler: handler.removeScope
+    events:
+      - http:
+          path: user/scopes/{id}/{scopeName}
+          method: delete
+          authorizer: authRemoveScope
+          request:
+            parameters:
+              paths:
+                id: true
+                scopeName: true
   hidden:
     handler: handler.hidden
     events:
@@ -98,3 +110,6 @@ functions:
 
   authAddScope:
     handler: controllers/auth.addScope
+
+  authRemoveScope:
+    handler: controllers/auth.removeScope
