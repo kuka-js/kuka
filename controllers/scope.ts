@@ -30,8 +30,11 @@ export default class ScopeController {
       console.log(e)
       return false
     }
-    const user: User = await User.findOne({id: userId})
+    const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
     if (user) {
+      console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
+      console.log(user)
+      console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
       const newScope: Scope = new Scope()
       newScope.scope = scope
       await Scope.save(newScope)
