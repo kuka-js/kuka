@@ -33,15 +33,25 @@ Adding general SMTP support is in the to-do list.
 * `sls deploy --env staging`
 * `sls deploy --env production`
 
+## How it works
+
+First user created will be the root user. The root user has the rights to add and remove scopes.
+If you want to let other users list, add and remove scopes, give them the following scopes:
+
+- getScopes
+- addScope
+- removeScope
+
 ## What works
 
 - Register endpoint
 - Email verification endpoint
 - Login endpoint (returns token)
 - Hidden endpoint (endpoint to test that token verification works)
+- Scopes. Ability to list, add and remove scopes.
 - Password reset
 - Local dev uses sqlite for DB. (no config needed)
-- Deployment works. Connects to the DB. Put your DB settings in the .env._stage_
+- Deployment works. Connects to the DB. Put your DB settings in the .env._staging_
 
 ## Status
 
