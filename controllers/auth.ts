@@ -21,23 +21,38 @@ module.exports.auth = (event, context, callback) => {
   // check header or url parameters or post parameters for token
   const full_token = event.authorizationToken
   if (!full_token) return callback(null, "Unauthorized")
-
-  console.log(full_token)
-  console.log("debug 1")
   const token = full_token.split(" ")[1]
 
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    console.log("debug 2")
-    console.log(err)
     if (err) return callback(null, "Unauthorized")
-    console.log("debug 3")
-    console.log(decoded)
 
     // if everything is good, save to request for use in other routes
     return callback(
       null,
       generatePolicy(decoded.username, "Allow", event.methodArn)
     )
+  })
+}
+
+module.exports.getScopes = (event, context, callback) => {
+  // check header or url parameters or post parameters for token
+  const full_token = event.authorizationToken
+  if (!full_token) return callback(null, "Unauthorized")
+  const token = full_token.split(" ")[1]
+
+  // verifies secret and checks exp
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return callback(null, "Unauthorized")
+    const {scopes} = decoded
+    if (scopes.includes("root") || scopes.includes("getScopes")) {
+      // if everything is good, save to request for use in other routes
+      return callback(
+        null,
+        generatePolicy(decoded.username, "Allow", event.methodArn)
+      )
+    } else {
+      return callback(null, "Unauthorized")
+    }
   })
 }
