@@ -137,6 +137,18 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
+export const removeScope: Handler = async (event: APIGatewayEvent) => {
+  const {id, scopeName} = event.pathParameters
+  const body = JSON.parse(event.body)
+  const scopes = new ScopeController()
+  const scopeResponse = await scopes.removeScope(parseInt(id), scopeName)
+  if (scopeResponse) {
+    return new BaseResponse(200, 1, `Scope removed succesfully`).response()
+  } else {
+    return new BaseResponse(500, 0, "Failed to remove scope").response()
+  }
+}
+
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const scopes = new ScopeController()

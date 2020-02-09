@@ -32,13 +32,27 @@ export default class ScopeController {
     }
     const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
     if (user) {
-      console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
-      console.log(user)
-      console.log("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW")
       const newScope: Scope = new Scope()
       newScope.scope = scope
       await Scope.save(newScope)
       user.scopes.push(newScope)
+      await User.save(user)
+      return true
+    } else {
+      return false
+    }
+  }
+
+  async removeScope(userId: number, scope: string) {
+    try {
+      await ProjectConnection.connect()
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+    const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
+    if (user) {
+      user.scopes = user.scopes.filter(e => e.scope !== scope)
       await User.save(user)
       return true
     } else {
