@@ -122,7 +122,22 @@ export const password: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
-export const scopes: Handler = async (event: APIGatewayEvent) => {
+export const addScope: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  if (event.body != null) {
+    const body = JSON.parse(event.body)
+    const newScope = body.scope
+    const scopes = new ScopeController()
+    const scopeResponse = await scopes.addScope(parseInt(id), newScope)
+    if (scopeResponse) {
+      return new BaseResponse(200, 1, `Scope added succesfully`).response()
+    } else {
+      return new BaseResponse(500, 0, "Failed to add scope").response()
+    }
+  }
+}
+
+export const getScopes: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const scopes = new ScopeController()
   const scopeResponse = await scopes.getScopes(parseInt(id))
@@ -132,7 +147,6 @@ export const scopes: Handler = async (event: APIGatewayEvent) => {
     return new BaseResponse(500, 0, "Something went wrong").response()
   }
 }
-
 export const hidden: Handler = async (event: APIGatewayEvent) => {
   const username = event.requestContext.authorizer.principalId
   return new HiddenResponse(200, 1, `Hello, ${username}`).response()

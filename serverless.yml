@@ -58,13 +58,25 @@ functions:
           path: user/password
           method: post
 
-  scopes:
-    handler: handler.scopes
+  getScopes:
+    handler: handler.getScopes
     events:
       - http:
           path: user/scopes/{id}
           method: get
-          authorizer: getScopes
+          authorizer: authGetScopes
+          request:
+            parameters:
+              paths:
+                id: true
+
+  addScope:
+    handler: handler.addScope
+    events:
+      - http:
+          path: user/scopes/{id}
+          method: post
+          authorizer: authAddScope
           request:
             parameters:
               paths:
@@ -81,5 +93,8 @@ functions:
   auth:
     handler: controllers/auth.auth
 
-  getScopes:
+  authGetScopes:
     handler: controllers/auth.getScopes
+
+  authAddScope:
+    handler: controllers/auth.addScope
