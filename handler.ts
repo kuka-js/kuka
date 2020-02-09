@@ -129,10 +129,10 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
     const newScope = body.scope
     const scopes = new ScopeController()
     const scopeResponse = await scopes.addScope(parseInt(id), newScope)
-    if (Array.isArray(scopeResponse)) {
-      return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
+    if (scopeResponse) {
+      return new BaseResponse(200, 1, `Scope added succesfully`).response()
     } else {
-      return new BaseResponse(500, 0, "Something went wrong").response()
+      return new BaseResponse(500, 0, "Failed to add scope").response()
     }
   }
 }
