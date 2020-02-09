@@ -122,7 +122,7 @@ export const password: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
-export const scopes: Handler = async (event: APIGatewayEvent) => {
+export const getScopes: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const scopes = new ScopeController()
   const scopeResponse = await scopes.getScopes(parseInt(id))
