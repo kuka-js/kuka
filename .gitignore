@@ -8,3 +8,6 @@ test.sqlite
 .env.staging
 .env.production
 .tmp.*
+.DS_Store
+.AppleDouble
+.LSOverride
