@@ -58,6 +58,17 @@ functions:
           path: user/password
           method: post
 
+  scopes:
+    handler: handler.scopes
+    events:
+      - http:
+          path: user/scopes/{id}
+          method: get
+          request:
+            parameters:
+              paths:
+                id: true
+
   hidden:
     handler: handler.hidden
     events:

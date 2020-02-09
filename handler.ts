@@ -6,7 +6,9 @@ import HiddenResponse from "./responses/HiddenResponse"
 import BaseResponse from "./responses/BaseResponse"
 import VerificationController from "./controllers/verification"
 import PasswordResetController from "./controllers/reset"
+import ScopeController from "./controllers/scope"
 import ResetResponse from "./responses/ResetResponse"
+import ScopeResponse from "./responses/ScopeResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -117,6 +119,17 @@ export const password: Handler = async (event: APIGatewayEvent) => {
     }
 
     return new BaseResponse(200, 1, `Password reset succesfully`).response()
+  }
+}
+
+export const scopes: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  const scopes = new ScopeController()
+  const scopeResponse = await scopes.getScopes(parseInt(id))
+  if (Array.isArray(scopeResponse)) {
+    return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
+  } else {
+    return new BaseResponse(500, 0, "Something went wrong").response()
   }
 }
 
