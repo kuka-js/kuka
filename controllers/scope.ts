@@ -6,7 +6,7 @@ import ProjectConnection from "../service/connection"
 export default class ScopeController {
   async getScopes(userId: number): Promise<string[] | boolean> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return false
@@ -18,6 +18,26 @@ export default class ScopeController {
         return item.scope
       })
       return scopes
+    } else {
+      return false
+    }
+  }
+
+  async addScope(userId: number, scope: string): Promise<boolean> {
+    try {
+      await ProjectConnection.connect()
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+    const user: User = await User.findOne({id: userId})
+    if (user) {
+      const newScope: Scope = new Scope()
+      newScope.scope = scope
+      await Scope.save(newScope)
+      user.scopes.push(newScope)
+      await User.save(user)
+      return true
     } else {
       return false
     }
