@@ -38,7 +38,7 @@ functions:
     events:
       - http:
           path: user/verify/{id}
-          method: get
+          method: post
           request:
             parameters:
               paths:
@@ -56,7 +56,7 @@ functions:
     events:
       - http:
           path: user/password
-          method: post
+          method: put
 
   hidden:
     handler: handler.hidden
