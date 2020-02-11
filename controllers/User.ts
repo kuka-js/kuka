@@ -6,6 +6,7 @@ import {hashSync, compareSync} from "bcrypt"
 import {sign} from "jsonwebtoken"
 import VerificationController from "./verification"
 import PasswordReset from "../entities/PasswordReset"
+import {OurMailResponse} from "../service/email"
 
 export default class UserController {
   async changePassword(passwordResetId, password1, password2) {
@@ -122,13 +123,22 @@ export default class UserController {
           user.scopes.push(rootScope)
         }
         const userResponse: User = await User.save(user)
-        await VerificationController.createVerificationLink(email)
-        return {
-          ok: 1,
-          data: {
-            userId: userResponse.id,
-            username,
-            message: "User successfully created!"
+        const verificationLinkResult: OurMailResponse = await VerificationController.createVerificationLink(
+          email
+        )
+        if (verificationLinkResult.ok == 0) {
+          return {
+            ok: 0,
+            data: {username, message: "createVerificationLink failed"}
+          }
+        } else {
+          return {
+            ok: 1,
+            data: {
+              userId: userResponse.id,
+              username,
+              message: "User successfully created!"
+            }
           }
         }
       } else {
