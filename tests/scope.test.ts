@@ -41,4 +41,30 @@ describe("scope tests", () => {
       throw "ScopeResult returned a boolean"
     }
   })
+
+  it("addScope_adds_scope", async () => {
+    const sc = new ScopeController()
+    const scopeResult = await sc.addScope(2, "test_scope")
+    const scopeResultList = await sc.getScopes(2)
+
+    expect(scopeResult).toBeTruthy
+    if (Array.isArray(scopeResultList)) {
+      expect(scopeResultList.includes("test_scope")).toBe(true)
+    } else {
+      throw "ScopeResultList returned a boolean"
+    }
+  })
+
+  it("removeScope_removes_scope", async () => {
+    const sc = new ScopeController()
+    const scopeResult = await sc.removeScope(2, "test_scope")
+    const scopeResultList = await sc.getScopes(2)
+
+    expect(scopeResult).toBeTruthy
+    if (Array.isArray(scopeResultList)) {
+      expect(scopeResultList.includes("test_scope")).toBe(false)
+    } else {
+      throw "ScopeResultList returned a boolean"
+    }
+  })
 })
