@@ -63,7 +63,8 @@ export default class PasswordResetController {
         await emailInstance.sendEmail(
           email,
           "Reset your password",
-          `You can reset your password from this link: ${PW_RESET_LINK_PAGE}/${passwordResetId}`
+          `You can reset your password from this link: ${PW_RESET_LINK_PAGE}/${passwordResetId}`,
+          process.env.EMAIL_SERVICE
         )
         return "true"
       }

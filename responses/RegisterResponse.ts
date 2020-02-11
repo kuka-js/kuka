@@ -5,17 +5,14 @@ export default class RegisterResponse extends BaseResponse {
   ok: number
   message: string
   userId?: number
-  token?: string
 
   constructor(
     statusCode: number,
     ok: number,
     message: string,
-    userId?: number,
-    token?: string
+    userId?: number
   ) {
     super(statusCode, ok, message)
-    this.token = token
     this.userId = userId
   }
 
@@ -27,8 +24,7 @@ export default class RegisterResponse extends BaseResponse {
           ok: this.ok,
           data: {
             message: this.message,
-            userId: this.userId,
-            token: this.token
+            userId: this.userId
           }
         },
         null,
