@@ -32,6 +32,11 @@ export default class ScopeController {
     }
     const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
     if (user) {
+      for (let item of user.scopes) {
+        if (item.scope == scope) {
+          return false
+        }
+      }
       const newScope: Scope = new Scope()
       newScope.scope = scope
       await Scope.save(newScope)
