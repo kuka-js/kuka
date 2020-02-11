@@ -20,8 +20,16 @@ To reset passwords in dev without email sending capability. You can put this in 
 
 ### Email
 
-If you want the email sending functionality to work, e.g. sending mail verification link, password reset link. Make sure your .env has `VER_SENDER` and `VER_RECIPIENT` set. Also set up AWS SES here: https://aws.amazon.com/ses/getting-started/
-Adding general SMTP support is in the to-do list.
+Verifying email and password resetting needs email (unless you turn them off, see above). Make sure your .env has `VER_SENDER` and `VER_RECIPIENT` set. Below info on how to configurate them:
+
+#### SMTP
+
+You can enter your own SMTP credentials in the .env files.
+If you're developing and dont have a SMTP server yet, you can use a service like https://www.smtpbucket.com/ . Just make sure you have MAIL_NO_AUTH set to true and MAIL_PORT to what the service asks for.
+
+#### AWS SES
+
+To use AWS Simple Email Service read this: https://docs.aws.amazon.com/ses/latest/DeveloperGuide/quick-start.html
 
 ## Deployment
 
