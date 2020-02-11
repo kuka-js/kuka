@@ -4,7 +4,7 @@ import User from "../entities/User"
 import UserController from "./User"
 import {Connection} from "typeorm"
 import ProjectConnection from "../service/connection"
-import Email from "../service/email"
+import Email, {OurMailResponse} from "../service/email"
 
 export default class VerificationController {
   async markEmailVerified(verifyLinkId: string): Promise<boolean> {
@@ -32,12 +32,14 @@ export default class VerificationController {
     }
   }
 
-  public static async createVerificationLink(email: string): Promise<boolean> {
+  public static async createVerificationLink(
+    email: string
+  ): Promise<OurMailResponse> {
     try {
       let connection: Connection = await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
-      return false
+      return {ok: 0, error: "createVerificationLink db connection problem"}
     }
     const verificationId = uuid()
 
@@ -50,25 +52,29 @@ export default class VerificationController {
     verification.clicked = false
     try {
       await Verification.save(verification)
-      verification.save()
       const BASE_URL = process.env.BASE_URL
       if (
         process.env.STAGE == "test" ||
         process.env.AUTO_VERIFY_MAIL == "true"
       ) {
-        return true
+        return {ok: 1}
       } else {
         const emailInstance = new Email()
-        await emailInstance.sendEmail(
+        return await emailInstance.sendEmail(
           email,
           "Verify your email address",
-          `Please verify your email address by clicking this link: https://${BASE_URL}/user/verify/${verificationId}`
+          `Please verify your email address by clicking this link: ${process.env.VERIFICATION_LINK_URL}${verificationId}`,
+          process.env.EMAIL_SERVICE
         )
       }
-      return true
     } catch (e) {
       console.log(e)
-      return false
+
+      return {
+        ok: 0,
+        error:
+          "Problem saving verification id or sending verification email mail"
+      }
     }
   }
 }
