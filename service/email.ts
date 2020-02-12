@@ -19,7 +19,10 @@ export default class Email {
     const VER_RECIPIENT = process.env.VER_RECIPIENT
     const VER_SENDER = process.env.VER_SENDER
     const recipient: string =
-      STAGE == "development" || STAGE == "local" ? VER_RECIPIENT : email
+      STAGE == "development" || STAGE == "test" || STAGE == "local"
+        ? VER_RECIPIENT
+        : email
+
     if (emailService.toLowerCase() == "aws") {
       const ses = new SES({region: "eu-central-1"})
       const sender: string = VER_SENDER
