@@ -21,7 +21,7 @@ To reset passwords in dev without email sending capability, you can put this in 
 ### Email
 
 Verifying email and password resetting needs email (unless you turn them off, see above). Make sure your .env has `VER_SENDER` and `VER_RECIPIENT` set. `VER_SENDER` should be the email address
-from which the verification link is sent, and `VER_RECIPIENT` is the email the link is sent to. `VER_RECIPIENT` is needed only in devevelopment, local, and testing stages.
+from which the verification link is sent, and `VER_RECIPIENT` is the email the link is sent to. `VER_RECIPIENT` is needed only in development, local, and testing stages.
 
 #### SMTP
 
