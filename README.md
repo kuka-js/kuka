@@ -10,22 +10,23 @@ A Typescript jwt boilerplate using the Serverless framework
 - `npm i -D`
 - `cp .env.local.template .env.local`. Then modify .env.local with your details.
 - `sls offline start --env local`
-- Start modifying your ts files. Hot reload AKA Every save will automatically restart the server :)
+- Start modifying your ts files. Hot reload, ie. every save will automatically restart the server :)
 
 ### .env variables
 
-In local and maybe even in dev you might want to have email addresses to be auto verified.
+In local and maybe even in dev, you might want to have email addresses to be auto-verified.
 In that case, have this in your .env.local: `AUTO_VERIFY_MAIL=true`
-To reset passwords in dev without email sending capability. You can put this in .env.local: `AUTO_SEND_PASSWORD_RESET_ID=true`. Then the reset endpoint will return the password reset ID immediately. DO NOT USE THIS IN ANYTHING BUT LOCAL OR DEV MODE! Otherwise anyone can reset your password through this endpoint. This is for testing purposes only.
+To reset passwords in dev without email sending capability, you can put this in .env.local: `AUTO_SEND_PASSWORD_RESET_ID=true`. Then the reset endpoint will return the password reset ID immediately. DO NOT USE THIS IN ANYTHING BUT LOCAL OR DEV MODE! Otherwise anyone can reset your password through this endpoint. This is for testing purposes only.
 
 ### Email
 
-Verifying email and password resetting needs email (unless you turn them off, see above). Make sure your .env has `VER_SENDER` and `VER_RECIPIENT` set. Below info on how to configurate them:
+Verifying email and password resetting needs email (unless you turn them off, see above). Make sure your .env has `VER_SENDER` and `VER_RECIPIENT` set. `VER_SENDER` should be the email address
+from which the verification link is sent, and `VER_RECIPIENT` is the email the link is sent to. `VER_RECIPIENT` is needed only in devevelopment, local, and testing stages.
 
 #### SMTP
 
 You can enter your own SMTP credentials in the .env files.
-If you're developing and dont have a SMTP server yet, you can use a service like https://www.smtpbucket.com/ . Just make sure you have MAIL_NO_AUTH set to true and MAIL_PORT to what the service asks for.
+If you're developing and dont have a SMTP server yet, you can use a service like https://www.smtpbucket.com/ . Just make sure you have `MAIL_NO_AUTH` set to true and `MAIL_PORT` to what the service asks for.
 
 #### AWS SES
 
@@ -34,8 +35,8 @@ To use AWS Simple Email Service read this: https://docs.aws.amazon.com/ses/lates
 ## Deployment
 
 - Setup [AWS credentials](https://docs.aws.amazon.com/sdk-for-java/v1/developer-guide/setup-credentials.html)
-- Run `cp .env.development.template .env.development`. Then modify .env.development with your the correct DB credentials and AWS region. Do the same to the other env template files.
-- Then depending on where you want to deploy. Run
+- Run `cp .env.development.template .env.development`. Then modify .env.development with your DB credentials and AWS region. Do the same to the other .env template files.
+- Then, depending on where you want to deploy, run
 
 * `sls deploy --env development`
 * `sls deploy --env staging`
@@ -43,12 +44,13 @@ To use AWS Simple Email Service read this: https://docs.aws.amazon.com/ses/lates
 
 ## How it works
 
-First user created will be the root user. The root user has the rights to add and remove scopes.
-If you want to let other users list, add and remove scopes, give them the following scopes:
+The first user created will be the root user. The root user has the rights to add and remove scopes. If you want to let other users list, add, or remove scopes, give them the following scopes:
 
 - getScopes
 - addScope
 - removeScope
+
+Also read the openapi.yml for more information about the endpoints.
 
 ## What works
 
@@ -56,11 +58,11 @@ If you want to let other users list, add and remove scopes, give them the follow
 - Email verification endpoint
 - Login endpoint (returns token)
 - Hidden endpoint (endpoint to test that token verification works)
-- Scopes. Ability to list, add and remove scopes.
+- Scopes: ability to list, add and remove scopes
 - Password reset
-- Local dev uses sqlite for DB. (no config needed)
+- Local dev uses sqlite for DB (no config needed)
 - Deployment works. Connects to the DB. Put your DB settings in the .env._staging_
 
 ## Status
 
-This is still a working progress so the master branch is continually being updated.
+This boilerplate is usable as a user authentication service.
