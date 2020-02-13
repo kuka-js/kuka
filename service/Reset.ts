@@ -1,15 +1,15 @@
 import {v4 as uuid} from "uuid"
 import User from "../entities/User"
-import UserController from "./user"
+import UserService from "./User"
 import {Connection} from "typeorm"
-import ProjectConnection from "../service/connection"
-import Email from "../service/email"
+import ProjectConnection from "./Connection"
+import Email from "./Email"
 import PasswordReset from "../entities/PasswordReset"
 
-export default class PasswordResetController {
+export default class PasswordResetService {
   async markPasswordResetDone(passwordResetId: string): Promise<boolean> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return false
@@ -37,7 +37,7 @@ export default class PasswordResetController {
     return_id: boolean
   ): Promise<string> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return "false"
@@ -45,9 +45,9 @@ export default class PasswordResetController {
     const passwordResetId = uuid()
 
     let passwordReset = new PasswordReset()
-    let userController = new UserController()
+    let userService = new UserService()
 
-    passwordReset.userId = await userController.emailToUserId(email)
+    passwordReset.userId = await userService.emailToUserId(email)
     passwordReset.passwordResetId = passwordResetId
     passwordReset.email = email
     passwordReset.clicked = false
