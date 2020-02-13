@@ -103,13 +103,13 @@ functions:
           authorizer: auth
 
   auth:
-    handler: controllers/auth.auth
+    handler: service/Auth.auth
 
   authGetScopes:
-    handler: controllers/auth.getScopes
+    handler: service/Auth.getScopes
 
   authAddScope:
-    handler: controllers/auth.addScope
+    handler: service/Auth.addScope
 
   authRemoveScope:
-    handler: controllers/auth.removeScope
+    handler: service/Auth.removeScope

@@ -1,12 +1,12 @@
 import {v4 as uuid} from "uuid"
 import Verification from "../entities/Verification"
 import User from "../entities/User"
-import UserController from "./User"
+import UserService from "./User"
 import {Connection} from "typeorm"
-import ProjectConnection from "../service/connection"
-import Email, {OurMailResponse} from "../service/email"
+import ProjectConnection from "./Connection"
+import Email, {OurMailResponse} from "./Email"
 
-export default class VerificationController {
+export default class VerificationService {
   async markEmailVerified(verifyLinkId: string): Promise<boolean> {
     try {
       let connection: Connection = await ProjectConnection.connect()
@@ -44,7 +44,7 @@ export default class VerificationController {
     const verificationId = uuid()
 
     let verification = new Verification()
-    let userController = new UserController()
+    let userController = new UserService()
 
     verification.userId = await userController.emailToUserId(email)
     verification.verifyLinkId = verificationId

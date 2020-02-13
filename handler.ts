@@ -1,12 +1,12 @@
 import {APIGatewayEvent, Context, Handler, Callback} from "aws-lambda"
 import RegisterResponse from "./responses/RegisterResponse"
-import UserController from "./controllers/user"
+import UserService from "./service/User"
 import LoginResponse from "./responses/LoginResponse"
 import HiddenResponse from "./responses/HiddenResponse"
 import BaseResponse from "./responses/BaseResponse"
-import VerificationController from "./controllers/verification"
-import PasswordResetController from "./controllers/reset"
-import ScopeController from "./controllers/scope"
+import VerificationService from "./service/Verification"
+import PasswordResetService from "./service/Reset"
+import ScopeService from "./service/Scope"
 import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
 
@@ -18,7 +18,7 @@ export const register: Handler = async (event: APIGatewayEvent) => {
       return new RegisterResponse(500, 0, "JSON invalid").response()
     }
     const {username, email, password} = JSON.parse(event.body)
-    const userController = new UserController()
+    const userController = new UserService()
     const {ok, data} = await userController.registerUser(
       username,
       email,
@@ -38,7 +38,7 @@ export const register: Handler = async (event: APIGatewayEvent) => {
 export const login: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
     const {username, password} = JSON.parse(event.body)
-    const userController = new UserController()
+    const userController = new UserService()
     const {ok, data} = await userController.loginUser(username, password)
     if (ok == 0) {
       return new LoginResponse(400, 0, data.message).response()
@@ -52,7 +52,7 @@ export const login: Handler = async (event: APIGatewayEvent) => {
 
 export const verify: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
-  const verification = new VerificationController()
+  const verification = new VerificationService()
   if (await verification.markEmailVerified(id)) {
     return new BaseResponse(200, 1, `Email verified`).response()
   } else {
@@ -64,7 +64,7 @@ export const reset: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
     const {email} = JSON.parse(event.body)
 
-    const passwordReset = new PasswordResetController()
+    const passwordReset = new PasswordResetService()
 
     let passwordResetResult: string
     if (process.env.AUTO_SEND_PASSWORD_RESET_ID) {
@@ -103,7 +103,7 @@ export const password: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
     const {passwordResetId, password1, password2} = JSON.parse(event.body)
 
-    const user = new UserController()
+    const user = new UserService()
     const changePasswordResult = await user.changePassword(
       passwordResetId,
       password1,
@@ -127,7 +127,7 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
     const body = JSON.parse(event.body)
     const newScope = body.scope
-    const scopes = new ScopeController()
+    const scopes = new ScopeService()
     const scopeResponse = await scopes.addScope(parseInt(id), newScope)
     if (scopeResponse) {
       return new BaseResponse(200, 1, `Scope added succesfully`).response()
@@ -140,7 +140,7 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
 export const removeScope: Handler = async (event: APIGatewayEvent) => {
   const {id, scopeName} = event.pathParameters
   const body = JSON.parse(event.body)
-  const scopes = new ScopeController()
+  const scopes = new ScopeService()
   const scopeResponse = await scopes.removeScope(parseInt(id), scopeName)
   if (scopeResponse) {
     return new BaseResponse(200, 1, `Scope removed succesfully`).response()
@@ -151,7 +151,7 @@ export const removeScope: Handler = async (event: APIGatewayEvent) => {
 
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
-  const scopes = new ScopeController()
+  const scopes = new ScopeService()
   const scopeResponse = await scopes.getScopes(parseInt(id))
   if (Array.isArray(scopeResponse)) {
     return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
