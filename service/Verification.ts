@@ -1,15 +1,14 @@
 import {v4 as uuid} from "uuid"
 import Verification from "../entities/Verification"
 import User from "../entities/User"
-import UserController from "./User"
-import {Connection} from "typeorm"
-import ProjectConnection from "../service/connection"
-import Email, {OurMailResponse} from "../service/email"
+import UserService from "./User"
+import ProjectConnection from "./Connection"
+import Email, {OurMailResponse} from "./Email"
 
-export default class VerificationController {
+export default class VerificationService {
   async markEmailVerified(verifyLinkId: string): Promise<boolean> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return false
@@ -36,7 +35,7 @@ export default class VerificationController {
     email: string
   ): Promise<OurMailResponse> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return {ok: 0, error: "createVerificationLink db connection problem"}
@@ -44,15 +43,14 @@ export default class VerificationController {
     const verificationId = uuid()
 
     let verification = new Verification()
-    let userController = new UserController()
+    let userService = new UserService()
 
-    verification.userId = await userController.emailToUserId(email)
+    verification.userId = await userService.emailToUserId(email)
     verification.verifyLinkId = verificationId
     verification.email = email
     verification.clicked = false
     try {
       await Verification.save(verification)
-      const BASE_URL = process.env.BASE_URL
       if (
         process.env.STAGE == "test" ||
         process.env.AUTO_VERIFY_MAIL == "true"

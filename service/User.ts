@@ -1,14 +1,14 @@
 import User from "../entities/User"
 import Scope from "../entities/Scope"
 import {Connection} from "typeorm"
-import ProjectConnection from "../service/connection"
+import ProjectConnection from "./Connection"
 import {hashSync, compareSync} from "bcrypt"
 import {sign} from "jsonwebtoken"
-import VerificationController from "./verification"
+import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
-import {OurMailResponse} from "../service/email"
+import {OurMailResponse} from "./Email"
 
-export default class UserController {
+export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
     if (!this.passwordStrengthCheck(password1)) {
       return {
@@ -123,7 +123,7 @@ export default class UserController {
           user.scopes.push(rootScope)
         }
         const userResponse: User = await User.save(user)
-        const verificationLinkResult: OurMailResponse = await VerificationController.createVerificationLink(
+        const verificationLinkResult: OurMailResponse = await VerificationService.createVerificationLink(
           email
         )
         if (verificationLinkResult.ok == 0) {
