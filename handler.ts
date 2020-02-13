@@ -18,12 +18,8 @@ export const register: Handler = async (event: APIGatewayEvent) => {
       return new RegisterResponse(500, 0, "JSON invalid").response()
     }
     const {username, email, password} = JSON.parse(event.body)
-    const userController = new UserService()
-    const {ok, data} = await userController.registerUser(
-      username,
-      email,
-      password
-    )
+    const userService = new UserService()
+    const {ok, data} = await userService.registerUser(username, email, password)
 
     if (ok == 0) {
       return new RegisterResponse(500, 0, data.message).response()
@@ -38,8 +34,8 @@ export const register: Handler = async (event: APIGatewayEvent) => {
 export const login: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
     const {username, password} = JSON.parse(event.body)
-    const userController = new UserService()
-    const {ok, data} = await userController.loginUser(username, password)
+    const userService = new UserService()
+    const {ok, data} = await userService.loginUser(username, password)
     if (ok == 0) {
       return new LoginResponse(400, 0, data.message).response()
     } else {

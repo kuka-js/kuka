@@ -9,7 +9,7 @@ import PasswordReset from "../entities/PasswordReset"
 export default class PasswordResetService {
   async markPasswordResetDone(passwordResetId: string): Promise<boolean> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return false
@@ -37,7 +37,7 @@ export default class PasswordResetService {
     return_id: boolean
   ): Promise<string> {
     try {
-      let connection: Connection = await ProjectConnection.connect()
+      await ProjectConnection.connect()
     } catch (e) {
       console.log(e)
       return "false"
@@ -45,9 +45,9 @@ export default class PasswordResetService {
     const passwordResetId = uuid()
 
     let passwordReset = new PasswordReset()
-    let userController = new UserService()
+    let userService = new UserService()
 
-    passwordReset.userId = await userController.emailToUserId(email)
+    passwordReset.userId = await userService.emailToUserId(email)
     passwordReset.passwordResetId = passwordResetId
     passwordReset.email = email
     passwordReset.clicked = false
