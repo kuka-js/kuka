@@ -1,12 +1,12 @@
 require("reflect-metadata")
-import ScopeController from "../controllers/scope"
-import userController from "../controllers/User"
+import ScopeService from "../service/Scope"
+import UserService from "../service/User"
 
 require("dotenv").config({path: process.cwd() + "/.env.testing"})
 
 describe("scope tests", () => {
   beforeAll(async () => {
-    const uc = new userController()
+    const uc = new UserService()
     await uc.registerUser(
       "nake89@gmail.com",
       "nake89@gmail.com",
@@ -21,7 +21,7 @@ describe("scope tests", () => {
   })
 
   it("getScopes_has_root", async () => {
-    const sc = new ScopeController()
+    const sc = new ScopeService()
     const scopeResult = await sc.getScopes(1)
 
     if (Array.isArray(scopeResult)) {
@@ -32,7 +32,7 @@ describe("scope tests", () => {
   })
 
   it("getScopes_does_not_have_root", async () => {
-    const sc = new ScopeController()
+    const sc = new ScopeService()
     const scopeResult = await sc.getScopes(2)
 
     if (Array.isArray(scopeResult)) {
@@ -43,7 +43,7 @@ describe("scope tests", () => {
   })
 
   it("addScope_adds_scope", async () => {
-    const sc = new ScopeController()
+    const sc = new ScopeService()
     const scopeResult = await sc.addScope(2, "test_scope")
     const scopeResultList = await sc.getScopes(2)
 
@@ -56,7 +56,7 @@ describe("scope tests", () => {
   })
 
   it("removeScope_removes_scope", async () => {
-    const sc = new ScopeController()
+    const sc = new ScopeService()
     const scopeResult = await sc.removeScope(2, "test_scope")
     const scopeResultList = await sc.getScopes(2)
 

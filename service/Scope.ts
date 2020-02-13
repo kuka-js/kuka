@@ -1,9 +1,9 @@
 import User from "../entities/User"
 import Scope from "../entities/Scope"
 import {Connection} from "typeorm"
-import ProjectConnection from "../service/connection"
+import ProjectConnection from "./Connection"
 
-export default class ScopeController {
+export default class ScopeService {
   async getScopes(userId: number): Promise<string[] | boolean> {
     try {
       await ProjectConnection.connect()

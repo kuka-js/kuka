@@ -1,5 +1,5 @@
 require("reflect-metadata")
-import Email, {OurMailResponse} from "../service/email"
+import Email, {OurMailResponse} from "../service/Email"
 require("dotenv").config({path: process.cwd() + "/.env.testing"})
 const sendMailMock = jest.fn()
 

@@ -1,12 +1,12 @@
 import {v4 as uuid} from "uuid"
 import User from "../entities/User"
-import UserController from "./user"
+import UserService from "./User"
 import {Connection} from "typeorm"
-import ProjectConnection from "../service/connection"
-import Email from "../service/email"
+import ProjectConnection from "./Connection"
+import Email from "./Email"
 import PasswordReset from "../entities/PasswordReset"
 
-export default class PasswordResetController {
+export default class PasswordResetService {
   async markPasswordResetDone(passwordResetId: string): Promise<boolean> {
     try {
       let connection: Connection = await ProjectConnection.connect()
@@ -45,7 +45,7 @@ export default class PasswordResetController {
     const passwordResetId = uuid()
 
     let passwordReset = new PasswordReset()
-    let userController = new UserController()
+    let userController = new UserService()
 
     passwordReset.userId = await userController.emailToUserId(email)
     passwordReset.passwordResetId = passwordResetId
