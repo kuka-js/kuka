@@ -1,6 +1,5 @@
 import User from "../entities/User"
 import Scope from "../entities/Scope"
-import {Connection} from "typeorm"
 import ProjectConnection from "./Connection"
 
 export default class ScopeService {
