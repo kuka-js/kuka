@@ -6,14 +6,14 @@ require("dotenv").config({path: process.cwd() + "/.env.testing"})
 
 describe("scope tests", () => {
   beforeAll(async () => {
-    const uc = new UserService()
-    await uc.registerUser(
+    const userService = new UserService()
+    await userService.registerUser(
       "nake89@gmail.com",
       "nake89@gmail.com",
       "asdaAa12aaaa3!!"
     )
 
-    await uc.registerUser(
+    await userService.registerUser(
       "nake89+1@gmail.com",
       "nake89+1@gmail.com",
       "asdaAa12aaaa3!!"
