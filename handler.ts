@@ -9,6 +9,7 @@ import PasswordResetService from "./service/Reset"
 import ScopeService from "./service/Scope"
 import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
+import UserListResponse from "./responses/UserListResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -155,6 +156,17 @@ export const getScopes: Handler = async (event: APIGatewayEvent) => {
     return new BaseResponse(500, 0, "Something went wrong").response()
   }
 }
+
+export const getUserList: Handler = async (event: APIGatewayEvent) => {
+  const users = new UserService()
+  const userResponse = await users.getUserList()
+  if (Array.isArray(userResponse)) {
+    return new UserListResponse(200, 1, "The userlist", userResponse).response()
+  } else {
+    return new BaseResponse(500, 0, "Connection error").response()
+  }
+}
+
 export const hidden: Handler = async (event: APIGatewayEvent) => {
   const username = event.requestContext.authorizer.principalId
   return new HiddenResponse(200, 1, `Hello, ${username}`).response()
