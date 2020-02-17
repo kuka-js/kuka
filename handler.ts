@@ -9,6 +9,7 @@ import PasswordResetService from "./service/Reset"
 import ScopeService from "./service/Scope"
 import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
+import TokenResponse from "./responses/TokenResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -39,7 +40,14 @@ export const login: Handler = async (event: APIGatewayEvent) => {
     if (ok == 0) {
       return new LoginResponse(400, 0, data.message).response()
     } else {
-      return new LoginResponse(200, 1, data.message, data.token).response()
+      return new LoginResponse(
+        200,
+        1,
+        data.message,
+        data.token,
+        data.expiry,
+        data.refreshToken
+      ).response()
     }
   } else {
     return new LoginResponse(400, 0, "No body sent").response()
