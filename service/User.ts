@@ -3,10 +3,11 @@ import Scope from "../entities/Scope"
 import {Connection} from "typeorm"
 import ProjectConnection from "./Connection"
 import {hashSync, compareSync} from "bcrypt"
-import {sign} from "jsonwebtoken"
+import {sign, decode} from "jsonwebtoken"
 import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
+import {v4 as uuid} from "uuid"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -220,12 +221,19 @@ export default class UserService {
           process.env.JWT_SECRET,
           {expiresIn: process.env.EXPIRATION_TIME}
         )
+
+        const {exp} = decode(token) as {
+          [key: string]: number
+        }
+
         return {
           ok: 1,
           data: {
             username,
             message: "Login successful.",
-            token
+            token,
+            refreshToken: this.generateRefreshToken(),
+            expiry: exp
           }
         }
       } else {
@@ -289,6 +297,10 @@ export default class UserService {
     } else {
       return false
     }
+  }
+
+  public generateRefreshToken(): string {
+    return uuid()
   }
 }
 

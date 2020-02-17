@@ -5,10 +5,21 @@ export default class LoginResponse extends BaseResponse {
   ok: number
   message: string
   token?: string
+  tokenExpiry?: number
+  refreshToken?: string
 
-  constructor(statusCode: number, ok: number, message: string, token?: string) {
+  constructor(
+    statusCode: number,
+    ok: number,
+    message: string,
+    token?: string,
+    tokenExpiry?: number,
+    refreshToken?: string
+  ) {
     super(statusCode, ok, message)
     this.token = token
+    this.tokenExpiry = tokenExpiry
+    this.refreshToken = refreshToken
   }
 
   response() {
@@ -19,12 +30,16 @@ export default class LoginResponse extends BaseResponse {
           ok: this.ok,
           data: {
             message: this.message,
-            token: this.token
+            token: this.token,
+            tokenExpiry: this.tokenExpiry
           }
         },
         null,
         2
-      )
+      ),
+      headers: {
+        "Set-Cookie": "RefreshToken=" + this.refreshToken + ";HttpOnly;"
+      }
     }
   }
 }
