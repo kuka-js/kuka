@@ -1,5 +1,5 @@
 require("reflect-metadata")
-import UserService from "../service/User"
+import UserService, {getUserListResponse} from "../service/User"
 require("dotenv").config({path: process.cwd() + "/.env.testing"})
 
 describe("user tests", () => {
@@ -61,5 +61,15 @@ describe("user tests", () => {
     expect(registerUserResult.data.username).toBe(username)
     expect(registerUserResult.data.message).toBe("User successfully created!")
     expect(loginUserResult.ok).toBe(1)
+  })
+
+  it("getUserList_test", async () => {
+    const us = new UserService()
+    const userListResult: getUserListResponse[] = await us.getUserList()
+    expect(Array.isArray(userListResult)).toBe(true)
+    expect(userListResult.length).toBe(2)
+    expect(userListResult[0].userId).toBe(1)
+    expect(userListResult[0].username).toBe("nake89@gmail.com")
+    expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
 })
