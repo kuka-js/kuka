@@ -94,6 +94,14 @@ functions:
               paths:
                 id: true
                 scopeName: true
+
+  getUserList:
+    handler: handler.getUserList
+    events:
+      - http:
+          path: user/list
+          method: get
+
   hidden:
     handler: handler.hidden
     events:
