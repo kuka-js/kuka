@@ -70,6 +70,16 @@ paths:
         default:
           description: successful operation
           content: {}
+  /user/list:
+    get:
+      tags:
+        - user
+      summary: Get user list
+      description: Get a list of users
+      responses:
+        default:
+          description: successful operation
+          content: {}
   /user/reset:
     post:
       tags:
