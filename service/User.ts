@@ -216,7 +216,7 @@ export default class UserService {
             scopes
           },
           process.env.JWT_SECRET,
-          {expiresIn: "1h"}
+          {expiresIn: process.env.EXPIRATION_TIME}
         )
         return {
           ok: 1,
