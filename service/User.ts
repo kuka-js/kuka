@@ -204,14 +204,16 @@ export default class UserService {
           }
         }
       }
+
       if (compareSync(password, user.passwordHash)) {
         const scopeArray: Scope[] = await Scope.find({user})
-        const scopes = scopeArray.map(item => {
+        const scopes: string[] = scopeArray.map(item => {
           return item.scope
         })
-
+        const userId: number = user.id
         const token: string = sign(
           {
+            userId,
             username,
             scopes
           },
