@@ -40,7 +40,14 @@ export const login: Handler = async (event: APIGatewayEvent) => {
     if (ok == 0) {
       return new LoginResponse(400, 0, data.message).response()
     } else {
-      return new LoginResponse(200, 1, data.message, data.token).response()
+      return new LoginResponse(
+        200,
+        1,
+        data.message,
+        data.token,
+        data.expiry,
+        data.refreshToken
+      ).response()
     }
   } else {
     return new LoginResponse(400, 0, "No body sent").response()

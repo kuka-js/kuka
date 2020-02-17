@@ -61,6 +61,9 @@ describe("user tests", () => {
     expect(registerUserResult.data.username).toBe(username)
     expect(registerUserResult.data.message).toBe("User successfully created!")
     expect(loginUserResult.ok).toBe(1)
+    expect(typeof loginUserResult.data.token).toBe("string")
+    expect(Number.isInteger(loginUserResult.data.expiry)).toBe(true)
+    expect(typeof loginUserResult.data.refreshToken).toBe("string")
   })
 
   it("getUserList_test", async () => {
