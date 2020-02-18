@@ -7,8 +7,8 @@ import {sign, decode} from "jsonwebtoken"
 import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
-import {v4 as uuid} from "uuid"
 import RefreshToken from "../entities/RefreshToken"
+import RefreshTokenService from "./RefreshTokenService"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -228,7 +228,7 @@ export default class UserService {
         }
 
         // Save refresh token to db
-        const refreshTokenString: string = this.generateRefreshToken()
+        const refreshTokenString: string = RefreshTokenService.generateRefreshToken()
         const refreshToken = new RefreshToken()
         refreshToken.refreshToken = refreshTokenString
         await RefreshToken.save(refreshToken)
@@ -306,10 +306,6 @@ export default class UserService {
     } else {
       return false
     }
-  }
-
-  public generateRefreshToken(): string {
-    return uuid()
   }
 }
 
