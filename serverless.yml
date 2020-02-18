@@ -101,6 +101,7 @@ functions:
       - http:
           path: user/list
           method: get
+          authorizer: authGetUserList
 
   hidden:
     handler: handler.hidden
@@ -121,3 +122,6 @@ functions:
 
   authRemoveScope:
     handler: service/Auth.removeScope
+
+  authGetUserList:
+    handler: service/Auth.getUserList
