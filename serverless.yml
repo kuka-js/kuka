@@ -107,8 +107,8 @@ functions:
     handler: handler.refreshToken
     events:
       - http:
-          path: refresh/token
-          method: get
+          path: user/token
+          method: put
 
   authGetScopes:
     handler: service/Auth.getScopes
