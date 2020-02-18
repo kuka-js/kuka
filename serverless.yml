@@ -103,16 +103,12 @@ functions:
           method: get
           authorizer: authGetUserList
 
-  hidden:
-    handler: handler.hidden
+  refreshToken:
+    handler: handler.refreshToken
     events:
       - http:
-          path: hidden/page
+          path: refresh/token
           method: get
-          authorizer: auth
-
-  auth:
-    handler: service/Auth.auth
 
   authGetScopes:
     handler: service/Auth.getScopes
