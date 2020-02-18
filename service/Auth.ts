@@ -110,7 +110,7 @@ module.exports.getUserList = (event, context, callback) => {
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
     const {scopes} = decoded
-    if (scopes.includes("root")) {
+    if (scopes.includes("root") || scopes.includes("getUserList")) {
       // if everything is good, save to request for use in other routes
       return callback(
         null,
