@@ -17,7 +17,8 @@ export default class Scope extends BaseEntity {
 
   @ManyToOne(
     type => User,
-    user => user.scopes
+    user => user.scopes,
+    {onDelete: "CASCADE"}
   )
   user: User
 }
