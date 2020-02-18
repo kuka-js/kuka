@@ -3,9 +3,12 @@ import {
   PrimaryGeneratedColumn,
   Column,
   BaseEntity,
-  OneToMany
+  OneToMany,
+  OneToOne,
+  JoinColumn
 } from "typeorm"
 import Scope from "./Scope"
+import RefreshToken from "./RefreshToken"
 
 @Entity()
 export default class User extends BaseEntity {
@@ -32,4 +35,8 @@ export default class User extends BaseEntity {
     scope => scope.user
   )
   scopes: Scope[]
+
+  @OneToOne(type => RefreshToken)
+  @JoinColumn()
+  refreshToken: RefreshToken
 }

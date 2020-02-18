@@ -8,6 +8,7 @@ import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
 import {v4 as uuid} from "uuid"
+import RefreshToken from "../entities/RefreshToken"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -226,13 +227,21 @@ export default class UserService {
           [key: string]: number
         }
 
+        // Save refresh token to db
+        const refreshTokenString: string = this.generateRefreshToken()
+        const refreshToken = new RefreshToken()
+        refreshToken.refreshToken = refreshTokenString
+        await RefreshToken.save(refreshToken)
+        user.refreshToken = refreshToken
+        await User.save(user)
+
         return {
           ok: 1,
           data: {
             username,
             message: "Login successful.",
             token,
-            refreshToken: this.generateRefreshToken(),
+            refreshToken: refreshTokenString,
             expiry: exp
           }
         }
