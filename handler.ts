@@ -9,6 +9,10 @@ import ScopeService from "./service/Scope"
 import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
 import UserListResponse from "./responses/UserListResponse"
+import RefreshTokenService, {
+  CookieFromHeader
+} from "./service/RefreshTokenService"
+import RefreshToken from "./entities/RefreshToken"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -174,5 +178,16 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  const body = JSON.parse(event.body)
+  const cookie = RefreshTokenService.getCookiesFromHeader(
+    body.headers
+  ) as CookieFromHeader
+  const {RefreshToken} = cookie
+
+  const tokenResponse = await RefreshTokenService.refreshToken(id, RefreshToken)
+  if (tokenResponse.ok == 1) {
+    //return new LoginResponse(200,1,"Token refresh successful",tokenResponse.refreshToken,)
+  }
   return {statusCode: 200, body: `{"event": ${JSON.stringify(event)} }`}
 }
