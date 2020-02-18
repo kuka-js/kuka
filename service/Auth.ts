@@ -17,24 +17,6 @@ const generatePolicy = (principalId, effect, resource) => {
   return authResponse
 }
 
-module.exports.auth = (event, context, callback) => {
-  // check header or url parameters or post parameters for token
-  const full_token = event.authorizationToken
-  if (!full_token) return callback(null, "Unauthorized")
-  const token = full_token.split(" ")[1]
-
-  // verifies secret and checks exp
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-    if (err) return callback(null, "Unauthorized")
-
-    // if everything is good, save to request for use in other routes
-    return callback(
-      null,
-      generatePolicy(decoded.username, "Allow", event.methodArn)
-    )
-  })
-}
-
 module.exports.getScopes = (event, context, callback) => {
   // check header or url parameters or post parameters for token
   const full_token = event.authorizationToken

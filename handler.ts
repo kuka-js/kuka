@@ -2,7 +2,6 @@ import {APIGatewayEvent, Context, Handler, Callback} from "aws-lambda"
 import RegisterResponse from "./responses/RegisterResponse"
 import UserService from "./service/User"
 import LoginResponse from "./responses/LoginResponse"
-import HiddenResponse from "./responses/HiddenResponse"
 import BaseResponse from "./responses/BaseResponse"
 import VerificationService from "./service/Verification"
 import PasswordResetService from "./service/Reset"
@@ -172,9 +171,4 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
   } else {
     return new BaseResponse(500, 0, "Connection error").response()
   }
-}
-
-export const hidden: Handler = async (event: APIGatewayEvent) => {
-  const username = event.requestContext.authorizer.principalId
-  return new HiddenResponse(200, 1, `Hello, ${username}`).response()
 }
