@@ -172,3 +172,7 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
     return new BaseResponse(500, 0, "Connection error").response()
   }
 }
+
+export const refreshToken: Handler = async (event: APIGatewayEvent) => {
+  return {statusCode: 200, body: `{"event": ${JSON.stringify(event)} }`}
+}
