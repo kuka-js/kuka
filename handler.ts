@@ -174,6 +174,17 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
+export const deleteUser: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  const user = new UserService()
+  const userResponse: boolean = await user.deleteUser(parseInt(id))
+  if (userResponse) {
+    return new BaseResponse(200, 1, `Removed user by id ${id}`).response()
+  } else {
+    return new BaseResponse(500, 0, "Something went wrong").response()
+  }
+}
+
 export const hidden: Handler = async (event: APIGatewayEvent) => {
   const username = event.requestContext.authorizer.principalId
   return new HiddenResponse(200, 1, `Hello, ${username}`).response()
