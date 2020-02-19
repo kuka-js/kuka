@@ -79,9 +79,8 @@ describe("user tests", () => {
   it("deleteUser_test", async () => {
     const us = new UserService()
     const deleteResponse: boolean = await us.deleteUser(2)
-    const userListResult: getUserListResponse[] = await us.getUserList()
     expect(deleteResponse).toBe(true)
-    expect(Array.isArray(userListResult)).toBe(true)
-    expect(userListResult.length).toBe(1)
+    const deleteResponseCheck: boolean = await us.deleteUser(2)
+    expect(deleteResponseCheck).toBe(false)
   })
 })
