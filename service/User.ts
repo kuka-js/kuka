@@ -226,11 +226,9 @@ export default class UserService {
         }
 
         // Save refresh token to db
-        console.log(user)
         const refreshTokenString: string = RefreshTokenService.generateRefreshToken()
         user.refreshToken = refreshTokenString
-        const savedUser = await User.save(user)
-        console.log(savedUser)
+        await User.save(user)
 
         return {
           ok: 1,
