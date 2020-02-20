@@ -46,7 +46,7 @@ describe("user tests", () => {
     )
   })
 
-  it("saveAndloginUser_test", async () => {
+  it("registerAndloginUser_test", async () => {
     const uc = new UserService()
     const username = "nake89+new@gmail.com"
     const password = "asdaAa12aaaa3!!"
@@ -63,7 +63,25 @@ describe("user tests", () => {
     expect(loginUserResult.ok).toBe(1)
     expect(typeof loginUserResult.data.token).toBe("string")
     expect(Number.isInteger(loginUserResult.data.expiry)).toBe(true)
-    expect(typeof loginUserResult.data.refreshToken).toBe("string")
+  })
+
+  it("renewJWTToken_ExpectSuccess", async () => {
+    const renewTokenResult = await UserService.renewJWTToken(1)
+    expect(renewTokenResult.ok).toBe(1)
+    expect(Number.isInteger(renewTokenResult.data.userId)).toBe(true)
+    expect(typeof renewTokenResult.data.username === "string").toBe(true)
+    expect(renewTokenResult.data.message).toBe("JWT renewed succesfully.")
+    expect(typeof renewTokenResult.data.token === "string").toBe(true)
+    expect(Number.isInteger(renewTokenResult.data.expiry)).toBe(true)
+  })
+
+  it("renewJWTToken_ExpectFailure", async () => {
+    const userId = 10000
+    const renewTokenResult = await UserService.renewJWTToken(userId)
+    expect(renewTokenResult.ok).toBe(0)
+    expect(Number.isInteger(renewTokenResult.data.userId)).toBe(true)
+    expect(renewTokenResult.data.userId).toBe(userId)
+    expect(renewTokenResult.data.error).toBe("User doesn't exist.")
   })
 
   it("getUserList_test", async () => {
