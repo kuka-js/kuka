@@ -19,7 +19,8 @@ export default class RefreshTokenService {
     }
     const user: User = await User.findOne({id: userId})
     const refreshTokenFromDB: string = user.refreshToken
-    if (oldRefreshToken == refreshTokenFromDB) {
+
+    if (this.compareRefreshTokens(oldRefreshToken, refreshTokenFromDB)) {
       const newRefreshToken = this.generateRefreshToken()
       user.refreshToken = newRefreshToken
       await User.save(user)
@@ -30,6 +31,17 @@ export default class RefreshTokenService {
         errorCode: RefreshTokenServiceError.REFRESH_TOKEN_INVALID,
         errorMessage: "Given refresh token does not match"
       }
+    }
+  }
+
+  public static compareRefreshTokens(
+    oldRefreshToken: string,
+    newRefreshToken: string
+  ): boolean {
+    if (oldRefreshToken == newRefreshToken) {
+      return true
+    } else {
+      return false
     }
   }
 
@@ -71,7 +83,7 @@ interface RefreshTokenServiceResponse {
   refreshToken?: string
 }
 
-enum RefreshTokenServiceError {
+export enum RefreshTokenServiceError {
   CONNECTION_PROBLEM,
   REFRESH_TOKEN_INVALID
 }

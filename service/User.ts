@@ -8,6 +8,7 @@ import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
 import RefreshTokenService from "./RefreshTokenService"
+import {identifier} from "@babel/types"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -238,7 +239,6 @@ export default class UserService {
             username,
             message: "Login successful.",
             token,
-            refreshToken: refreshTokenString,
             expiry: exp
           }
         }
@@ -269,7 +269,7 @@ export default class UserService {
           ok: 0,
           data: {
             error: "User doesn't exist.",
-            userId: user.id,
+            userId,
             message: "User doesn't exist."
           }
         }
@@ -297,6 +297,7 @@ export default class UserService {
       return {
         ok: 1,
         data: {
+          userId,
           username,
           message: "JWT renewed succesfully.",
           token,
