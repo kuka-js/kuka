@@ -201,3 +201,16 @@ export const refreshToken: Handler = async (event: APIGatewayEvent) => {
     return new BaseErrorResponse("Could not renew refresh token").response()
   }
 }
+
+export const deleteUser: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  const user = new UserService()
+  const userResponse: boolean = await user.deleteUser(parseInt(id))
+  if (userResponse) {
+    return new BaseResponse(200, 1, `Removed user by id ${id}`).response()
+  } else {
+    return new BaseResponse(500, 0, "Something went wrong").response()
+  }
+}
+
+

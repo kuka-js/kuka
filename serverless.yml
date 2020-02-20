@@ -106,6 +106,18 @@ functions:
             parameters:
               paths:
                 id: true
+  deleteuser:
+    handler: handler.deleteUser
+    events:
+      - http:
+          path: user/{id}
+          method: delete
+          authorizer: authDeleteUser
+          request:
+            parameters:
+              paths:
+                id: true
+
   authGetScopes:
     handler: service/Auth.getScopes
 
@@ -117,3 +129,6 @@ functions:
 
   authGetUserList:
     handler: service/Auth.getUserList
+
+  authDeleteUser:
+    handler: service/Auth.deleteUser

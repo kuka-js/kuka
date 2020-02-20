@@ -65,6 +65,7 @@ export default class UserService {
       }
     }
   }
+
   async registerUser(
     username: string,
     email: string,
@@ -337,6 +338,24 @@ export default class UserService {
         return user
       })
       return userList
+    } else {
+      throw "Connection problem"
+    }
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const user: User = await User.findOne({id})
+      if (!user) {
+        return false
+      }
+      const userRemoveResponse: User = await User.remove(user)
+      if (userRemoveResponse) {
+        return true
+      } else {
+        return false
+      }
     } else {
       throw "Connection problem"
     }
