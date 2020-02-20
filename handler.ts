@@ -2,7 +2,6 @@ import {APIGatewayEvent, Context, Handler, Callback} from "aws-lambda"
 import RegisterResponse from "./responses/RegisterResponse"
 import UserService from "./service/User"
 import LoginResponse from "./responses/LoginResponse"
-import HiddenResponse from "./responses/HiddenResponse"
 import BaseResponse from "./responses/BaseResponse"
 import VerificationService from "./service/Verification"
 import PasswordResetService from "./service/Reset"
@@ -10,6 +9,10 @@ import ScopeService from "./service/Scope"
 import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
 import UserListResponse from "./responses/UserListResponse"
+import RefreshTokenService, {
+  CookieFromHeader
+} from "./service/RefreshTokenService"
+import BaseErrorResponse from "./responses/BaseErrorResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -174,6 +177,31 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
+export const refreshToken: Handler = async (event: APIGatewayEvent) => {
+  const id = parseInt(event.pathParameters.id)
+  console.log(event.headers)
+  console.log(event.multiValueHeaders)
+  const cookie = RefreshTokenService.getCookiesFromHeader(
+    event.headers
+  ) as CookieFromHeader
+  const {RefreshToken} = cookie
+
+  const tokenResponse = await RefreshTokenService.refreshToken(id, RefreshToken)
+  const renewJWTResponse = await UserService.renewJWTToken(id)
+  if (tokenResponse.ok == 1 && renewJWTResponse.ok == 1) {
+    return new LoginResponse(
+      200,
+      1,
+      "JWT renewed succesfully",
+      renewJWTResponse.data.token,
+      renewJWTResponse.data.expiry,
+      tokenResponse.refreshToken
+    ).response()
+  } else {
+    return new BaseErrorResponse("Could not renew refresh token").response()
+  }
+}
+
 export const deleteUser: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const user = new UserService()
@@ -185,7 +213,4 @@ export const deleteUser: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
-export const hidden: Handler = async (event: APIGatewayEvent) => {
-  const username = event.requestContext.authorizer.principalId
-  return new HiddenResponse(200, 1, `Hello, ${username}`).response()
-}
+

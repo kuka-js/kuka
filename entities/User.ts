@@ -1,9 +1,9 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
   BaseEntity,
-  OneToMany
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn
 } from "typeorm"
 import Scope from "./Scope"
 
@@ -24,8 +24,8 @@ export default class User extends BaseEntity {
   @Column()
   emailVerified: boolean
 
-  @Column()
-  userType: string
+  @Column({nullable: true})
+  refreshToken: string
 
   @OneToMany(
     type => Scope,

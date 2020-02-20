@@ -7,7 +7,7 @@ import {sign, decode} from "jsonwebtoken"
 import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
-import {v4 as uuid} from "uuid"
+import RefreshTokenService from "./RefreshTokenService"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -112,7 +112,6 @@ export default class UserService {
         } else {
           user.emailVerified = false
         }
-        user.userType = "regular"
         const defaultScope: Scope = new Scope()
         defaultScope.scope = "default"
         await Scope.save(defaultScope)
@@ -184,7 +183,7 @@ export default class UserService {
   async loginUser(username: string, password: string) {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
-      const user: User = await User.findOne({username})
+      const user: User = await User.findOne({username}, {relations: ["scopes"]})
       if (!user) {
         return {
           ok: 0,
@@ -208,7 +207,7 @@ export default class UserService {
       }
 
       if (compareSync(password, user.passwordHash)) {
-        const scopeArray: Scope[] = await Scope.find({user})
+        const scopeArray: Scope[] = user.scopes
         const scopes: string[] = scopeArray.map(item => {
           return item.scope
         })
@@ -227,13 +226,18 @@ export default class UserService {
           [key: string]: number
         }
 
+        // Save refresh token to db
+        const refreshTokenString: string = RefreshTokenService.generateRefreshToken()
+        user.refreshToken = refreshTokenString
+        await User.save(user)
+
         return {
           ok: 1,
           data: {
             username,
             message: "Login successful.",
+            refreshToken: refreshTokenString,
             token,
-            refreshToken: this.generateRefreshToken(),
             expiry: exp
           }
         }
@@ -252,6 +256,57 @@ export default class UserService {
     }
   }
 
+  static async renewJWTToken(userId: number) {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const user: User = await User.findOne(
+        {id: userId},
+        {relations: ["scopes"]}
+      )
+      if (!user) {
+        return {
+          ok: 0,
+          data: {
+            error: "User doesn't exist.",
+            userId,
+            message: "User doesn't exist."
+          }
+        }
+      }
+
+      const scopeArray: Scope[] = user.scopes
+      const scopes: string[] = scopeArray.map(item => {
+        return item.scope
+      })
+      const username = user.username
+      const token: string = sign(
+        {
+          userId,
+          username,
+          scopes
+        },
+        process.env.JWT_SECRET,
+        {expiresIn: process.env.EXPIRATION_TIME}
+      )
+
+      const {exp} = decode(token) as {
+        [key: string]: number
+      }
+
+      return {
+        ok: 1,
+        data: {
+          userId,
+          username,
+          message: "JWT renewed succesfully.",
+          token,
+          expiry: exp
+        }
+      }
+    } else {
+      throw "Connection problem"
+    }
+  }
   async emailToUserId(email: string): Promise<number> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
@@ -316,10 +371,6 @@ export default class UserService {
     } else {
       return false
     }
-  }
-
-  public generateRefreshToken(): string {
-    return uuid()
   }
 }
 

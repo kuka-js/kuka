@@ -12,13 +12,6 @@ provider:
   region: ${env:REGION}
 
 functions:
-  hello:
-    handler: handler.ping
-    events:
-      - http:
-          path: ping
-          method: get
-
   register:
     handler: handler.register
     events:
@@ -103,6 +96,16 @@ functions:
           method: get
           authorizer: authGetUserList
 
+  refreshToken:
+    handler: handler.refreshToken
+    events:
+      - http:
+          path: user/token/{id}
+          method: put
+          request:
+            parameters:
+              paths:
+                id: true
   deleteuser:
     handler: handler.deleteUser
     events:
@@ -114,17 +117,6 @@ functions:
             parameters:
               paths:
                 id: true
-
-  hidden:
-    handler: handler.hidden
-    events:
-      - http:
-          path: hidden/page
-          method: get
-          authorizer: auth
-
-  auth:
-    handler: service/Auth.auth
 
   authGetScopes:
     handler: service/Auth.getScopes
