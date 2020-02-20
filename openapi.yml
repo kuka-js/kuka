@@ -80,6 +80,29 @@ paths:
         default:
           description: successful operation
           content: {}
+  /user/delete/{userId}:
+    delete:
+      security:
+        - jwt_auth: []
+      x-security-scopes:
+        - deleteUser
+        - root
+      tags:
+        - user
+      summary: Delete a user
+      description: Deletes a user by userId
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        default:
+          description: successful operation
+          content: {}
   /user/reset:
     post:
       tags:

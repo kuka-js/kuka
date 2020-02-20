@@ -93,4 +93,12 @@ describe("user tests", () => {
     expect(userListResult[0].username).toBe("nake89@gmail.com")
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
+
+  it("deleteUser_test", async () => {
+    const us = new UserService()
+    const deleteResponse: boolean = await us.deleteUser(2)
+    expect(deleteResponse).toBe(true)
+    const deleteResponseCheck: boolean = await us.deleteUser(2)
+    expect(deleteResponseCheck).toBe(false)
+  })
 })
