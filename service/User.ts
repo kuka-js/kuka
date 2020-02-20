@@ -8,7 +8,6 @@ import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
 import RefreshTokenService from "./RefreshTokenService"
-import {identifier} from "@babel/types"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
