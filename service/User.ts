@@ -236,6 +236,7 @@ export default class UserService {
           data: {
             username,
             message: "Login successful.",
+            refreshToken: refreshTokenString,
             token,
             expiry: exp
           }
