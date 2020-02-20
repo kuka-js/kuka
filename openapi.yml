@@ -39,7 +39,7 @@ paths:
       tags:
         - user
       summary: Login
-      description: Login with your credentials.
+      description: Login with your credentials. Returns JWT in body and refresh token in a cookie.
       requestBody:
         description: LoginUser object
         content:
@@ -137,6 +137,26 @@ paths:
           description: successful operation
           content: {}
       x-codegen-request-body-name: body
+  /user/token/{id}:
+    put:
+      x-security-cookie:
+        - refreshToken
+      tags:
+        - user
+      summary: Renew JWT with refresh token
+      description: Renew JWT with refresh token via cookie. The cookie is first given with through the login endpoint.
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        default:
+          description: successful operation
+          content: {}
   /user/scopes/{userId}:
     get:
       security:
