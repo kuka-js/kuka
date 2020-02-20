@@ -1,12 +1,11 @@
 import ProjectConnection from "./Connection"
 import User from "../entities/User"
-import RefreshToken from "../entities/RefreshToken"
 import {v4 as uuid} from "uuid"
 
 export default class RefreshTokenService {
   public static async refreshToken(
-    userId,
-    oldRefreshToken
+    userId: number,
+    oldRefreshToken: string
   ): Promise<RefreshTokenServiceResponse> {
     try {
       await ProjectConnection.connect()
@@ -18,13 +17,13 @@ export default class RefreshTokenService {
         errorMessage: "Connection problem"
       }
     }
-    const user: User = await User.findOne(
-      {id: userId},
-      {relations: ["refreshToken"]}
-    )
-    const refreshTokenFromDB: RefreshToken = user.refreshToken
-    if (oldRefreshToken == refreshTokenFromDB.refreshToken) {
-      return {ok: 1, refreshToken: this.generateRefreshToken()}
+    const user: User = await User.findOne({id: userId})
+    const refreshTokenFromDB: string = user.refreshToken
+    if (oldRefreshToken == refreshTokenFromDB) {
+      const newRefreshToken = this.generateRefreshToken()
+      user.refreshToken = newRefreshToken
+      await User.save(user)
+      return {ok: 1, refreshToken: newRefreshToken}
     } else {
       return {
         ok: 0,

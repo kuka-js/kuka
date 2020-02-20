@@ -12,13 +12,6 @@ provider:
   region: ${env:REGION}
 
 functions:
-  hello:
-    handler: handler.ping
-    events:
-      - http:
-          path: ping
-          method: get
-
   register:
     handler: handler.register
     events:
@@ -107,9 +100,12 @@ functions:
     handler: handler.refreshToken
     events:
       - http:
-          path: user/token
+          path: user/token/{id}
           method: put
-
+          request:
+            parameters:
+              paths:
+                id: true
   authGetScopes:
     handler: service/Auth.getScopes
 

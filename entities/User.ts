@@ -1,14 +1,11 @@
 import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
   BaseEntity,
+  Column,
+  Entity,
   OneToMany,
-  OneToOne,
-  JoinColumn
+  PrimaryGeneratedColumn
 } from "typeorm"
 import Scope from "./Scope"
-import RefreshToken from "./RefreshToken"
 
 @Entity()
 export default class User extends BaseEntity {
@@ -27,16 +24,12 @@ export default class User extends BaseEntity {
   @Column()
   emailVerified: boolean
 
-  @Column()
-  userType: string
+  @Column({nullable: true})
+  refreshToken: string
 
   @OneToMany(
     type => Scope,
     scope => scope.user
   )
   scopes: Scope[]
-
-  @OneToOne(type => RefreshToken)
-  @JoinColumn()
-  refreshToken: RefreshToken
 }
