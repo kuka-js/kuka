@@ -12,7 +12,7 @@ import UserListResponse from "./responses/UserListResponse"
 import RefreshTokenService, {
   CookieFromHeader
 } from "./service/RefreshTokenService"
-import RefreshToken from "./entities/RefreshToken"
+import BaseErrorResponse from "./responses/BaseErrorResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -178,16 +178,26 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
-  const body = JSON.parse(event.body)
+  const id = parseInt(event.pathParameters.id)
+  console.log(event.headers)
+  console.log(event.multiValueHeaders)
   const cookie = RefreshTokenService.getCookiesFromHeader(
-    body.headers
+    event.headers
   ) as CookieFromHeader
   const {RefreshToken} = cookie
 
   const tokenResponse = await RefreshTokenService.refreshToken(id, RefreshToken)
-  if (tokenResponse.ok == 1) {
-    //return new LoginResponse(200,1,"Token refresh successful",tokenResponse.refreshToken,)
+  const renewJWTResponse = await UserService.renewJWTToken(id)
+  if (tokenResponse.ok == 1 && renewJWTResponse.ok == 1) {
+    return new LoginResponse(
+      200,
+      1,
+      "JWT renewed succesfully",
+      renewJWTResponse.data.token,
+      renewJWTResponse.data.expiry,
+      tokenResponse.refreshToken
+    ).response()
+  } else {
+    return new BaseErrorResponse("Could not renew refresh token").response()
   }
-  return {statusCode: 200, body: `{"event": ${JSON.stringify(event)} }`}
 }
