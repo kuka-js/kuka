@@ -96,6 +96,18 @@ functions:
           method: get
           authorizer: authGetUserList
 
+  getUserData:
+    handler: handler.getUser
+    events:
+      - http:
+          path: user/{id}
+          method: get
+          authorizer: authGetUserData
+          request:
+            parameters:
+              paths:
+                id: true
+
   refreshToken:
     handler: handler.refreshToken
     events:
@@ -142,6 +154,9 @@ functions:
 
   authGetUserList:
     handler: service/Auth.getUserList
+
+  authGetUserData:
+    handler: service/Auth.getUserData
 
   authDeleteUser:
     handler: service/Auth.deleteUser

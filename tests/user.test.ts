@@ -1,5 +1,5 @@
 require("reflect-metadata")
-import UserService, {getUserListResponse} from "../service/User"
+import UserService, {getUserResponse} from "../service/User"
 require("dotenv").config({path: process.cwd() + "/.env.testing"})
 
 describe("user tests", () => {
@@ -86,7 +86,7 @@ describe("user tests", () => {
 
   it("getUserList_test", async () => {
     const us = new UserService()
-    const userListResult: getUserListResponse[] = await us.getUserList()
+    const userListResult: getUserResponse[] = await us.getUserList()
     expect(Array.isArray(userListResult)).toBe(true)
     expect(userListResult.length).toBe(2)
     expect(userListResult[0].userId).toBe(1)
@@ -94,6 +94,22 @@ describe("user tests", () => {
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
 
+  it("getUser_ExpectSuccess", async () => {
+    const us = new UserService()
+    const userResponse: getUserResponse = (await us.getUser(
+      1
+    )) as getUserResponse
+    expect(userResponse.userId).toBe(1)
+    expect(userResponse.username).toBe("nake89@gmail.com")
+    expect(userResponse.scopes.includes("root")).toBe(true)
+  })
+
+  it("getUser_ExpectFailure", async () => {
+    const us = new UserService()
+    const userResponse: null = (await us.getUser(10000)) as null
+    expect(userResponse).toBeFalsy()
+  })
+  
   it("lockUser_ExpectSuccess", async () => {
     const us = new UserService()
     const lockResponse: boolean = await us.lockUser(2, "root", "uncool")
