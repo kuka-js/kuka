@@ -321,17 +321,17 @@ export default class UserService {
     }
   }
 
-  async getUserList(): Promise<getUserListResponse[]> {
+  async getUserList(): Promise<getUserResponse[]> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const users: User[] = await User.find({relations: ["scopes"]})
-      const userList: getUserListResponse[] = users.map(item => {
+      const userList: getUserResponse[] = users.map(item => {
         const userId: number = item.id
         const username: string = item.username
         const scopes: string[] = item.scopes.map(scope => {
           return scope.scope
         })
-        const user: getUserListResponse = {
+        const user: getUserResponse = {
           userId,
           username,
           scopes
@@ -341,6 +341,30 @@ export default class UserService {
       return userList
     } else {
       throw "Connection problem"
+    }
+  }
+
+  async getUser(userId: number): Promise<getUserResponse | null> {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const user: User = await User.findOne(
+        {id: userId},
+        {relations: ["scopes"]}
+      )
+      if (!user) {
+        return null
+      }
+      const scopes: string[] = user.scopes.map(scope => {
+        return scope.scope
+      })
+      const userResponse: getUserResponse = {
+        userId,
+        username: user.username,
+        scopes
+      }
+      return userResponse
+    } else {
+      throw "Connections problem"
     }
   }
 
@@ -384,7 +408,7 @@ interface saveUserResponse {
   }
 }
 
-export interface getUserListResponse {
+export interface getUserResponse {
   userId: number
   username: string
   scopes: string[]

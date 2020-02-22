@@ -1,20 +1,20 @@
 import BaseResponse from "./BaseResponse"
 import {getUserResponse} from "../service/User"
 
-export default class UserListResponse extends BaseResponse {
+export default class UserResponse extends BaseResponse {
   statusCode: number
   ok: number
   message: string
-  users: getUserResponse[]
+  user: getUserResponse
 
   constructor(
     statusCode: number,
     ok: number,
     message: string,
-    users: getUserResponse[]
+    user: getUserResponse
   ) {
     super(statusCode, ok, message)
-    this.users = users
+    this.user = user
   }
 
   response() {
@@ -25,7 +25,7 @@ export default class UserListResponse extends BaseResponse {
           ok: this.ok,
           data: {
             message: this.message,
-            users: this.users
+            users: this.user
           }
         },
         null,
