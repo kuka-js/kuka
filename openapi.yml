@@ -72,10 +72,38 @@ paths:
           content: {}
   /user/list:
     get:
+      security:
+        - jwt_auth: []
+      x-security-scopes:
+        - geUserList
+        - root
       tags:
         - user
       summary: Get user list
       description: Get a list of users
+      responses:
+        default:
+          description: successful operation
+          content: {}
+  /user/{userId}:
+    get:
+      security:
+        - jwt_auth: []
+      x-security-scopes:
+        - geUserData
+        - root
+      tags:
+        - user
+      summary: Get user by id
+      description: Get user data by id
+      parameters:
+        - name: userId
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         default:
           description: successful operation

@@ -106,8 +106,8 @@ describe("user tests", () => {
 
   it("getUser_ExpectFailure", async () => {
     const us = new UserService()
-    const userResponse: boolean = (await us.getUser(10000)) as boolean
-    expect(userResponse).toBe(false)
+    const userResponse: null = (await us.getUser(10000)) as null
+    expect(userResponse).toBeFalsy()
   })
 
   it("deleteUser_test", async () => {
