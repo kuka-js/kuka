@@ -32,4 +32,7 @@ export default class User extends BaseEntity {
     scope => scope.user
   )
   scopes: Scope[]
+
+  @Column({nullable: true})
+  public lockId: number
 }
