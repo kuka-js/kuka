@@ -94,6 +94,12 @@ describe("user tests", () => {
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
 
+  it("lockUser_test", async () => {
+    const us = new UserService()
+    const lockResponse: boolean = await us.lockUser(2)
+    expect(lockResponse).toBe(true)
+  })
+
   it("deleteUser_test", async () => {
     const us = new UserService()
     const deleteResponse: boolean = await us.deleteUser(2)

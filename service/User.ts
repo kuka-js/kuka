@@ -8,6 +8,7 @@ import VerificationService from "./Verification"
 import PasswordReset from "../entities/PasswordReset"
 import {OurMailResponse} from "./Email"
 import RefreshTokenService from "./RefreshTokenService"
+import Lock from "../entities/Lock"
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -307,6 +308,7 @@ export default class UserService {
       throw "Connection problem"
     }
   }
+
   async emailToUserId(email: string): Promise<number> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
@@ -357,6 +359,25 @@ export default class UserService {
       } else {
         return false
       }
+    } else {
+      throw "Connection problem"
+    }
+  }
+
+  async lockUser(id: number): Promise<boolean> {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const user: User = await User.findOne({id})
+      const lock: Lock = new Lock()
+      lock.lockedBy = "me"
+      lock.lockedAt = new Date()
+      lock.reason = "me no like this user"
+      lock.userId = id
+      const lockResult: Lock = await Lock.save(lock)
+      const lockId: number = lockResult.id
+      user.lockId = lockId
+      await User.save(user)
+      return true
     } else {
       throw "Connection problem"
     }
