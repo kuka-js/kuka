@@ -3,11 +3,9 @@ import {
   Column,
   Entity,
   OneToMany,
-  PrimaryGeneratedColumn,
-  OneToOne
+  PrimaryGeneratedColumn
 } from "typeorm"
 import Scope from "./Scope"
-import LockUser from "./LockUser"
 
 @Entity()
 export default class User extends BaseEntity {
@@ -35,12 +33,6 @@ export default class User extends BaseEntity {
   )
   scopes: Scope[]
 
-  @OneToOne(
-    () => LockUser,
-    lockUser => lockUser.user,
-    {
-      cascade: true
-    }
-  )
-  public lockUser: LockUser
+  @Column({nullable: true})
+  public lockId: number
 }
