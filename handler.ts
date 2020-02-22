@@ -183,7 +183,12 @@ export const getUser: Handler = async (event: APIGatewayEvent) => {
   const userService = new UserService()
   const userResponse = await userService.getUser(parseInt(id))
   if (userResponse != null) {
-    return new UserResponse(200, 1, `User data for ${id}`, userResponse)
+    return new UserResponse(
+      200,
+      1,
+      `User data for ${id}`,
+      userResponse
+    ).response()
   } else {
     return new BaseErrorResponse("Could not find user").response()
   }
