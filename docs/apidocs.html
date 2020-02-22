@@ -2,15 +2,12 @@
   <head>
     <script src="//unpkg.com/swagger-client" type="text/javascript"></script>
     <script>
-      var swaggerClient = new SwaggerClient(
-        "https://raw.githubusercontent.com/nake89/serverless-jwt-boilerplate/master/openapi.json"
-      )
+      var specUrl =
+        "https://raw.githubusercontent.com/nake89/serverless-jwt-boilerplate/docs_openapi/openapi.yml" // data urls are OK too 'data:application/json;base64,abc...'
+      var swaggerClient = new SwaggerClient(specUrl)
     </script>
   </head>
   <body>
-    <div
-      id="swagger-ui"
-      data-source="https://try.gitea.io/swagger.v1.json"
-    ></div>
+    check console in browser's dev. tools
   </body>
 </html>
