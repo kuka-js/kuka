@@ -94,10 +94,16 @@ describe("user tests", () => {
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
 
-  it("lockUser_test", async () => {
+  it("lockUser_ExpectSuccess", async () => {
     const us = new UserService()
     const lockResponse: boolean = await us.lockUser(2, "root", "uncool")
     expect(lockResponse).toBe(true)
+  })
+
+  it("lockUser_ExpectFailure", async () => {
+    const us = new UserService()
+    const lockResponse: boolean = await us.lockUser(10000, "root", "uncool")
+    expect(lockResponse).toBe(false)
   })
 
   it("loginWithLockedUser_ExpectLoginFail", async () => {
