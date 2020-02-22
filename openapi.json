@@ -1,0 +1,435 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "serverless-jwt-boilerplate",
+    "description": "Serverless user management system using JWT",
+    "license": {
+      "name": "License: MIT",
+      "url": "https://github.com/nake89/serverless-jwt-boilerplate/blob/master/LICENSE"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Docs: README.md",
+    "url": "https://github.com/nake89/serverless-jwt-boilerplate/blob/master/README.md"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3000/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "user",
+      "description": "Operations about user"
+    }
+  ],
+  "paths": {
+    "/user/register": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Register new user",
+        "description": "Creates a new user in the database.",
+        "operationId": "registerUser",
+        "requestBody": {
+          "description": "RegisterUser object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/user/login": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Login",
+        "description": "Login with your credentials. Returns JWT in body and refresh token in a cookie.",
+        "requestBody": {
+          "description": "LoginUser object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginUser"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          },
+          "x-codegen-request-body-name": "body"
+        }
+      }
+    },
+    "/user/verify/{id}": {
+      "post": {
+        "tags": ["user"],
+        "summary": "Verify",
+        "description": "Verify email address",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Email Verification ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/user/list": {
+      "get": {
+        "security": [
+          {
+            "jwt_auth": []
+          }
+        ],
+        "x-security-scopes": ["geUserList", "root"],
+        "tags": ["user"],
+        "summary": "Get user list",
+        "description": "Get a list of users",
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/user/{userId}": {
+      "get": {
+        "security": [
+          {
+            "jwt_auth": []
+          }
+        ],
+        "x-security-scopes": ["geUserData", "root"],
+        "tags": ["user"],
+        "summary": "Get user by id",
+        "description": "Get user data by id",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/user/delete/{userId}": {
+      "delete": {
+        "security": [
+          {
+            "jwt_auth": []
+          }
+        ],
+        "x-security-scopes": ["deleteUser", "root"],
+        "tags": ["user"],
+        "summary": "Delete a user",
+        "description": "Deletes a user by userId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/user/reset": {
+      "post": {
+        "tags": ["password"],
+        "summary": "Password reset request",
+        "description": "Sends password reset ID to users email.",
+        "requestBody": {
+          "description": "Reset object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/user/password": {
+      "put": {
+        "tags": ["password"],
+        "summary": "Password change",
+        "description": "Changes password with password reset id.",
+        "requestBody": {
+          "description": "PasswordResetObject",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordReset"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        },
+        "x-codegen-request-body-name": "body"
+      }
+    },
+    "/user/token/{id}": {
+      "put": {
+        "x-security-cookie": ["refreshToken"],
+        "tags": ["user"],
+        "summary": "Renew JWT with refresh token",
+        "description": "Renew JWT with refresh token via cookie. The cookie is first given with through the login endpoint.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/user/scopes/{userId}": {
+      "get": {
+        "security": [
+          {
+            "jwt_auth": []
+          }
+        ],
+        "x-security-scopes": ["getScopes", "root"],
+        "tags": ["scopes"],
+        "summary": "Get scopes",
+        "description": "Gets scopes of userId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      },
+      "post": {
+        "security": [
+          {
+            "jwt_auth": []
+          }
+        ],
+        "x-security-scopes": ["addScope", "root"],
+        "tags": ["scopes"],
+        "summary": "Add scope",
+        "description": "Adds new scope to userId.",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "AddScope object",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddScope"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/user/scopes/{userId}/{scopeName}": {
+      "delete": {
+        "security": [
+          {
+            "jwt_auth": []
+          }
+        ],
+        "x-security-scopes": ["removeScope", "root"],
+        "tags": ["scopes"],
+        "summary": "Delete a scope",
+        "description": "Deletes a scope of userId",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "description": "User ID",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            }
+          },
+          {
+            "name": "scopeName",
+            "in": "path",
+            "description": "Scope name",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "RegisterUser": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginUser": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ResetRequest": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
+      "PasswordReset": {
+        "type": "object",
+        "properties": {
+          "passwordResetId": {
+            "type": "string"
+          },
+          "password1": {
+            "type": "string"
+          },
+          "password2": {
+            "type": "string"
+          }
+        }
+      },
+      "AddScope": {
+        "type": "object",
+        "properties": {
+          "scope": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "jwt_auth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
