@@ -146,7 +146,6 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
 
 export const removeScope: Handler = async (event: APIGatewayEvent) => {
   const {id, scopeName} = event.pathParameters
-  const body = JSON.parse(event.body)
   const scopes = new ScopeService()
   const scopeResponse = await scopes.removeScope(parseInt(id), scopeName)
   if (scopeResponse) {
@@ -213,4 +212,23 @@ export const deleteUser: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
-
+export const lockUser: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  const lockedBy = event.requestContext.authorizer.principalId
+  let reason: string | null
+  if (event.body != null) {
+    const body = JSON.parse(event.body)
+    reason = body.reason
+  }
+  const user = new UserService()
+  const lockResponse: boolean = await user.lockUser(
+    parseInt(id),
+    lockedBy,
+    reason
+  )
+  if (lockResponse) {
+    return new BaseResponse(200, 1, `User ${id} locked `).response()
+  } else {
+    return new BaseResponse(500, 0, "Failed to lock user").response()
+  }
+}

@@ -106,6 +106,7 @@ functions:
             parameters:
               paths:
                 id: true
+
   deleteuser:
     handler: handler.deleteUser
     events:
@@ -113,6 +114,18 @@ functions:
           path: user/{id}
           method: delete
           authorizer: authDeleteUser
+          request:
+            parameters:
+              paths:
+                id: true
+
+  lockUser:
+    handler: handler.lockUser
+    events:
+      - http:
+          path: user/lock/{id}
+          method: put
+          authorizer: authLockUser
           request:
             parameters:
               paths:
@@ -132,3 +145,6 @@ functions:
 
   authDeleteUser:
     handler: service/Auth.deleteUser
+
+  authLockUser:
+    handler: service/Auth.lockUser
