@@ -1,13 +1,22 @@
 <html>
-  <head>
-    <script src="//unpkg.com/swagger-client" type="text/javascript"></script>
-    <script>
-      var specUrl =
-        "https://raw.githubusercontent.com/nake89/serverless-jwt-boilerplate/docs_openapi/openapi.json" // data urls are OK too 'data:application/json;base64,abc...'
-      var swaggerClient = new SwaggerClient(specUrl)
-    </script>
-  </head>
+  <head> </head>
   <body>
+    <div id="swagger-ui"></div>
+    <script src="https://unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
+
+    <script>
+      const ui = SwaggerUIBundle({
+        url:
+          "https://raw.githubusercontent.com/nake89/serverless-jwt-boilerplate/docs_openapi/openapi.json",
+        dom_id: "#swagger-ui",
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "StandaloneLayout"
+      })
+    </script>
+
     check console in browser's dev. tools
   </body>
 </html>
