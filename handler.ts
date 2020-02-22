@@ -213,7 +213,7 @@ export const deleteUser: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const lockUser: Handler = async (event: APIGatewayEvent) => {
-  const {userid} = event.pathParameters
+  const {id} = event.pathParameters
   const lockedBy = event.requestContext.authorizer.principalId
   let reason: string | null
   if (event.body != null) {
@@ -222,12 +222,12 @@ export const lockUser: Handler = async (event: APIGatewayEvent) => {
   }
   const user = new UserService()
   const lockResponse: boolean = await user.lockUser(
-    parseInt(userid),
+    parseInt(id),
     lockedBy,
     reason
   )
   if (lockResponse) {
-    return new BaseResponse(200, 1, `User ${userid} locked `).response()
+    return new BaseResponse(200, 1, `User ${id} locked `).response()
   } else {
     return new BaseResponse(500, 0, "Failed to lock user").response()
   }
