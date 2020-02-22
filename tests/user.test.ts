@@ -94,6 +94,27 @@ describe("user tests", () => {
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
 
+  it("lockUser_ExpectSuccess", async () => {
+    const us = new UserService()
+    const lockResponse: boolean = await us.lockUser(2, "root", "uncool")
+    expect(lockResponse).toBe(true)
+  })
+
+  it("lockUser_ExpectFailure", async () => {
+    const us = new UserService()
+    const lockResponse: boolean = await us.lockUser(10000, "root", "uncool")
+    expect(lockResponse).toBe(false)
+  })
+
+  it("loginWithLockedUser_ExpectLoginFail", async () => {
+    const us = new UserService()
+    const username: string = "nake89+new@gmail.com"
+    const password: string = "asdaAa12aaaa3!!"
+    const loginUserResult = await us.loginUser(username, password)
+    expect(loginUserResult.ok).toBe(0)
+    expect(loginUserResult.data.error).toBe("User is locked.")
+  })
+
   it("deleteUser_test", async () => {
     const us = new UserService()
     const deleteResponse: boolean = await us.deleteUser(2)
