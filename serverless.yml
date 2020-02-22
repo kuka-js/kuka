@@ -130,5 +130,8 @@ functions:
   authGetUserList:
     handler: service/Auth.getUserList
 
+  authGetUserData:
+    handler: service/Auth.getUserData
+
   authDeleteUser:
     handler: service/Auth.deleteUser
