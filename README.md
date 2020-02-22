@@ -2,7 +2,9 @@
 
 # serverless_jwt_boilerplate
 
-A Typescript jwt boilerplate using the Serverless framework
+A Typescript jwt boilerplate using the Serverless framework.
+
+[API Documentation](https://nake89.github.io/serverless-jwt-boilerplate/apidocs.html)
 
 ## Development
 
