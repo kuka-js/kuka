@@ -207,6 +207,17 @@ export default class UserService {
         }
       }
 
+      if (user.lockId) {
+        return {
+          ok: 0,
+          data: {
+            error: "User is locked.",
+            username,
+            message: "User is locked."
+          }
+        }
+      }
+
       if (compareSync(password, user.passwordHash)) {
         const scopeArray: Scope[] = user.scopes
         const scopes: string[] = scopeArray.map(item => {
