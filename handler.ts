@@ -13,6 +13,7 @@ import RefreshTokenService, {
   CookieFromHeader
 } from "./service/RefreshTokenService"
 import BaseErrorResponse from "./responses/BaseErrorResponse"
+import UserResponse from "./responses/UserResponse"
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -176,6 +177,22 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
   }
 }
 
+export const getUser: Handler = async (event: APIGatewayEvent) => {
+  const {id} = event.pathParameters
+  const userService = new UserService()
+  const userResponse = await userService.getUser(parseInt(id))
+  if (userResponse != null) {
+    return new UserResponse(
+      200,
+      1,
+      `User data for ${id}`,
+      userResponse
+    ).response()
+  } else {
+    return new BaseErrorResponse("Could not find user").response()
+  }
+}
+
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
   const id = parseInt(event.pathParameters.id)
   console.log(event.headers)
@@ -232,3 +249,4 @@ export const lockUser: Handler = async (event: APIGatewayEvent) => {
     return new BaseResponse(500, 0, "Failed to lock user").response()
   }
 }
+
