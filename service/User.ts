@@ -375,14 +375,21 @@ export default class UserService {
     }
   }
 
-  async lockUser(id: number): Promise<boolean> {
+  async lockUser(
+    id: number,
+    lockedBy: string,
+    reason: string | null
+  ): Promise<boolean> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const user: User = await User.findOne({id})
+      if (!user) {
+        return false
+      }
       const lock: Lock = new Lock()
-      lock.lockedBy = "me"
+      lock.lockedBy = lockedBy
       lock.lockedAt = new Date()
-      lock.reason = "me no like this user"
+      lock.reason = reason
       lock.userId = id
       const lockResult: Lock = await Lock.save(lock)
       const lockId: number = lockResult.id

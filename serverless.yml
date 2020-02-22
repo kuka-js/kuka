@@ -18,14 +18,12 @@ functions:
       - http:
           path: user/register
           method: post
-
   login:
     handler: handler.login
     events:
       - http:
           path: user/login
           method: post
-
   verify:
     handler: handler.verify
     events:
@@ -36,21 +34,18 @@ functions:
             parameters:
               paths:
                 id: true
-
   reset:
     handler: handler.reset
     events:
       - http:
           path: user/reset
           method: post
-
   password:
     handler: handler.password
     events:
       - http:
           path: user/password
           method: put
-
   getScopes:
     handler: handler.getScopes
     events:
@@ -62,7 +57,6 @@ functions:
             parameters:
               paths:
                 id: true
-
   addScope:
     handler: handler.addScope
     events:
@@ -74,7 +68,6 @@ functions:
             parameters:
               paths:
                 id: true
-
   removeScope:
     handler: handler.removeScope
     events:
@@ -87,7 +80,6 @@ functions:
               paths:
                 id: true
                 scopeName: true
-
   getUserList:
     handler: handler.getUserList
     events:
@@ -95,7 +87,6 @@ functions:
           path: user/list
           method: get
           authorizer: authGetUserList
-
   refreshToken:
     handler: handler.refreshToken
     events:
@@ -117,7 +108,17 @@ functions:
             parameters:
               paths:
                 id: true
-
+  lockUser:
+    handler: handler.lockUser
+    events:
+      - http:
+          path: user/lock/{id}
+          method: put
+          authorizer: authLockUser
+          request:
+            parameters:
+              paths:
+                id: true
   authGetScopes:
     handler: service/Auth.getScopes
 
@@ -132,3 +133,6 @@ functions:
 
   authDeleteUser:
     handler: service/Auth.deleteUser
+
+  authLockUser:
+    handler: service/Auth.lockUser
