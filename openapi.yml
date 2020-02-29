@@ -14,6 +14,10 @@ servers:
 tags:
   - name: user
     description: Operations about user
+  - name: password
+    description: Operations about password
+  - name: scopes
+    description: Operations about scopes
 paths:
   /user/register:
     post:
@@ -75,7 +79,7 @@ paths:
       security:
         - jwt_auth: []
       x-security-scopes:
-        - geUserList
+        - getUserList
         - root
       tags:
         - user
@@ -85,19 +89,19 @@ paths:
         default:
           description: successful operation
           content: {}
-  /user/{userId}:
+  /user/{id}:
     get:
       security:
         - jwt_auth: []
       x-security-scopes:
-        - geUserData
+        - getUserData
         - root
       tags:
         - user
       summary: Get user by id
       description: Get user data by id
       parameters:
-        - name: userId
+        - name: id
           in: path
           description: User ID
           required: true
@@ -108,7 +112,6 @@ paths:
         default:
           description: successful operation
           content: {}
-  /user/delete/{userId}:
     delete:
       security:
         - jwt_auth: []
@@ -118,9 +121,9 @@ paths:
       tags:
         - user
       summary: Delete a user
-      description: Deletes a user by userId
+      description: Deletes a user by id
       parameters:
-        - name: userId
+        - name: id
           in: path
           description: User ID
           required: true
@@ -172,7 +175,7 @@ paths:
       tags:
         - user
       summary: Renew JWT with refresh token
-      description: Renew JWT with refresh token via cookie. The cookie is first given with through the login endpoint.
+      description: Renew JWT with refresh token via cookie. The cookie is first given through the login endpoint.
       parameters:
         - name: id
           in: path
@@ -185,7 +188,7 @@ paths:
         default:
           description: successful operation
           content: {}
-  /user/scopes/{userId}:
+  /user/scopes/{id}:
     get:
       security:
         - jwt_auth: []
@@ -197,7 +200,7 @@ paths:
       summary: Get scopes
       description: Gets scopes of userId
       parameters:
-        - name: userId
+        - name: id
           in: path
           description: User ID
           required: true
@@ -219,7 +222,7 @@ paths:
       summary: Add scope
       description: Adds new scope to userId.
       parameters:
-        - name: userId
+        - name: id
           in: path
           description: User ID
           required: true
@@ -236,7 +239,7 @@ paths:
         default:
           description: successful operation
           content: {}
-  /user/scopes/{userId}/{scopeName}:
+  /user/scopes/{id}/{scopeName}:
     delete:
       security:
         - jwt_auth: []
@@ -248,7 +251,7 @@ paths:
       summary: Delete a scope
       description: Deletes a scope of userId
       parameters:
-        - name: userId
+        - name: id
           in: path
           description: User ID
           required: true
@@ -261,6 +264,29 @@ paths:
           required: true
           schema:
             type: string
+      responses:
+        default:
+          description: successful operation
+          content: {}
+  /user/lock/{id}:
+    put:
+      security:
+        - jwt_auth: []
+      x-security-scopes:
+        - lockUser
+        - root
+      tags:
+        - user
+      summary: Lock user's account
+      description: Lock user's account by id
+      parameters:
+        - name: id
+          in: path
+          description: User ID
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         default:
           description: successful operation
