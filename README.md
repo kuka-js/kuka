@@ -4,7 +4,7 @@
 
 A Typescript jwt boilerplate using the Serverless framework
 
-[API Documentation](https://nake89.github.io/serverless-jwt-boilerplate/apidocs.html)
+[API Documentation](https://kuka-js.github.io/kuka/apidocs.html)
 
 ## Development
 
