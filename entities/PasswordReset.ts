@@ -13,7 +13,7 @@ export default class PasswordReset extends BaseEntity {
   id: number
 
   @Column()
-  userId: number
+  username: string
 
   @Column()
   email: string
@@ -25,8 +25,8 @@ export default class PasswordReset extends BaseEntity {
   clicked: boolean
 
   @CreateDateColumn()
-  createdDate: Date
+  creationDate: Date
 
   @UpdateDateColumn()
-  updatedDate: Date
+  updateDate: Date
 }

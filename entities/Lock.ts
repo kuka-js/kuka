@@ -15,5 +15,5 @@ export default class Lock extends BaseEntity {
   lockedAt: Date
 
   @Column()
-  userId: number
+  userId: string
 }

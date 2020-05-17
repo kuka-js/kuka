@@ -3,7 +3,7 @@ import Scope from "../entities/Scope"
 import ProjectConnection from "./Connection"
 
 export default class ScopeService {
-  async getScopes(userId: number): Promise<string[] | boolean> {
+  async getScopes(userId: string): Promise<string[] | boolean> {
     try {
       await ProjectConnection.connect()
     } catch (e) {
@@ -13,7 +13,7 @@ export default class ScopeService {
     const user: User = await User.findOne({id: userId})
     if (user) {
       const scopeArray: Scope[] = await Scope.find({user})
-      const scopes: string[] = scopeArray.map(item => {
+      const scopes: string[] = scopeArray.map((item) => {
         return item.scope
       })
       return scopes
@@ -22,7 +22,7 @@ export default class ScopeService {
     }
   }
 
-  async addScope(userId: number, scope: string): Promise<boolean> {
+  async addScope(userId: string, scope: string): Promise<boolean> {
     try {
       await ProjectConnection.connect()
     } catch (e) {
@@ -47,7 +47,7 @@ export default class ScopeService {
     }
   }
 
-  async removeScope(userId: number, scope: string) {
+  async removeScope(userId: string, scope: string) {
     try {
       await ProjectConnection.connect()
     } catch (e) {
@@ -56,7 +56,7 @@ export default class ScopeService {
     }
     const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
     if (user) {
-      user.scopes = user.scopes.filter(e => e.scope !== scope)
+      user.scopes = user.scopes.filter((e) => e.scope !== scope)
       await User.save(user)
       return true
     } else {

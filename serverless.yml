@@ -1,5 +1,9 @@
 service: sls-jwt-boilerplate
 
+custom:
+  serverless-offline:
+    httpPort: 4000
+
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
