@@ -13,10 +13,7 @@ export default class Verification extends BaseEntity {
   id: number
 
   @Column()
-  userId: number
-
-  @Column()
-  email: string
+  username: string
 
   @Column()
   verifyLinkId: string

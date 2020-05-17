@@ -4,13 +4,13 @@ export default class RegisterResponse extends BaseResponse {
   statusCode: number
   ok: number
   message: string
-  userId?: number
+  userId?: string
 
   constructor(
     statusCode: number,
     ok: number,
     message: string,
-    userId?: number
+    userId?: string
   ) {
     super(statusCode, ok, message)
     this.userId = userId
@@ -24,12 +24,12 @@ export default class RegisterResponse extends BaseResponse {
           ok: this.ok,
           data: {
             message: this.message,
-            userId: this.userId
-          }
+            userId: this.userId,
+          },
         },
         null,
         2
-      )
+      ),
     }
   }
 }

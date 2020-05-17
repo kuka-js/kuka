@@ -4,7 +4,7 @@ import {v4 as uuid} from "uuid"
 
 export default class RefreshTokenService {
   public static async refreshToken(
-    userId: number,
+    userId: string,
     oldRefreshToken: string
   ): Promise<RefreshTokenServiceResponse> {
     try {
@@ -14,7 +14,7 @@ export default class RefreshTokenService {
       return {
         ok: 0,
         errorCode: RefreshTokenServiceError.CONNECTION_PROBLEM,
-        errorMessage: "Connection problem"
+        errorMessage: "Connection problem",
       }
     }
     const user: User = await User.findOne({id: userId})
@@ -29,7 +29,7 @@ export default class RefreshTokenService {
       return {
         ok: 0,
         errorCode: RefreshTokenServiceError.REFRESH_TOKEN_INVALID,
-        errorMessage: "Given refresh token does not match"
+        errorMessage: "Given refresh token does not match",
       }
     }
   }
@@ -63,7 +63,7 @@ export default class RefreshTokenService {
       rc = headers.Cookie
 
     rc &&
-      rc.split(";").forEach(function(cookie) {
+      rc.split(";").forEach(function (cookie) {
         var parts = cookie.split("=")
         var key = parts.shift().trim()
         var value = decodeURI(parts.join("="))
@@ -85,7 +85,7 @@ interface RefreshTokenServiceResponse {
 
 export enum RefreshTokenServiceError {
   CONNECTION_PROBLEM,
-  REFRESH_TOKEN_INVALID
+  REFRESH_TOKEN_INVALID,
 }
 
 export interface CookieFromHeader {

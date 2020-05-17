@@ -61,9 +61,10 @@ export const login: Handler = async (event: APIGatewayEvent) => {
 export const verify: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const verification = new VerificationService()
-  if (await verification.markEmailVerified(id)) {
+  try {
+    await verification.markEmailVerified(id)
     return new BaseResponse(200, 1, `Email verified`).response()
-  } else {
+  } catch (e) {
     return new BaseResponse(500, 0, `Unable to verify email`).response()
   }
 }
@@ -74,18 +75,9 @@ export const reset: Handler = async (event: APIGatewayEvent) => {
 
     const passwordReset = new PasswordResetService()
 
-    let passwordResetResult: string
-    if (process.env.AUTO_SEND_PASSWORD_RESET_ID) {
-      passwordResetResult = await passwordReset.createPasswordResetLink(
-        email,
-        true
-      )
-    } else {
-      passwordResetResult = await passwordReset.createPasswordResetLink(
-        email,
-        false
-      )
-    }
+    let passwordResetResult: string = await passwordReset.createPasswordResetLink(
+      email
+    )
 
     if (passwordResetResult == "true") {
       return new BaseResponse(200, 1, `Password Reset email sent`).response()
@@ -136,7 +128,7 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
     const body = JSON.parse(event.body)
     const newScope = body.scope
     const scopes = new ScopeService()
-    const scopeResponse = await scopes.addScope(parseInt(id), newScope)
+    const scopeResponse = await scopes.addScope(id, newScope)
     if (scopeResponse) {
       return new BaseResponse(200, 1, `Scope added succesfully`).response()
     } else {
@@ -148,7 +140,7 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
 export const removeScope: Handler = async (event: APIGatewayEvent) => {
   const {id, scopeName} = event.pathParameters
   const scopes = new ScopeService()
-  const scopeResponse = await scopes.removeScope(parseInt(id), scopeName)
+  const scopeResponse = await scopes.removeScope(id, scopeName)
   if (scopeResponse) {
     return new BaseResponse(200, 1, `Scope removed succesfully`).response()
   } else {
@@ -159,7 +151,7 @@ export const removeScope: Handler = async (event: APIGatewayEvent) => {
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const scopes = new ScopeService()
-  const scopeResponse = await scopes.getScopes(parseInt(id))
+  const scopeResponse = await scopes.getScopes(id)
   if (Array.isArray(scopeResponse)) {
     return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
   } else {
@@ -180,7 +172,7 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
 export const getUser: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const userService = new UserService()
-  const userResponse = await userService.getUser(parseInt(id))
+  const userResponse = await userService.getUser(id)
   if (userResponse != null) {
     return new UserResponse(
       200,
@@ -194,7 +186,7 @@ export const getUser: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
-  const id = parseInt(event.pathParameters.id)
+  const id = event.pathParameters.id
   console.log(event.headers)
   console.log(event.multiValueHeaders)
   const cookie = RefreshTokenService.getCookiesFromHeader(
@@ -221,7 +213,7 @@ export const refreshToken: Handler = async (event: APIGatewayEvent) => {
 export const deleteUser: Handler = async (event: APIGatewayEvent) => {
   const {id} = event.pathParameters
   const user = new UserService()
-  const userResponse: boolean = await user.deleteUser(parseInt(id))
+  const userResponse: boolean = await user.deleteUser(id)
   if (userResponse) {
     return new BaseResponse(200, 1, `Removed user by id ${id}`).response()
   } else {
@@ -238,15 +230,10 @@ export const lockUser: Handler = async (event: APIGatewayEvent) => {
     reason = body.reason
   }
   const user = new UserService()
-  const lockResponse: boolean = await user.lockUser(
-    parseInt(id),
-    lockedBy,
-    reason
-  )
+  const lockResponse: boolean = await user.lockUser(id, lockedBy, reason)
   if (lockResponse) {
     return new BaseResponse(200, 1, `User ${id} locked `).response()
   } else {
     return new BaseResponse(500, 0, "Failed to lock user").response()
   }
 }
-

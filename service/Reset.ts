@@ -5,6 +5,16 @@ import {Connection} from "typeorm"
 import ProjectConnection from "./Connection"
 import Email from "./Email"
 import PasswordReset from "../entities/PasswordReset"
+import {
+  CreateDBAdapter,
+  convert,
+  DatabaseImpl
+} from "./Database/DatabaseFactory"
+import {PasswordResetModel} from "../models/PasswordResetModel"
+import * as logg from "loglevel"
+
+const log = logg.getLogger("PasswordResetService")
+log.setLevel("debug")
 
 export default class PasswordResetService {
   async markPasswordResetDone(passwordResetId: string): Promise<boolean> {
@@ -20,7 +30,7 @@ export default class PasswordResetService {
         passwordResetId
       })
       passwordReset.clicked = true
-      let {userId} = passwordReset
+      let {username: userId} = passwordReset
       await PasswordReset.save(passwordReset)
       const user = await User.findOne({id: userId})
       user.emailVerified = true
@@ -32,33 +42,32 @@ export default class PasswordResetService {
     }
   }
 
-  async createPasswordResetLink(
-    email: string,
-    return_id: boolean
-  ): Promise<string> {
+  async createPasswordResetLink(email: string): Promise<string> {
+    const passwordResetId = uuid()
     try {
-      await ProjectConnection.connect()
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      const passwordResetModel: PasswordResetModel = {
+        passwordResetId,
+        email,
+        clicked: false
+      }
+      log.debug(
+        `Inserting password reset link details to DB for email ${email} `
+      )
+      DBImpl.createPasswordReset(passwordResetModel)
     } catch (e) {
       console.log(e)
       return "false"
     }
-    const passwordResetId = uuid()
 
-    let passwordReset = new PasswordReset()
-    let userService = new UserService()
-
-    passwordReset.userId = await userService.emailToUserId(email)
-    passwordReset.passwordResetId = passwordResetId
-    passwordReset.email = email
-    passwordReset.clicked = false
     try {
-      await PasswordReset.save(passwordReset)
-      passwordReset.save()
       const PW_RESET_LINK_PAGE = process.env.PW_RESET_LINK_PAGE
-
-      if (return_id) {
+      if (process.env.AUTO_SEND_PASSWORD_RESET_ID === "true") {
         return passwordResetId
       } else {
+        log.debug(`Sending password reset link to customer. ${email}`)
         const emailInstance = new Email()
         await emailInstance.sendEmail(
           email,
@@ -66,6 +75,7 @@ export default class PasswordResetService {
           `You can reset your password from this link: ${PW_RESET_LINK_PAGE}/${passwordResetId}`,
           process.env.EMAIL_SERVICE
         )
+        console.log("WTFWTFWTFWTFWTFWTFWTFWTFWTFWTFWTFWTFWTF")
         return "true"
       }
     } catch (e) {

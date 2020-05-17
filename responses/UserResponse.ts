@@ -1,17 +1,17 @@
 import BaseResponse from "./BaseResponse"
-import {getUserResponse} from "../service/User"
+import {GetUserApiResponse} from "../service/User"
 
 export default class UserResponse extends BaseResponse {
   statusCode: number
   ok: number
   message: string
-  user: getUserResponse
+  user: GetUserApiResponse
 
   constructor(
     statusCode: number,
     ok: number,
     message: string,
-    user: getUserResponse
+    user: GetUserApiResponse
   ) {
     super(statusCode, ok, message)
     this.user = user
