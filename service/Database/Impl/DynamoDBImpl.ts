@@ -259,4 +259,20 @@ export class DynamoDBImpl implements DatabaseImpl {
       throw new DBQueryFailedException()
     }
   }
+
+  private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
+    const {username, email, passwordHash, emailVerified, refreshToken, scopes, lockId} = user
+    return {pk: "USER#"+username, sk: "USER#"+username, email, passwordHash, emailVerified, refreshToken, scopes, lockId} 
+  }
+}
+
+interface UserModelForDynamoDB {
+  pk: string,
+  sk: string,
+  email: string
+  passwordHash: string
+  emailVerified: boolean
+  refreshToken?: string
+  scopes: string[]
+  lockId?: number
 }
