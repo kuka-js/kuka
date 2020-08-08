@@ -108,6 +108,7 @@ export default class UserService {
         }
       }
     }
+    console.log("Creating user")
     log.debug("Creating user")
     const createUserResponse: CreateUserResponse = await DBImpl.createUser(
       userModel

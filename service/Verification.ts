@@ -1,10 +1,10 @@
-import {v4 as uuid} from "uuid"
+import { v4 as uuid } from "uuid"
 import Email from "./Email"
-import {CreateVerificationLinkRequest} from "./Requests/CreateVerificationLinkRequest"
+import { CreateVerificationLinkRequest } from "./Requests/CreateVerificationLinkRequest"
 import {
   CreateDBAdapter,
   DatabaseImpl,
-  convert
+  convert,
 } from "./Database/DatabaseFactory"
 
 export default class VerificationService {
@@ -23,7 +23,7 @@ export default class VerificationService {
   public static async createVerificationLink(
     request: CreateVerificationLinkRequest
   ): Promise<void> {
-    const {email, username} = request
+    const { email, username } = request
     const verifyLinkId = uuid()
     let clicked
     if (process.env.AUTO_VERIFY_MAIL == "true") {
@@ -39,28 +39,26 @@ export default class VerificationService {
       DBImpl.createVerificationLink({
         verifyLinkId,
         username,
-        clicked
+        clicked,
       })
     } catch (e) {
       // throws DBConnectionException
       throw e
     }
-
-    if (
-      !(process.env.STAGE == "test") ||
-      !(process.env.AUTO_VERIFY_MAIL == "true")
-    ) {
-      try {
-        const emailInstance = new Email()
-        await emailInstance.sendEmail(
-          email,
-          "Verify your email address",
-          `Please verify your email address by clicking this link: ${process.env.VERIFICATION_LINK_URL}${verifyLinkId}`,
-          process.env.EMAIL_SERVICE
-        )
-      } catch (e) {
-        // throws EmailSendException, UnkownEmailServiceException
-        throw e
+    if (!(process.env.STAGE == "test")) {
+      if (!(process.env.AUTO_VERIFY_MAIL == "true") ) {
+        try {
+          const emailInstance = new Email()
+          await emailInstance.sendEmail(
+            email,
+            "Verify your email address",
+            `Please verify your email address by clicking this link: ${process.env.VERIFICATION_LINK_URL}${verifyLinkId}`,
+            process.env.EMAIL_SERVICE
+          )
+        } catch (e) {
+          // throws EmailSendException, UnkownEmailServiceException
+          throw e
+        }
       }
     }
   }
