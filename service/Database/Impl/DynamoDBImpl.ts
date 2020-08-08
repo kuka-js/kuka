@@ -50,7 +50,8 @@ export class DynamoDBImpl implements DatabaseImpl {
 
     try {
       const result = await docClient.get(params).promise()
-    console.log("result getUser")
+      console.log("result getUser")
+      console.log(result)
       if (!result) {
         throw new UserDoesNotExistException()
       } else {
@@ -71,7 +72,9 @@ export class DynamoDBImpl implements DatabaseImpl {
 
     try {
       const result = await docClient.get(params).promise()
-      if (result && result.Item && result.Item.username === username) {
+      console.log("User exist result")
+      console.log(result)
+      if (result && result.Item && result.Item.pk === "USER#"+username) {
         return true
       } else {
         return false
