@@ -1,57 +1,56 @@
-import {DynamoDB, config, SharedIniFileCredentials, AWSError} from "aws-sdk"
-import {DatabaseImpl} from "../DatabaseFactory"
+import { DynamoDB, config, SharedIniFileCredentials, AWSError } from "aws-sdk"
+import { DatabaseImpl } from "../DatabaseFactory"
 import {
   CreateUserResponse,
   GetUserResponse,
   UpdateUserResponse,
-  DeleteUserResponse
+  DeleteUserResponse,
 } from "../Responses"
-import {UserModel} from "../../../models/UserModel"
-import {UserDoesNotExistException} from "../../../exceptions/UserDoesNotExistException"
-import {DBConnectionException} from "../../../exceptions/DBConncetionException"
-import {VerificationModel} from "../../../models/VerificationModel"
-import {PasswordResetModel} from "../../../models/PasswordResetModel"
+import { UserModel } from "../../../models/UserModel"
+import { UserDoesNotExistException } from "../../../exceptions/UserDoesNotExistException"
+import { DBConnectionException } from "../../../exceptions/DBConncetionException"
+import { VerificationModel } from "../../../models/VerificationModel"
+import { PasswordResetModel } from "../../../models/PasswordResetModel"
 import UserService from "../../User"
-import {CouldNotGetItemException} from "../../../exceptions/CouldNotGetItemException"
-import {DBQueryFailedException} from "../../../exceptions/DBQueryFailedException"
+import { CouldNotGetItemException } from "../../../exceptions/CouldNotGetItemException"
+import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
 
-const credentials = new SharedIniFileCredentials({profile: "kuka-dynamo"})
+const credentials = new SharedIniFileCredentials({ profile: "kuka-dynamo" })
 config.credentials = credentials
 
-config.update({
-  region: "eu-central-1"
-})
+config.update({ region: "eu-north-1" })
 
 const docClient = new DynamoDB.DocumentClient()
 
 export class DynamoDBImpl implements DatabaseImpl {
   async createUser(user: UserModel): Promise<CreateUserResponse> {
-    var params = {
-      TableName: "kuka-users",
-      Item: user
-    }
+    const userModel: UserModelForDynamoDB = this.userModelToDynamoDBModel(user)
+    const params = { TableName: "kuka-users", Item: userModel }
     try {
       await docClient.put(params).promise()
-      return {ok: 1, data: {message: "User succesfully created!"}}
+      return { ok: 1, data: { message: "User succesfully created!" } }
     } catch (e) {
       console.log(e)
       return {
         ok: 0,
         data: {
-          message: e.message
-        }
+          message: e.message,
+        },
       }
     }
   }
 
   async getUser(username: string): Promise<UserModel> {
+    console.log("getUser")
+    const pksk = "USER#" + username
     const params = {
       TableName: "kuka-users",
-      Key: {username}
+      Key: { pk: pksk, sk: pksk },
     }
 
     try {
       const result = await docClient.get(params).promise()
+    console.log("result getUser")
       if (!result) {
         throw new UserDoesNotExistException()
       } else {
@@ -64,9 +63,10 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   async userExists(username: string): Promise<boolean> {
+    const key = "USER#" + username
     const params = {
       TableName: "kuka-users",
-      Key: {username}
+      Key: { pk: key, sk: key },
     }
 
     try {
@@ -89,12 +89,12 @@ export class DynamoDBImpl implements DatabaseImpl {
     var params = {
       TableName: "kuka-users",
       Key: {
-        username: username
+        username: username,
       },
       UpdateExpression: "set refreshToken = :r",
       ExpressionAttributeValues: {
-        ":r": refreshToken
-      }
+        ":r": refreshToken,
+      },
     }
     await docClient.update(params).promise()
   }
@@ -102,15 +102,15 @@ export class DynamoDBImpl implements DatabaseImpl {
   async deleteUser(userId: string): Promise<DeleteUserResponse> {
     const params = {
       TableName: "kuka-users",
-      Key: {userId}
+      Key: { userId },
     }
     try {
       await docClient.delete(params).promise()
       return {
         ok: 1,
         data: {
-          message: "User deleted"
-        }
+          message: "User deleted",
+        },
       }
     } catch (e) {
       console.log(e)
@@ -119,16 +119,16 @@ export class DynamoDBImpl implements DatabaseImpl {
         ok: 0,
         data: {
           message: "Couldn't delete user",
-          error: e.message
-        }
+          error: e.message,
+        },
       }
     }
   }
 
   async createVerificationLink(verifyObject: VerificationModel): Promise<void> {
-    var params = {
-      TableName: "kuka-verifyLink",
-      Item: verifyObject
+    const params = {
+      TableName: "kuka-users",
+      Item: this.verificationModelToDynamoDBModel(verifyObject),
     }
     try {
       await docClient.put(params).promise()
@@ -143,25 +143,25 @@ export class DynamoDBImpl implements DatabaseImpl {
       var params = {
         TableName: "kuka-verifyLink",
         Key: {
-          verifyLinkId
+          verifyLinkId,
         },
         UpdateExpression: "set clicked = :bool",
         ExpressionAttributeValues: {
-          ":bool": true
+          ":bool": true,
         },
-        ReturnValues: "ALL_NEW"
+        ReturnValues: "ALL_NEW",
       }
       const result = await docClient.update(params).promise()
       const username = result.Attributes.username
       var emailVerifiedRequest = {
         TableName: "kuka-users",
         Key: {
-          username: username
+          username: username,
         },
         UpdateExpression: "set emailVerified = :bool",
         ExpressionAttributeValues: {
-          ":bool": true
-        }
+          ":bool": true,
+        },
       }
       await docClient.update(emailVerifiedRequest).promise()
     } catch (e) {
@@ -174,7 +174,7 @@ export class DynamoDBImpl implements DatabaseImpl {
     passwordResetModel: PasswordResetModel
   ): Promise<void> {
     try {
-      const {passwordResetId, email, clicked} = passwordResetModel
+      const { passwordResetId, email, clicked } = passwordResetModel
       const userService = new UserService()
       const username = await userService.emailToUsername(email)
       const date = new Date()
@@ -184,11 +184,11 @@ export class DynamoDBImpl implements DatabaseImpl {
         username,
         clicked,
         passwordResetId,
-        creationDate
+        creationDate,
       }
       const params = {
         TableName: "kuka-passwordReset",
-        Item: passwordResetItem
+        Item: passwordResetItem,
       }
       await docClient.put(params).promise()
     } catch (e) {
@@ -199,7 +199,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   async getPasswordReset(passwordResetId: string): Promise<PasswordResetModel> {
     const params = {
       TableName: "kuka-passwordReset",
-      Key: {passwordResetId}
+      Key: { passwordResetId },
     }
 
     try {
@@ -223,12 +223,12 @@ export class DynamoDBImpl implements DatabaseImpl {
       const params = {
         TableName: "kuka-users",
         Key: {
-          username
+          username,
         },
         UpdateExpression: "set passwordHash = :r",
         ExpressionAttributeValues: {
-          ":r": passwordHash
-        }
+          ":r": passwordHash,
+        },
       }
       await docClient.update(params).promise()
     } catch (e) {
@@ -242,9 +242,9 @@ export class DynamoDBImpl implements DatabaseImpl {
       IndexName: "email-index",
       KeyConditionExpression: "email  = :email",
       ExpressionAttributeValues: {
-        ":email": email
+        ":email": email,
       },
-      ProjectionExpression: "username"
+      ProjectionExpression: "username",
     }
     let result
     try {
@@ -261,18 +261,51 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
-    const {username, email, passwordHash, emailVerified, refreshToken, scopes, lockId} = user
-    return {pk: "USER#"+username, sk: "USER#"+username, email, passwordHash, emailVerified, refreshToken, scopes, lockId} 
+    const {
+      username,
+      email,
+      passwordHash,
+      emailVerified,
+      refreshToken,
+      scopes,
+      lockId,
+    } = user
+    return {
+      pk: "USER#" + username,
+      sk: "USER#" + username,
+      email,
+      passwordHash,
+      emailVerified,
+      refreshToken,
+      scopes,
+      lockId,
+    }
+  }
+
+  private verificationModelToDynamoDBModel(
+    verification: VerificationModel
+  ): VerificationModelForDynamoDB {
+    return {
+      pk: "USER#" + verification.username,
+      sk: "VER#" + verification.verifyLinkId,
+      emailVerified: verification.clicked,
+    }
   }
 }
 
 interface UserModelForDynamoDB {
-  pk: string,
-  sk: string,
+  pk: string
+  sk: string
   email: string
   passwordHash: string
   emailVerified: boolean
   refreshToken?: string
   scopes: string[]
   lockId?: number
+}
+
+interface VerificationModelForDynamoDB {
+  pk: string
+  sk: string
+  emailVerified: boolean
 }
