@@ -60,7 +60,9 @@ export class DynamoDBImpl implements DatabaseImpl {
       if (!result || !result.Item) {
         throw new UserDoesNotExistException()
       } else {
-        const userModel = this.dynamoDBToUserModel(result.Item as UserModelForDynamoDB) 
+        const userModel = this.dynamoDBToUserModel(
+          result.Item as UserModelForDynamoDB
+        )
         return userModel
       }
     } catch (e) {
@@ -147,31 +149,48 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   async markEmailVerified(verifyLinkId: string): Promise<void> {
+    const sk = "VER#" + verifyLinkId
     try {
-      var params = {
-        TableName: "kuka-verifyLink",
-        Key: {
-          verifyLinkId,
-        },
-        UpdateExpression: "set clicked = :bool",
+      let getVerifyParams = {
+        TableName: "kuka-users",
+        IndexName: "sk-pk-index",
+        KeyConditionExpression: "sk = :sk AND begins_with(pk, :pk)",
         ExpressionAttributeValues: {
-          ":bool": true,
+          ":sk": sk,
+          ":pk": "USER#",
         },
-        ReturnValues: "ALL_NEW",
       }
-      const result = await docClient.update(params).promise()
-      const username = result.Attributes.username
-      var emailVerifiedRequest = {
+      const verifyItem = await docClient.query(getVerifyParams).promise()
+      log.debug("verifyItem")
+      log.debug(verifyItem)
+      if (verifyItem.Items.length != 1) {
+        throw new DBQueryFailedException()
+      }
+      const pk = verifyItem.Items[0].pk
+      const emailVerifiedToUserItem = {
         TableName: "kuka-users",
         Key: {
-          username: username,
+          pk,
+          sk,
         },
         UpdateExpression: "set emailVerified = :bool",
         ExpressionAttributeValues: {
           ":bool": true,
         },
       }
-      await docClient.update(emailVerifiedRequest).promise()
+      await docClient.update(emailVerifiedToUserItem).promise()
+      const emailVerifiedToVerifyItem = {
+        TableName: "kuka-users",
+        Key: {
+          pk,
+          sk: pk,
+        },
+        UpdateExpression: "set emailVerified = :bool",
+        ExpressionAttributeValues: {
+          ":bool": true,
+        },
+      }
+      await docClient.update(emailVerifiedToVerifyItem).promise()
     } catch (e) {
       console.log(e)
       throw new DBConnectionException()
