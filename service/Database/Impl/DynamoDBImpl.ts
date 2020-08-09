@@ -14,6 +14,10 @@ import { PasswordResetModel } from "../../../models/PasswordResetModel"
 import UserService from "../../User"
 import { CouldNotGetItemException } from "../../../exceptions/CouldNotGetItemException"
 import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
+import * as logg from "loglevel"
+
+const log = logg.getLogger("DynamoDBImpl")
+log.setLevel("debug")
 
 const credentials = new SharedIniFileCredentials({ profile: "kuka-dynamo" })
 config.credentials = credentials
@@ -25,6 +29,10 @@ const docClient = new DynamoDB.DocumentClient()
 export class DynamoDBImpl implements DatabaseImpl {
   async createUser(user: UserModel): Promise<CreateUserResponse> {
     const userModel: UserModelForDynamoDB = this.userModelToDynamoDBModel(user)
+    log.debug("Trying to print userModel variable")
+    log.debug(userModel)
+    log.debug("Does this display without server restart")
+    log.debug("What about this")
     const params = { TableName: "kuka-users", Item: userModel }
     try {
       await docClient.put(params).promise()
@@ -41,7 +49,6 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   async getUser(username: string): Promise<UserModel> {
-    console.log("getUser")
     const pksk = "USER#" + username
     const params = {
       TableName: "kuka-users",
@@ -50,12 +57,11 @@ export class DynamoDBImpl implements DatabaseImpl {
 
     try {
       const result = await docClient.get(params).promise()
-      console.log("result getUser")
-      console.log(result)
-      if (!result) {
+      if (!result || !result.Item) {
         throw new UserDoesNotExistException()
       } else {
-        return result.Item as UserModel
+        const userModel = this.dynamoDBToUserModel(result.Item as UserModelForDynamoDB) 
+        return userModel
       }
     } catch (e) {
       console.log(e)
@@ -74,7 +80,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       const result = await docClient.get(params).promise()
       console.log("User exist result")
       console.log(result)
-      if (result && result.Item && result.Item.pk === "USER#"+username) {
+      if (result && result.Item && result.Item.pk === "USER#" + username) {
         return true
       } else {
         return false
@@ -89,11 +95,10 @@ export class DynamoDBImpl implements DatabaseImpl {
     username: string,
     refreshToken: string
   ): Promise<void> {
-    var params = {
+    const key = "USER#" + username
+    const params = {
       TableName: "kuka-users",
-      Key: {
-        username: username,
-      },
+      Key: { pk: key, sk: key },
       UpdateExpression: "set refreshToken = :r",
       ExpressionAttributeValues: {
         ":r": refreshToken,
@@ -285,6 +290,26 @@ export class DynamoDBImpl implements DatabaseImpl {
     }
   }
 
+  private dynamoDBToUserModel(user: UserModelForDynamoDB): UserModel {
+    const {
+      pk,
+      email,
+      passwordHash,
+      emailVerified,
+      refreshToken,
+      scopes,
+      lockId,
+    } = user
+    return {
+      username: pk.split("#")[1],
+      email,
+      passwordHash,
+      emailVerified,
+      refreshToken,
+      scopes,
+      lockId,
+    }
+  }
   private verificationModelToDynamoDBModel(
     verification: VerificationModel
   ): VerificationModelForDynamoDB {
