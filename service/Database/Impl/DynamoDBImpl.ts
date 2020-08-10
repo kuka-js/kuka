@@ -34,8 +34,13 @@ export class DynamoDBImpl implements DatabaseImpl {
     log.debug("Does this display without server restart")
     log.debug("What about this")
     const params = { TableName: "kuka-users", Item: userModel }
+    const addEmailSK = {
+      TableName: "kuka-users",
+      Item: { pk: userModel.pk, sk: "EMAIL#" + userModel.email },
+    }
     try {
       await docClient.put(params).promise()
+      await docClient.put(addEmailSK).promise()
       return { ok: 1, data: { message: "User succesfully created!" } }
     } catch (e) {
       console.log(e)
@@ -207,14 +212,14 @@ export class DynamoDBImpl implements DatabaseImpl {
       const date = new Date()
       const creationDate = date.toISOString()
       const passwordResetItem = {
+        pk: "USER#" + username,
+        sk: "PWRESET" + passwordResetId,
         email,
-        username,
         clicked,
-        passwordResetId,
         creationDate,
       }
       const params = {
-        TableName: "kuka-passwordReset",
+        TableName: "kuka-users",
         Item: passwordResetItem,
       }
       await docClient.put(params).promise()
@@ -266,12 +271,12 @@ export class DynamoDBImpl implements DatabaseImpl {
   async emailToUsername(email: string): Promise<string> {
     const params = {
       TableName: "kuka-users",
-      IndexName: "email-index",
-      KeyConditionExpression: "email  = :email",
+      IndexName: "sk-pk-index",
+      KeyConditionExpression: "sk  = :email",
       ExpressionAttributeValues: {
-        ":email": email,
+        ":email": "EMAIL#"+email,
       },
-      ProjectionExpression: "username",
+      ProjectionExpression: "pk",
     }
     let result
     try {
@@ -281,7 +286,8 @@ export class DynamoDBImpl implements DatabaseImpl {
     }
 
     if (Array.isArray(result.Items) && result.Items.length > 0) {
-      return result.Items[0].username
+      const username = result.Items[0].pk.split("#")[1]
+      return username
     } else {
       throw new DBQueryFailedException()
     }
