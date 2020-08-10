@@ -29,10 +29,6 @@ const docClient = new DynamoDB.DocumentClient()
 export class DynamoDBImpl implements DatabaseImpl {
   async createUser(user: UserModel): Promise<CreateUserResponse> {
     const userModel: UserModelForDynamoDB = this.userModelToDynamoDBModel(user)
-    log.debug("Trying to print userModel variable")
-    log.debug(userModel)
-    log.debug("Does this display without server restart")
-    log.debug("What about this")
     const params = { TableName: "kuka-users", Item: userModel }
     const addEmailSK = {
       TableName: "kuka-users",
