@@ -225,18 +225,26 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   async getPasswordReset(passwordResetId: string): Promise<PasswordResetModel> {
-    const params = {
-      TableName: "kuka-passwordReset",
-      Key: { passwordResetId },
-    }
-
     try {
-      const result = await docClient.get(params).promise()
-      if (!result) {
-        throw new CouldNotGetItemException()
-      } else {
-        return result.Item as PasswordResetModel
+      let params = {
+        TableName: "kuka-users",
+        IndexName: "sk-pk-index",
+        KeyConditionExpression: "sk = :sk AND begins_with(pk, :pk)",
+        ExpressionAttributeValues: {
+          ":sk": "PWRESET#" + passwordResetId,
+          ":pk": "USER#",
+        },
       }
+      const result = await docClient.query(params).promise()
+      log.debug(getPWResetResult)
+      log.debug(result)
+      if (result.Items.length != 1) {
+        throw new DBQueryFailedException()
+      }
+      const resetModel = this.dynamoDBToPasswordResetModel(
+        result.Items[0] as PasswordResetModelForDynamoDB
+      )
+      return result.Items[0] as PasswordResetModel
     } catch (e) {
       console.log(e)
       throw new DBConnectionException()
@@ -247,17 +255,19 @@ export class DynamoDBImpl implements DatabaseImpl {
     username: string,
     passwordHash: string
   ): Promise<void> {
+    const pksk = "USER#" + username
     try {
       const params = {
         TableName: "kuka-users",
         Key: {
-          username,
+          pk: pksk, sk: pksk,
         },
         UpdateExpression: "set passwordHash = :r",
         ExpressionAttributeValues: {
           ":r": passwordHash,
         },
       }
+      log.debug("Updating password hash")
       await docClient.update(params).promise()
     } catch (e) {
       throw new DBConnectionException()
@@ -270,7 +280,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       IndexName: "sk-pk-index",
       KeyConditionExpression: "sk  = :email",
       ExpressionAttributeValues: {
-        ":email": "EMAIL#"+email,
+        ":email": "EMAIL#" + email,
       },
       ProjectionExpression: "pk",
     }
@@ -340,8 +350,27 @@ export class DynamoDBImpl implements DatabaseImpl {
       emailVerified: verification.clicked,
     }
   }
+  private dynamoDBToPasswordResetModel(
+    reset: PasswordResetModelForDynamoDB
+  ): PasswordResetModel {
+    const { pk, sk, email, creationDate, clicked } = reset
+    return {
+      username: pk.split("#")[1],
+      passwordResetId: sk.split("#")[1],
+      email,
+      creationDate,
+      clicked,
+    }
+  }
 }
 
+interface PasswordResetModelForDynamoDB {
+  pk: string
+  sk: string
+  email: string
+  creationDate: string
+  clicked: boolean
+}
 interface UserModelForDynamoDB {
   pk: string
   sk: string
