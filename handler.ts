@@ -14,6 +14,10 @@ import RefreshTokenService, {
 } from "./service/RefreshTokenService"
 import BaseErrorResponse from "./responses/BaseErrorResponse"
 import UserResponse from "./responses/UserResponse"
+import * as logg from "loglevel"
+
+const log = logg.getLogger("DynamoDBImpl")
+log.setLevel("debug")
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -153,23 +157,16 @@ export const removeScope: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
-  if (event.body != null) {
-    const { username } = JSON.parse(event.body)
-    if (username) {
-      const scopes = new ScopeService()
-      const scopeResponse = await scopes.getScopes(username)
-      if (Array.isArray(scopeResponse)) {
-        return new ScopeResponse(
-          200,
-          1,
-          `Your scopes`,
-          scopeResponse
-        ).response()
-      } else {
-        return new BaseResponse(500, 0, "Something went wrong").response()
-      }
+  log.debug("handler getScopes")
+  log.debug(event)
+  const { username } = JSON.parse(event.body)
+  if (username) {
+    const scopes = new ScopeService()
+    const scopeResponse = await scopes.getScopes(username)
+    if (Array.isArray(scopeResponse)) {
+      return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
     } else {
-      return new BaseResponse(400, 0, "Give username").response()
+      return new BaseResponse(500, 0, "Something went wrong").response()
     }
   } else {
     return new BaseResponse(400, 0, "Give username").response()
