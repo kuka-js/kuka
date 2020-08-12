@@ -1,4 +1,4 @@
-import {APIGatewayEvent, Context, Handler, Callback} from "aws-lambda"
+import { APIGatewayEvent, Context, Handler, Callback } from "aws-lambda"
 import RegisterResponse from "./responses/RegisterResponse"
 import UserService from "./service/User"
 import LoginResponse from "./responses/LoginResponse"
@@ -10,7 +10,7 @@ import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
 import UserListResponse from "./responses/UserListResponse"
 import RefreshTokenService, {
-  CookieFromHeader
+  CookieFromHeader,
 } from "./service/RefreshTokenService"
 import BaseErrorResponse from "./responses/BaseErrorResponse"
 import UserResponse from "./responses/UserResponse"
@@ -22,9 +22,13 @@ export const register: Handler = async (event: APIGatewayEvent) => {
     } catch (e) {
       return new RegisterResponse(500, 0, "JSON invalid").response()
     }
-    const {username, email, password} = JSON.parse(event.body)
+    const { username, email, password } = JSON.parse(event.body)
     const userService = new UserService()
-    const {ok, data} = await userService.registerUser(username, email, password)
+    const { ok, data } = await userService.registerUser(
+      username,
+      email,
+      password
+    )
 
     if (ok == 0) {
       return new RegisterResponse(500, 0, data.message).response()
@@ -38,9 +42,9 @@ export const register: Handler = async (event: APIGatewayEvent) => {
 
 export const login: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
-    const {username, password} = JSON.parse(event.body)
+    const { username, password } = JSON.parse(event.body)
     const userService = new UserService()
-    const {ok, data} = await userService.loginUser(username, password)
+    const { ok, data } = await userService.loginUser(username, password)
     if (ok == 0) {
       return new LoginResponse(400, 0, data.message).response()
     } else {
@@ -59,7 +63,7 @@ export const login: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const verify: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const { id } = event.pathParameters
   const verification = new VerificationService()
   try {
     await verification.markEmailVerified(id)
@@ -71,7 +75,7 @@ export const verify: Handler = async (event: APIGatewayEvent) => {
 
 export const reset: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
-    const {email} = JSON.parse(event.body)
+    const { email } = JSON.parse(event.body)
 
     const passwordReset = new PasswordResetService()
 
@@ -101,7 +105,7 @@ export const reset: Handler = async (event: APIGatewayEvent) => {
 
 export const password: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
-    const {passwordResetId, password1, password2} = JSON.parse(event.body)
+    const { passwordResetId, password1, password2 } = JSON.parse(event.body)
 
     const user = new UserService()
     const changePasswordResult = await user.changePassword(
@@ -123,22 +127,22 @@ export const password: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const addScope: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
   if (event.body != null) {
     const body = JSON.parse(event.body)
+    const username = body.username
     const newScope = body.scope
     const scopes = new ScopeService()
-    const scopeResponse = await scopes.addScope(id, newScope)
-    if (scopeResponse) {
+    try {
+      await scopes.addScope(username, newScope)
       return new BaseResponse(200, 1, `Scope added succesfully`).response()
-    } else {
+    } catch (e) {
       return new BaseResponse(500, 0, "Failed to add scope").response()
     }
   }
 }
 
 export const removeScope: Handler = async (event: APIGatewayEvent) => {
-  const {id, scopeName} = event.pathParameters
+  const { id, scopeName } = event.pathParameters
   const scopes = new ScopeService()
   const scopeResponse = await scopes.removeScope(id, scopeName)
   if (scopeResponse) {
@@ -149,13 +153,26 @@ export const removeScope: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
-  const scopes = new ScopeService()
-  const scopeResponse = await scopes.getScopes(id)
-  if (Array.isArray(scopeResponse)) {
-    return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
+  if (event.body != null) {
+    const { username } = JSON.parse(event.body)
+    if (username) {
+      const scopes = new ScopeService()
+      const scopeResponse = await scopes.getScopes(username)
+      if (Array.isArray(scopeResponse)) {
+        return new ScopeResponse(
+          200,
+          1,
+          `Your scopes`,
+          scopeResponse
+        ).response()
+      } else {
+        return new BaseResponse(500, 0, "Something went wrong").response()
+      }
+    } else {
+      return new BaseResponse(400, 0, "Give username").response()
+    }
   } else {
-    return new BaseResponse(500, 0, "Something went wrong").response()
+    return new BaseResponse(400, 0, "Give username").response()
   }
 }
 
@@ -170,7 +187,7 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const getUser: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const { id } = event.pathParameters
   const userService = new UserService()
   const userResponse = await userService.getUser(id)
   if (userResponse != null) {
@@ -192,7 +209,7 @@ export const refreshToken: Handler = async (event: APIGatewayEvent) => {
   const cookie = RefreshTokenService.getCookiesFromHeader(
     event.headers
   ) as CookieFromHeader
-  const {RefreshToken} = cookie
+  const { RefreshToken } = cookie
 
   const tokenResponse = await RefreshTokenService.refreshToken(id, RefreshToken)
   const renewJWTResponse = await UserService.renewJWTToken(id)
@@ -211,7 +228,7 @@ export const refreshToken: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const deleteUser: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const { id } = event.pathParameters
   const user = new UserService()
   const userResponse: boolean = await user.deleteUser(id)
   if (userResponse) {
@@ -222,7 +239,7 @@ export const deleteUser: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const lockUser: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const { id } = event.pathParameters
   const lockedBy = event.requestContext.authorizer.principalId
   let reason: string | null
   if (event.body != null) {

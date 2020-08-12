@@ -2,28 +2,28 @@ import {
   CreateUserResponse,
   DeleteUserResponse,
   GetUserResponse,
-  UpdateUserResponse
+  UpdateUserResponse,
 } from "../Responses"
-import {UserModel} from "../../../models/UserModel"
-import {DatabaseImpl} from "../DatabaseFactory"
-import {Connection} from "typeorm"
+import { UserModel } from "../../../models/UserModel"
+import { DatabaseImpl } from "../DatabaseFactory"
+import { Connection } from "typeorm"
 import ProjectConnection from "../../Connection"
 import User from "../../../entities/User"
 import Scope from "../../../entities/Scope"
 import VerificationService from "../../Verification"
-import {UserDoesNotExistException} from "../../../exceptions/UserDoesNotExistException"
-import {DBConnectionException} from "../../../exceptions/DBConncetionException"
-import {VerificationModel} from "../../../models/VerificationModel"
+import { UserDoesNotExistException } from "../../../exceptions/UserDoesNotExistException"
+import { DBConnectionException } from "../../../exceptions/DBConncetionException"
+import { VerificationModel } from "../../../models/VerificationModel"
 import Verification from "../../../entities/Verification"
-import {PasswordResetModel} from "../../../models/PasswordResetModel"
+import { PasswordResetModel } from "../../../models/PasswordResetModel"
 import UserService from "../../User"
 import PasswordResetService from "../../Reset"
 import PasswordReset from "../../../entities/PasswordReset"
-import {DBQueryFailedException} from "../../../exceptions/DBQueryFailedException"
+import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
 
 export class TypeORMImpl implements DatabaseImpl {
   async createUser(userModel: UserModel): Promise<CreateUserResponse> {
-    const {userId, username, passwordHash, email, emailVerified} = userModel
+    const { userId, username, passwordHash, email, emailVerified } = userModel
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const findCount: [User[], number] = await User.findAndCount()
@@ -39,8 +39,8 @@ export class TypeORMImpl implements DatabaseImpl {
           ok: 0,
           data: {
             error: "Couldn't create user. User exists",
-            message: "Couldn't create user. User exists"
-          }
+            message: "Couldn't create user. User exists",
+          },
         }
       }
       const user: User = new User()
@@ -62,7 +62,7 @@ export class TypeORMImpl implements DatabaseImpl {
       }
       await User.save(user)
       try {
-        await VerificationService.createVerificationLink({username, email})
+        await VerificationService.createVerificationLink({ username, email })
       } catch (e) {
         throw e
       }
@@ -70,21 +70,21 @@ export class TypeORMImpl implements DatabaseImpl {
       return {
         ok: 1,
         data: {
-          message: "User successfully created!"
-        }
+          message: "User successfully created!",
+        },
       }
     } else {
       throw new DBConnectionException()
     }
   }
   async deleteUser(userId: string): Promise<DeleteUserResponse> {
-    return {ok: 0, data: {message: "Fail"}}
+    return { ok: 0, data: { message: "Fail" } }
   }
 
   async getUser(username: string): Promise<UserModel> {
     const convert = (user: User): UserModel => {
       const scopeArray: Scope[] = user.scopes
-      const scopes: string[] = scopeArray.map((item) => {
+      const scopes: string[] = scopeArray.map(item => {
         return item.scope
       })
       const {
@@ -94,7 +94,7 @@ export class TypeORMImpl implements DatabaseImpl {
         emailVerified,
         passwordHash,
         refreshToken,
-        lockId
+        lockId,
       } = user
       return {
         userId: id,
@@ -104,13 +104,16 @@ export class TypeORMImpl implements DatabaseImpl {
         passwordHash,
         refreshToken,
         lockId,
-        scopes
+        scopes,
       }
     }
 
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
-      const user: User = await User.findOne({username}, {relations: ["scopes"]})
+      const user: User = await User.findOne(
+        { username },
+        { relations: ["scopes"] }
+      )
       if (!user) {
         throw new UserDoesNotExistException()
       }
@@ -123,7 +126,7 @@ export class TypeORMImpl implements DatabaseImpl {
   async userExists(username: string): Promise<boolean> {
     try {
       await ProjectConnection.connect()
-      const user: User = await User.findOne({username})
+      const user: User = await User.findOne({ username })
       if (!user) {
         return false
       } else {
@@ -140,7 +143,10 @@ export class TypeORMImpl implements DatabaseImpl {
   ): Promise<void> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
-      const user: User = await User.findOne({username}, {relations: ["scopes"]})
+      const user: User = await User.findOne(
+        { username },
+        { relations: ["scopes"] }
+      )
       if (!user) {
         throw new UserDoesNotExistException()
       } else {
@@ -156,7 +162,7 @@ export class TypeORMImpl implements DatabaseImpl {
   ): Promise<void> {
     try {
       await ProjectConnection.connect()
-      const {username, verifyLinkId, clicked} = verificationObject
+      const { username, verifyLinkId, clicked } = verificationObject
       const verification = new Verification()
       verification.username = username
       verification.verifyLinkId = verifyLinkId
@@ -177,12 +183,12 @@ export class TypeORMImpl implements DatabaseImpl {
 
     try {
       const verification: Verification = await Verification.findOne({
-        verifyLinkId
+        verifyLinkId,
       })
       verification.clicked = true
-      let {username} = verification
+      let { username } = verification
       await Verification.save(verification)
-      const user = await User.findOne({username})
+      const user = await User.findOne({ username })
       user.emailVerified = true
       await User.save(user)
     } catch (e) {
@@ -195,7 +201,7 @@ export class TypeORMImpl implements DatabaseImpl {
   ): Promise<void> {
     try {
       await ProjectConnection.connect()
-      const {passwordResetId, email, clicked} = passwordResetModel
+      const { passwordResetId, email, clicked } = passwordResetModel
       const userService = new UserService()
       const passwordReset = new PasswordReset()
       passwordReset.username = await userService.emailToUsername(email)
@@ -212,17 +218,17 @@ export class TypeORMImpl implements DatabaseImpl {
     try {
       await ProjectConnection.connect()
       const passwordReset: PasswordReset = await PasswordReset.findOne({
-        passwordResetId
+        passwordResetId,
       })
 
-      const {username, email, creationDate, clicked} = passwordReset
+      const { username, email, creationDate, clicked } = passwordReset
 
       return {
         username,
         email,
         creationDate: creationDate.toISOString(),
         clicked,
-        passwordResetId
+        passwordResetId,
       }
     } catch (e) {
       throw new DBConnectionException()
@@ -235,7 +241,7 @@ export class TypeORMImpl implements DatabaseImpl {
   ): Promise<void> {
     try {
       await ProjectConnection.connect()
-      const user: User = await User.findOne({username})
+      const user: User = await User.findOne({ username })
       user.passwordHash = passwordHash
       await User.save(user)
     } catch (e) {
@@ -247,12 +253,59 @@ export class TypeORMImpl implements DatabaseImpl {
     let findUser: User
     try {
       await ProjectConnection.connect()
-      findUser = await User.findOne({email})
+      findUser = await User.findOne({ email })
     } catch (e) {
       throw new DBConnectionException()
     }
     if (findUser) {
       return findUser.username
+    } else {
+      throw new DBQueryFailedException()
+    }
+  }
+
+  async getScopes(username: string): Promise<string[]> {
+    try {
+      await ProjectConnection.connect()
+    } catch (e) {
+      console.log(e)
+      throw new DBConnectionException()
+    }
+
+    const user: User = await User.findOne({ username })
+    if (user) {
+      const scopeArray: Scope[] = await Scope.find({ user })
+      const scopes: string[] = scopeArray.map(item => {
+        return item.scope
+      })
+      return scopes
+    } else {
+      throw new DBQueryFailedException()
+    }
+  }
+
+  async addScope(username: string, scope: string): Promise<void> {
+    try {
+      await ProjectConnection.connect()
+    } catch (e) {
+      console.log(e)
+      throw new DBConnectionException()
+    }
+    const user: User = await User.findOne(
+      { username },
+      { relations: ["scopes"] }
+    )
+    if (user) {
+      for (let item of user.scopes) {
+        if (item.scope == scope) {
+          throw new DBQueryFailedException()
+        }
+      }
+      const newScope: Scope = new Scope()
+      newScope.scope = scope
+      await Scope.save(newScope)
+      user.scopes.push(newScope)
+      await User.save(user)
     } else {
       throw new DBQueryFailedException()
     }

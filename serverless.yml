@@ -62,10 +62,6 @@ functions:
           path: user/scopes/{id}
           method: get
           authorizer: authGetScopes
-          request:
-            parameters:
-              paths:
-                id: true
 
   addScope:
     handler: handler.addScope

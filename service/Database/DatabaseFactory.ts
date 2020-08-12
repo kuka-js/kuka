@@ -1,16 +1,14 @@
-// import AWS from "aws-sdk"
-
 import {
   CreateUserResponse,
   DeleteUserResponse,
   GetUserResponse,
-  UpdateUserResponse
+  UpdateUserResponse,
 } from "./Responses"
-import {UserModel} from "../../models/UserModel"
-import {DynamoDBImpl} from "./Impl/DynamoDBImpl"
-import {TypeORMImpl} from "./Impl/TypeORMImpl"
-import {VerificationModel} from "../../models/VerificationModel"
-import {PasswordResetModel} from "../../models/PasswordResetModel"
+import { UserModel } from "../../models/UserModel"
+import { DynamoDBImpl } from "./Impl/DynamoDBImpl"
+import { TypeORMImpl } from "./Impl/TypeORMImpl"
+import { VerificationModel } from "../../models/VerificationModel"
+import { PasswordResetModel } from "../../models/PasswordResetModel"
 
 export interface DatabaseImpl {
   createUser(user: UserModel): Promise<CreateUserResponse>
@@ -25,16 +23,19 @@ export interface DatabaseImpl {
   getPasswordReset(passwordResetId: string): Promise<PasswordResetModel>
   updatePasswordHash(username: string, passwordHash: string): Promise<void>
   emailToUsername(email: string): Promise<string>
+
+  getScopes(username: string): Promise<string[]>
+  addScope(username: string, scope: string): Promise<void>
 }
 
 export enum DatabaseTypes {
   DYNAMODB,
-  TYPEORM
+  TYPEORM,
 }
 
 export function convert(provider: string): DatabaseTypes {
   // If you are wondering the "... as keyof typeof ...". Read about it here:
-  //https://stackoverflow.com/questions/36316326/typescript-ts7015-error-when-accessing-an-enum-using-a-string-type-parameter
+  // https://stackoverflow.com/questions/36316326/typescript-ts7015-error-when-accessing-an-enum-using-a-string-type-parameter
   return DatabaseTypes[provider.toUpperCase() as keyof typeof DatabaseTypes]
 }
 
