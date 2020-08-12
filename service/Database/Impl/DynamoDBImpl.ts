@@ -209,7 +209,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       const creationDate = date.toISOString()
       const passwordResetItem = {
         pk: "USER#" + username,
-        sk: "PWRESET" + passwordResetId,
+        sk: "PWRESET#" + passwordResetId,
         email,
         clicked,
         creationDate,
@@ -235,8 +235,10 @@ export class DynamoDBImpl implements DatabaseImpl {
           ":pk": "USER#",
         },
       }
+      log.debug("getPasswordReset params")
+      log.debug(params)
       const result = await docClient.query(params).promise()
-      log.debug(getPWResetResult)
+      log.debug("getPWResetResult")
       log.debug(result)
       if (result.Items.length != 1) {
         throw new DBQueryFailedException()
@@ -244,7 +246,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       const resetModel = this.dynamoDBToPasswordResetModel(
         result.Items[0] as PasswordResetModelForDynamoDB
       )
-      return result.Items[0] as PasswordResetModel
+      return resetModel
     } catch (e) {
       console.log(e)
       throw new DBConnectionException()
@@ -267,6 +269,8 @@ export class DynamoDBImpl implements DatabaseImpl {
           ":r": passwordHash,
         },
       }
+      log.debug("updatePasswordHash params")
+      log.debug(params)
       log.debug("Updating password hash")
       await docClient.update(params).promise()
     } catch (e) {
