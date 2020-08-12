@@ -18,6 +18,7 @@ const generatePolicy = (principalId, effect, resource) => {
 }
 
 module.exports.getScopes = (event, context, callback) => {
+  console.log(event)
   // check header or url parameters or post parameters for token
   const full_token = event.authorizationToken
   if (!full_token) return callback(null, "Unauthorized")
@@ -26,7 +27,8 @@ module.exports.getScopes = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    console.log(decoded)
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("getScopes")) {
       // if everything is good, save to request for use in other routes
       return callback(
@@ -48,7 +50,7 @@ module.exports.addScope = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("addScope")) {
       // if everything is good, save to request for use in other routes
       return callback(
@@ -60,6 +62,7 @@ module.exports.addScope = (event, context, callback) => {
     }
   })
 }
+
 module.exports.removeScope = (event, context, callback) => {
   // check header or url parameters or post parameters for token
   const full_token = event.authorizationToken
@@ -69,7 +72,7 @@ module.exports.removeScope = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("removeScope")) {
       // if everything is good, save to request for use in other routes
       return callback(
@@ -91,7 +94,7 @@ module.exports.getUserList = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("getUserList")) {
       // if everything is good, save to request for use in other routes
       return callback(
@@ -113,7 +116,7 @@ module.exports.getUserData = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("getUserData")) {
       // if everything is good, save to request for use in other routes
       return callback(
@@ -135,7 +138,7 @@ module.exports.deleteUser = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("deleteUser")) {
       // if everything is good, save to request for use in other routes
       return callback(
@@ -157,7 +160,7 @@ module.exports.lockUser = (event, context, callback) => {
   // verifies secret and checks exp
   jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
     if (err) return callback(null, "Unauthorized")
-    const {scopes} = decoded
+    const { scopes } = decoded
     if (scopes.includes("root") || scopes.includes("lockUser")) {
       // if everything is good, save to request for use in other routes
       return callback(

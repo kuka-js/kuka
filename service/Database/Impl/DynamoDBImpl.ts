@@ -323,7 +323,32 @@ export class DynamoDBImpl implements DatabaseImpl {
     return scopes
   }
 
-  async addScope(username: string, scope: string): Promise<void> {}
+  async addScope(username: string, scope: string): Promise<void> {
+    const scopes = await this.getScopes(username)
+    for (let item of scopes) {
+      if (item == scope) {
+        throw new DBQueryFailedException()
+      }
+    }
+    scopes.push(scope)
+    const pksk = "USER#" + username
+    try {
+      const params = {
+        TableName: "kuka-users",
+        Key: {
+          pk: pksk,
+          sk: pksk,
+        },
+        UpdateExpression: "set scopes = :r",
+        ExpressionAttributeValues: {
+          ":r": scopes,
+        },
+      }
+      await docClient.update(params).promise()
+    } catch (e) {
+      throw new DBConnectionException()
+    }
+  }
 
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
     const {
