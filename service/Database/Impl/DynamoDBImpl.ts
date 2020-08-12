@@ -262,7 +262,8 @@ export class DynamoDBImpl implements DatabaseImpl {
       const params = {
         TableName: "kuka-users",
         Key: {
-          pk: pksk, sk: pksk,
+          pk: pksk,
+          sk: pksk,
         },
         UpdateExpression: "set passwordHash = :r",
         ExpressionAttributeValues: {
@@ -302,6 +303,27 @@ export class DynamoDBImpl implements DatabaseImpl {
       throw new DBQueryFailedException()
     }
   }
+
+  async getScopes(username: string): Promise<string[]> {
+    const pksk = "USER#" + username
+    const params = {
+      TableName: "kuka-users",
+      Key: { pk: pksk, sk: pksk },
+      ProjectionExpression: "scopes",
+    }
+    let result
+    try {
+      result = await docClient.query(params).promise()
+    } catch (e) {
+      throw new DBConnectionException()
+    }
+    const scopes = result[0].scopes
+    log.debug("getScopes scopes var:")
+    log.debug(scopes)
+    return scopes
+  }
+
+  async addScope(username: string, scope: string): Promise<void> {}
 
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
     const {
