@@ -160,6 +160,8 @@ export const getScopes: Handler = async (event: APIGatewayEvent) => {
   log.debug("handler getScopes")
   log.debug(event)
   const username = event.requestContext.authorizer.principalId
+  log.debug("Username:")
+  log.debug(username)
   if (username) {
     const scopes = new ScopeService()
     const scopeResponse = await scopes.getScopes(username)
