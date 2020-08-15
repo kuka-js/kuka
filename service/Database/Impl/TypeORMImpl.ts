@@ -20,6 +20,7 @@ import UserService from "../../User"
 import PasswordResetService from "../../Reset"
 import PasswordReset from "../../../entities/PasswordReset"
 import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
+import { GetUserApiResponse } from "../../User"
 
 export class TypeORMImpl implements DatabaseImpl {
   async createUser(userModel: UserModel): Promise<CreateUserResponse> {
@@ -328,6 +329,39 @@ export class TypeORMImpl implements DatabaseImpl {
       await User.save(user)
     } else {
       throw new DBQueryFailedException()
+    }
+  }
+
+  async getUserList(): Promise<GetUserApiResponse[]> {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const users: User[] = await User.find({ relations: ["scopes"] })
+      const userList: GetUserApiResponse[] = users.map(item => {
+        const userId: string = item.id
+        const username: string = item.username
+
+        const scopes: string[] = item.scopes.map(scope => {
+          return scope.scope
+        })
+
+        let isLocked: string
+        if (item.lockId) {
+          isLocked = "true"
+        } else {
+          isLocked = "false"
+        }
+
+        const user: GetUserApiResponse = {
+          userId,
+          username,
+          scopes,
+          isLocked,
+        }
+        return user
+      })
+      return userList
+    } else {
+      throw "Connection problem"
     }
   }
 }
