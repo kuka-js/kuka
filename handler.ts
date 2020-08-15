@@ -146,12 +146,19 @@ export const addScope: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const removeScope: Handler = async (event: APIGatewayEvent) => {
-  const { id, scopeName } = event.pathParameters
+  log.debug(event)
+  const username = event.headers["X-Custom-Username"]
+  if (!username) {
+    return new BaseResponse(400, 0, "Give username in headers").response()
+  }
+  log.debug("Username: " + username)
+  const { scopeName } = event.pathParameters
   const scopes = new ScopeService()
-  const scopeResponse = await scopes.removeScope(id, scopeName)
-  if (scopeResponse) {
+  try {
+    await scopes.removeScope(username, scopeName)
     return new BaseResponse(200, 1, `Scope removed succesfully`).response()
-  } else {
+  } catch (e) {
+    log.debug(e)
     return new BaseResponse(500, 0, "Failed to remove scope").response()
   }
 }
@@ -159,7 +166,8 @@ export const removeScope: Handler = async (event: APIGatewayEvent) => {
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
   log.debug("handler getScopes")
   log.debug(event)
-  const username = event.requestContext.authorizer.principalId
+  const username = event.headers["X-Custom-Username"]
+  //  const username = event.requestContext.authorizer.principalId
   log.debug("Username:")
   log.debug(username)
   if (username) {

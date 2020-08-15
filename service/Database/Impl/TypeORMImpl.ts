@@ -310,4 +310,24 @@ export class TypeORMImpl implements DatabaseImpl {
       throw new DBQueryFailedException()
     }
   }
+
+  async removeScope(username: string, scope: string): Promise<void> {
+    try {
+      await ProjectConnection.connect()
+    } catch (e) {
+      console.log(e)
+      console.log(e)
+      throw new DBQueryFailedException()
+    }
+    const user: User = await User.findOne(
+      { username },
+      { relations: ["scopes"] }
+    )
+    if (user) {
+      user.scopes = user.scopes.filter(e => e.scope !== scope)
+      await User.save(user)
+    } else {
+      throw new DBQueryFailedException()
+    }
+  }
 }

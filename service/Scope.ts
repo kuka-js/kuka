@@ -1,6 +1,3 @@
-import User from "../entities/User"
-import Scope from "../entities/Scope"
-import ProjectConnection from "./Connection"
 import {
   CreateDBAdapter,
   DatabaseImpl,
@@ -30,23 +27,14 @@ export default class ScopeService {
     }
   }
 
-  async removeScope(userId: string, scope: string) {
-    try {
-      await ProjectConnection.connect()
-    } catch (e) {
-      console.log(e)
-      return false
-    }
-    const user: User = await User.findOne(
-      { id: userId },
-      { relations: ["scopes"] }
+  async removeScope(username: string, scope: string): Promise<void> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
     )
-    if (user) {
-      user.scopes = user.scopes.filter(e => e.scope !== scope)
-      await User.save(user)
-      return true
-    } else {
-      return false
+    try {
+      await DBImpl.removeScope(username, scope)
+    } catch (e) {
+      throw "Could not remove scope"
     }
   }
 }

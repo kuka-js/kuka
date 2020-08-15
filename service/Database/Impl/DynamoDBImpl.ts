@@ -328,7 +328,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   async addScope(username: string, scope: string): Promise<void> {
-    const scopes = await this.getScopes(username)
+    const scopes: string[] = await this.getScopes(username)
     for (let item of scopes) {
       if (item == scope) {
         throw new DBQueryFailedException()
@@ -346,6 +346,28 @@ export class DynamoDBImpl implements DatabaseImpl {
         UpdateExpression: "set scopes = :r",
         ExpressionAttributeValues: {
           ":r": scopes,
+        },
+      }
+      await docClient.update(params).promise()
+    } catch (e) {
+      throw new DBConnectionException()
+    }
+  }
+
+  async removeScope(username: string, scope: string): Promise<void> {
+    const scopes: string[] = await this.getScopes(username)
+    const newScopes = scopes.filter(e => e !== scope)
+    const pksk = "USER#" + username
+    try {
+      const params = {
+        TableName: "kuka-users",
+        Key: {
+          pk: pksk,
+          sk: pksk,
+        },
+        UpdateExpression: "set scopes = :r",
+        ExpressionAttributeValues: {
+          ":r": newScopes,
         },
       }
       await docClient.update(params).promise()
