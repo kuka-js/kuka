@@ -75,13 +75,12 @@ functions:
     handler: handler.removeScope
     events:
       - http:
-          path: user/scopes/{id}/{scopeName}
+          path: user/scopes/{scopeName}
           method: delete
           authorizer: authRemoveScope
           request:
             parameters:
               paths:
-                id: true
                 scopeName: true
 
   getUserList:

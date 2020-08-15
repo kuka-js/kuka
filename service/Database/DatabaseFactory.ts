@@ -26,6 +26,7 @@ export interface DatabaseImpl {
 
   getScopes(username: string): Promise<string[]>
   addScope(username: string, scope: string): Promise<void>
+  removeScope(username: string, scope:string):Promise<void>
 }
 
 export enum DatabaseTypes {
