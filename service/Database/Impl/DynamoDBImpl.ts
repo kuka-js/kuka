@@ -305,6 +305,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   }
 
   async getScopes(username: string): Promise<string[]> {
+    log.debug("getScopes username: " + username)
     const pksk = "USER#" + username
     const params = {
       TableName: "kuka-users",
@@ -313,11 +314,14 @@ export class DynamoDBImpl implements DatabaseImpl {
     }
     let result
     try {
-      result = await docClient.query(params).promise()
+      result = await docClient.get(params).promise()
+      log.debug("getScopes result:")
+      log.debug(result)
     } catch (e) {
+      log.debug(e)
       throw new DBConnectionException()
     }
-    const scopes = result[0].scopes
+    const scopes = result.Item.scopes
     log.debug("getScopes scopes var:")
     log.debug(scopes)
     return scopes

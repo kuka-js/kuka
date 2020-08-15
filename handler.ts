@@ -159,7 +159,7 @@ export const removeScope: Handler = async (event: APIGatewayEvent) => {
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
   log.debug("handler getScopes")
   log.debug(event)
-  const { username } = JSON.parse(event.body)
+  const username = event.requestContext.authorizer.principalId
   if (username) {
     const scopes = new ScopeService()
     const scopeResponse = await scopes.getScopes(username)
