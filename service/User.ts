@@ -281,36 +281,16 @@ export default class UserService {
   }
 
   async getUserList(): Promise<GetUserApiResponse[]> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const users: User[] = await User.find({relations: ["scopes"]})
-      const userList: GetUserApiResponse[] = users.map((item) => {
-        const userId: string = item.id
-        const username: string = item.username
-
-        const scopes: string[] = item.scopes.map((scope) => {
-          return scope.scope
-        })
-
-        let isLocked: string
-        if (item.lockId) {
-          isLocked = "true"
-        } else {
-          isLocked = "false"
-        }
-
-        const user: GetUserApiResponse = {
-          userId,
-          username,
-          scopes,
-          isLocked
-        }
-        return user
-      })
-      return userList
-    } else {
-      throw "Connection problem"
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      const userList: GetUserApiResponse[] = DBImpl.getUserList()
+      return userList 
+    } catch (e) {
+      throw e
     }
+
   }
 
   async getUser(userId: string): Promise<GetUserApiResponse | null> {
