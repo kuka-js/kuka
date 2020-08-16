@@ -14,6 +14,7 @@ import { PasswordResetModel } from "../../../models/PasswordResetModel"
 import UserService from "../../User"
 import { CouldNotGetItemException } from "../../../exceptions/CouldNotGetItemException"
 import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
+import { GetUserApiResponse } from "../../User"
 import * as logg from "loglevel"
 
 const log = logg.getLogger("DynamoDBImpl")
@@ -375,6 +376,8 @@ export class DynamoDBImpl implements DatabaseImpl {
       throw new DBConnectionException()
     }
   }
+
+  async getUserList(): Promise<GetUserApiResponse[]> {}
 
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
     const {
