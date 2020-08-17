@@ -116,29 +116,17 @@ export class DynamoDBImpl implements DatabaseImpl {
     }
   }
 
-  async deleteUser(userId: string): Promise<DeleteUserResponse> {
+  async deleteUser(username: string): Promise<void> {
+    const pksk = "USER#" + username
     const params = {
       TableName: "kuka-users",
-      Key: { userId },
+      Key: { pk: pksk, sk: pksk },
     }
     try {
       await docClient.delete(params).promise()
-      return {
-        ok: 1,
-        data: {
-          message: "User deleted",
-        },
-      }
     } catch (e) {
       console.log(e)
-
-      return {
-        ok: 0,
-        data: {
-          message: "Couldn't delete user",
-          error: e.message,
-        },
-      }
+      throw new DBQueryFailedException()
     }
   }
 

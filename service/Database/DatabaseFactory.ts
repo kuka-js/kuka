@@ -13,7 +13,7 @@ import { UserObject } from "../User"
 
 export interface DatabaseImpl {
   createUser(user: UserModel): Promise<CreateUserResponse>
-  deleteUser(userId: string): Promise<DeleteUserResponse>
+  deleteUser(username: string): Promise<void>
   getUser(username: string): Promise<UserModel>
   updateRefreshToken(username: string, refreshToken: string): Promise<void>
   userExists(username: string): Promise<boolean>
@@ -31,6 +31,11 @@ export interface DatabaseImpl {
   getUserList(): Promise<UserObject[]>
 
   getRefreshToken(username: string): Promise<string>
+  lockUser(
+    username: string,
+    lockedBy: string,
+    reason: string | null
+  ): Promise<boolean>
 }
 
 export enum DatabaseTypes {
