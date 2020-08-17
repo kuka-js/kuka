@@ -273,19 +273,19 @@ export default class UserService {
       const DBImpl: DatabaseImpl = CreateDBAdapter(
         convert(process.env.DB_PROVIDER)
       )
-      const username = DBImpl.emailToUsername(email)
+      const username = await DBImpl.emailToUsername(email)
       return username
     } catch (e) {
       throw e
     }
   }
 
-  async getUserList(): Promise<GetUserApiResponse[]> {
+  async getUserList(): Promise<UserObject[]> {
     try {
       const DBImpl: DatabaseImpl = CreateDBAdapter(
         convert(process.env.DB_PROVIDER)
       )
-      const userList: GetUserApiResponse[] = DBImpl.getUserList()
+      const userList: UserObject[] = await DBImpl.getUserList()
       return userList 
     } catch (e) {
       throw e
@@ -293,7 +293,7 @@ export default class UserService {
 
   }
 
-  async getUser(userId: string): Promise<GetUserApiResponse | null> {
+  async getUser(userId: string): Promise<UserObject | null> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const user: User = await User.findOne(
@@ -313,7 +313,7 @@ export default class UserService {
       } else {
         isLocked = "false"
       }
-      const userResponse: GetUserApiResponse = {
+      const userResponse: UserObject = {
         userId,
         username: user.username,
         scopes,
@@ -391,8 +391,8 @@ interface SaveUserResponse {
   }
 }
 
-export interface GetUserApiResponse {
-  userId: string
+export interface UserObject {
+  userId?: string
   username: string
   scopes: string[]
   isLocked?: string

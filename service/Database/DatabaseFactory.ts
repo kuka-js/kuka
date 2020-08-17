@@ -9,7 +9,7 @@ import { DynamoDBImpl } from "./Impl/DynamoDBImpl"
 import { TypeORMImpl } from "./Impl/TypeORMImpl"
 import { VerificationModel } from "../../models/VerificationModel"
 import { PasswordResetModel } from "../../models/PasswordResetModel"
-import { GetUserApiResponse } from "../User"
+import { UserObject } from "../User"
 
 export interface DatabaseImpl {
   createUser(user: UserModel): Promise<CreateUserResponse>
@@ -28,7 +28,7 @@ export interface DatabaseImpl {
   getScopes(username: string): Promise<string[]>
   addScope(username: string, scope: string): Promise<void>
   removeScope(username: string, scope: string): Promise<void>
-  getUserList(): Promise<GetUserApiResponse[]>
+  getUserList(): Promise<UserObject[]>
 }
 
 export enum DatabaseTypes {

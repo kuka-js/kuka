@@ -14,7 +14,7 @@ import { PasswordResetModel } from "../../../models/PasswordResetModel"
 import UserService from "../../User"
 import { CouldNotGetItemException } from "../../../exceptions/CouldNotGetItemException"
 import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
-import { GetUserApiResponse } from "../../User"
+import { UserObject } from "../../User"
 import * as logg from "loglevel"
 
 const log = logg.getLogger("DynamoDBImpl")
@@ -377,7 +377,28 @@ export class DynamoDBImpl implements DatabaseImpl {
     }
   }
 
-  async getUserList(): Promise<GetUserApiResponse[]> {}
+  async getUserList(): Promise<UserObject[]> {
+    const params = {
+      TableName: "kuka-users",
+      ProjectionExpression: "pk, scopes, locked",
+      FilterExpression: "begins_with(sk, :sk) AND begins_with(pk, :pk)",
+      ExpressionAttributeValues: {
+        ":sk": "USER#",
+        ":pk": "USER#",
+      },
+    }
+    const result = await docClient.scan(params).promise()
+    let userList = []
+    for (let item of result.Items) {
+      let userData = {
+        username: item.pk.split("#")[1],
+        scopes: item.scopes,
+        isLocked: item.locked,
+      }
+      userList.push(userData)
+    }
+    return userList
+  }
 
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
     const {
