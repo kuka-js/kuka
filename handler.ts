@@ -218,35 +218,42 @@ export const refreshToken: Handler = async (event: APIGatewayEvent) => {
   ) as CookieFromHeader
   const { RefreshToken } = cookie
 
-  const tokenResponse = await RefreshTokenService.refreshToken(username, RefreshToken)
-  const renewJWTResponse = await UserService.renewJWTToken(id)
-  if (tokenResponse.ok == 1 && renewJWTResponse.ok == 1) {
-    return new LoginResponse(
-      200,
-      1,
-      "JWT renewed succesfully",
-      renewJWTResponse.data.token,
-      renewJWTResponse.data.expiry,
-      tokenResponse.refreshToken
-    ).response()
+  const tokenResponse = await RefreshTokenService.refreshToken(
+    username,
+    RefreshToken
+  )
+  if (tokenResponse.ok == 1) {
+    try {
+      const renewJWTResponse = await UserService.renewJWTToken(username)
+      return new LoginResponse(
+        200,
+        1,
+        "JWT renewed succesfully",
+        renewJWTResponse.token,
+        renewJWTResponse.expiry,
+        tokenResponse.refreshToken
+      ).response()
+    } catch (e) {
+      return new BaseErrorResponse("Could not renew refresh token").response()
+    }
   } else {
     return new BaseErrorResponse("Could not renew refresh token").response()
   }
 }
 
 export const deleteUser: Handler = async (event: APIGatewayEvent) => {
-  const { id } = event.pathParameters
+  const username = event.headers["X-Custom-Username"]
   const user = new UserService()
-  const userResponse: boolean = await user.deleteUser(id)
+  const userResponse: boolean = await user.deleteUser(username)
   if (userResponse) {
-    return new BaseResponse(200, 1, `Removed user by id ${id}`).response()
+    return new BaseResponse(200, 1, `Removed user: ${username}`).response()
   } else {
     return new BaseResponse(500, 0, "Something went wrong").response()
   }
 }
 
 export const lockUser: Handler = async (event: APIGatewayEvent) => {
-  const { id } = event.pathParameters
+  const username = event.headers["X-Custom-Username"]
   const lockedBy = event.requestContext.authorizer.principalId
   let reason: string | null
   if (event.body != null) {
@@ -254,9 +261,9 @@ export const lockUser: Handler = async (event: APIGatewayEvent) => {
     reason = body.reason
   }
   const user = new UserService()
-  const lockResponse: boolean = await user.lockUser(id, lockedBy, reason)
+  const lockResponse: boolean = await user.lockUser(username, lockedBy, reason)
   if (lockResponse) {
-    return new BaseResponse(200, 1, `User ${id} locked `).response()
+    return new BaseResponse(200, 1, `User ${username} locked `).response()
   } else {
     return new BaseResponse(500, 0, "Failed to lock user").response()
   }

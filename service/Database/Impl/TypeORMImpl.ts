@@ -22,6 +22,7 @@ import PasswordReset from "../../../entities/PasswordReset"
 import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
 import { UserObject } from "../../User"
 import { RefreshTokenServiceResponse } from "../../RefreshTokenService"
+import Lock from "../../../entities/Lock"
 
 export class TypeORMImpl implements DatabaseImpl {
   async createUser(userModel: UserModel): Promise<CreateUserResponse> {
@@ -79,8 +80,45 @@ export class TypeORMImpl implements DatabaseImpl {
       throw new DBConnectionException()
     }
   }
-  async deleteUser(userId: string): Promise<DeleteUserResponse> {
-    return { ok: 0, data: { message: "Fail" } }
+  async deleteUser(username: string): Promise<void> {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const user: User = await User.findOne({username })
+      if (!user) {
+      throw new UserDoesNotExistException()}
+      const userRemoveResponse: User = await User.remove(user)
+      if (!userRemoveResponse) {
+      throw new DBConnectionException()} 
+    } else {
+      throw "Connection problem"
+    }
+  }
+
+  async lockUser(
+    username: string,
+    lockedBy: string,
+    reason: string | null
+  ): Promise<boolean>
+  {
+    let connection: Connection = await ProjectConnection.connect()
+    if (connection) {
+      const user: User = await User.findOne({ username })
+      if (!user) {
+        return false
+      }
+      const lock: Lock = new Lock()
+      lock.lockedBy = lockedBy
+      lock.lockedAt = new Date()
+      lock.reason = reason
+      lock.username = username 
+      const lockResult: Lock = await Lock.save(lock)
+      const lockId: number = lockResult.id
+      user.lockId = lockId
+      await User.save(user)
+      return true
+    } else {
+      throw "Connection problem"
+    }
   }
 
   async getUser(username: string): Promise<UserModel> {

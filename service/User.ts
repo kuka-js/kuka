@@ -20,6 +20,7 @@ import { DBConnectionException } from "../exceptions/DBConncetionException"
 import { UserDoesNotExistException } from "../exceptions/UserDoesNotExistException"
 import { PasswordResetModel } from "../models/PasswordResetModel"
 import VerificationService from "./Verification"
+import { RenewJWTModel } from "../models/RenewJWTModel"
 import * as logg from "loglevel"
 
 const log = logg.getLogger("User")
@@ -219,7 +220,7 @@ export default class UserService {
     }
   }
 
-  static async renewJWTToken(username: string) {
+  static async renewJWTToken(username: string): Promise<RenewJWTModel> {
     const DBImpl: DatabaseImpl = CreateDBAdapter(
       convert(process.env.DB_PROVIDER)
     )
@@ -239,13 +240,10 @@ export default class UserService {
       }
 
       return {
-        ok: 1,
-        data: {
-          username,
-          message: "JWT renewed succesfully.",
-          token,
-          expiry: exp,
-        },
+        username,
+        message: "JWT renewed succesfully.",
+        token,
+        expiry: exp,
       }
     } catch (e) {
       throw "renewJWTToken fail"
@@ -288,47 +286,31 @@ export default class UserService {
     }
   }
 
-  async deleteUser(id: string): Promise<boolean> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne({ id })
-      if (!user) {
-        return false
-      }
-      const userRemoveResponse: User = await User.remove(user)
-      if (userRemoveResponse) {
-        return true
-      } else {
-        return false
-      }
-    } else {
-      throw "Connection problem"
+  async deleteUser(username: string): Promise<boolean> {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      await DBImpl.deleteUser(username)
+      return true
+    } catch (e) {
+      return false
     }
   }
 
   async lockUser(
-    id: string,
+    username: string,
     lockedBy: string,
     reason: string | null
   ): Promise<boolean> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne({ id })
-      if (!user) {
-        return false
-      }
-      const lock: Lock = new Lock()
-      lock.lockedBy = lockedBy
-      lock.lockedAt = new Date()
-      lock.reason = reason
-      lock.userId = id
-      const lockResult: Lock = await Lock.save(lock)
-      const lockId: number = lockResult.id
-      user.lockId = lockId
-      await User.save(user)
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      await DBImpl.lockUser(username, lockedBy, reason)
       return true
-    } else {
-      throw "Connection problem"
+    } catch (e) {
+      return false
     }
   }
 
