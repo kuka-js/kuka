@@ -99,16 +99,21 @@ export class DynamoDBImpl implements DatabaseImpl {
     username: string,
     refreshToken: string
   ): Promise<void> {
-    const key = "USER#" + username
-    const params = {
-      TableName: "kuka-users",
-      Key: { pk: key, sk: key },
-      UpdateExpression: "set refreshToken = :r",
-      ExpressionAttributeValues: {
-        ":r": refreshToken,
-      },
+    try {
+      const key = "USER#" + username
+      const params = {
+        TableName: "kuka-users",
+        Key: { pk: key, sk: key },
+        UpdateExpression: "set refreshToken = :r",
+        ExpressionAttributeValues: {
+          ":r": refreshToken,
+        },
+      }
+      await docClient.update(params).promise()
+    } catch (e) {
+      console.log(e)
+      throw new DBConnectionException()
     }
-    await docClient.update(params).promise()
   }
 
   async deleteUser(userId: string): Promise<DeleteUserResponse> {
@@ -398,6 +403,27 @@ export class DynamoDBImpl implements DatabaseImpl {
       userList.push(userData)
     }
     return userList
+  }
+
+  async getRefreshToken(username: string): Promise<string> {
+    const pksk = "USER#" + username
+    const params = {
+      TableName: "kuka-users",
+      ProjectionExpression: "refreshToken",
+      Key: { pk: pksk, sk: pksk },
+    }
+
+    try {
+      const result = await docClient.get(params).promise()
+      if (!result || !result.Item) {
+        throw new UserDoesNotExistException()
+      } else {
+        return result.Item.refreshToken
+      }
+    } catch (e) {
+      console.log(e)
+      throw new DBConnectionException()
+    }
   }
 
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {

@@ -95,24 +95,16 @@ functions:
     handler: handler.getUser
     events:
       - http:
-          path: user/{id}
+          path: user
           method: get
           authorizer: authGetUserData
-          request:
-            parameters:
-              paths:
-                id: true
 
   refreshToken:
     handler: handler.refreshToken
     events:
       - http:
-          path: user/token/{id}
+          path: user/token
           method: put
-          request:
-            parameters:
-              paths:
-                id: true
 
   deleteuser:
     handler: handler.deleteUser

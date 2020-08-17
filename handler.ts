@@ -194,14 +194,14 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const getUser: Handler = async (event: APIGatewayEvent) => {
-  const { id } = event.pathParameters
+  const username = event.headers["X-Custom-Username"]
   const userService = new UserService()
-  const userResponse = await userService.getUser(id)
+  const userResponse = await userService.getUser(username)
   if (userResponse != null) {
     return new UserResponse(
       200,
       1,
-      `User data for ${id}`,
+      `User data for ${username}`,
       userResponse
     ).response()
   } else {
@@ -210,7 +210,7 @@ export const getUser: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
-  const id = event.pathParameters.id
+  const username = event.headers["X-Custom-Username"]
   console.log(event.headers)
   console.log(event.multiValueHeaders)
   const cookie = RefreshTokenService.getCookiesFromHeader(
@@ -218,7 +218,7 @@ export const refreshToken: Handler = async (event: APIGatewayEvent) => {
   ) as CookieFromHeader
   const { RefreshToken } = cookie
 
-  const tokenResponse = await RefreshTokenService.refreshToken(id, RefreshToken)
+  const tokenResponse = await RefreshTokenService.refreshToken(username, RefreshToken)
   const renewJWTResponse = await UserService.renewJWTToken(id)
   if (tokenResponse.ok == 1 && renewJWTResponse.ok == 1) {
     return new LoginResponse(

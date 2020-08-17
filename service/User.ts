@@ -290,38 +290,17 @@ export default class UserService {
     } catch (e) {
       throw e
     }
-
   }
 
-  async getUser(userId: string): Promise<UserObject | null> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne(
-        {id: userId},
-        {relations: ["scopes"]}
+  async getUser(username:string): Promise<UserObject | null> {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
       )
-      if (!user) {
-        return null
-      }
-      const scopes: string[] = user.scopes.map((scope) => {
-        return scope.scope
-      })
-
-      let isLocked: string
-      if (user.lockId) {
-        isLocked = "true"
-      } else {
-        isLocked = "false"
-      }
-      const userResponse: UserObject = {
-        userId,
-        username: user.username,
-        scopes,
-        isLocked
-      }
-      return userResponse
-    } else {
-      throw "Connections problem"
+      const user: UserObject = await DBImpl.getUser(username)
+      return user 
+    } catch (e) {
+      throw e
     }
   }
 

@@ -1,35 +1,40 @@
 import ProjectConnection from "./Connection"
 import User from "../entities/User"
-import {v4 as uuid} from "uuid"
+import { v4 as uuid } from "uuid"
+import {
+  CreateDBAdapter,
+  DatabaseImpl,
+  convert,
+} from "./Database/DatabaseFactory"
 
 export default class RefreshTokenService {
   public static async refreshToken(
-    userId: string,
+    username: string,
     oldRefreshToken: string
   ): Promise<RefreshTokenServiceResponse> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
     try {
-      await ProjectConnection.connect()
+      const refreshToken = await DBImpl.getRefreshToken(username)
+
+      if (this.compareRefreshTokens(oldRefreshToken, refreshToken)) {
+        const newRefreshToken = this.generateRefreshToken()
+        await DBImpl.updateRefreshToken(username, newRefreshToken)
+        return { ok: 1, refreshToken: newRefreshToken }
+      } else {
+        return {
+          ok: 0,
+          errorCode: RefreshTokenServiceError.REFRESH_TOKEN_INVALID,
+          errorMessage: "Given refresh token does not match",
+        }
+      }
     } catch (e) {
       console.log(e)
       return {
         ok: 0,
         errorCode: RefreshTokenServiceError.CONNECTION_PROBLEM,
         errorMessage: "Connection problem",
-      }
-    }
-    const user: User = await User.findOne({id: userId})
-    const refreshTokenFromDB: string = user.refreshToken
-
-    if (this.compareRefreshTokens(oldRefreshToken, refreshTokenFromDB)) {
-      const newRefreshToken = this.generateRefreshToken()
-      user.refreshToken = newRefreshToken
-      await User.save(user)
-      return {ok: 1, refreshToken: newRefreshToken}
-    } else {
-      return {
-        ok: 0,
-        errorCode: RefreshTokenServiceError.REFRESH_TOKEN_INVALID,
-        errorMessage: "Given refresh token does not match",
       }
     }
   }
@@ -76,7 +81,7 @@ export default class RefreshTokenService {
   }
 }
 
-interface RefreshTokenServiceResponse {
+export interface RefreshTokenServiceResponse {
   ok: number
   errorCode?: RefreshTokenServiceError
   errorMessage?: string
