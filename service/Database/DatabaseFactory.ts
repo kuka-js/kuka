@@ -15,7 +15,7 @@ export interface DatabaseImpl {
   createUser(user: UserModel): Promise<CreateUserResponse>
   deleteUser(userId: string): Promise<DeleteUserResponse>
   getUser(username: string): Promise<UserModel>
-  updateRefreshToken(username: string, refreshToken: string)
+  updateRefreshToken(username: string, refreshToken: string): Promise<void>
   userExists(username: string): Promise<boolean>
 
   createVerificationLink(verificationObject: VerificationModel): Promise<void>
@@ -29,6 +29,8 @@ export interface DatabaseImpl {
   addScope(username: string, scope: string): Promise<void>
   removeScope(username: string, scope: string): Promise<void>
   getUserList(): Promise<UserObject[]>
+
+  getRefreshToken(username: string): Promise<string>
 }
 
 export enum DatabaseTypes {

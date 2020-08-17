@@ -21,6 +21,7 @@ import PasswordResetService from "../../Reset"
 import PasswordReset from "../../../entities/PasswordReset"
 import { DBQueryFailedException } from "../../../exceptions/DBQueryFailedException"
 import { UserObject } from "../../User"
+import { RefreshTokenServiceResponse } from "../../RefreshTokenService"
 
 export class TypeORMImpl implements DatabaseImpl {
   async createUser(userModel: UserModel): Promise<CreateUserResponse> {
@@ -151,11 +152,23 @@ export class TypeORMImpl implements DatabaseImpl {
       if (!user) {
         throw new UserDoesNotExistException()
       } else {
+        user.refreshToken = refreshToken
         await User.save(user)
       }
     } else {
       throw new DBConnectionException()
     }
+  }
+
+  async getRefreshToken(username: string): Promise<string> {
+    try {
+      await ProjectConnection.connect()
+    } catch (e) {
+      throw e
+    }
+    const user: User = await User.findOne({ username })
+    const refreshTokenFromDB: string = user.refreshToken
+    return refreshTokenFromDB
   }
 
   async createVerificationLink(
