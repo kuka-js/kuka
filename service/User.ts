@@ -1,24 +1,24 @@
 import User from "../entities/User"
 import Scope from "../entities/Scope"
-import {Connection} from "typeorm"
+import { Connection } from "typeorm"
 import ProjectConnection from "./Connection"
-import {hashSync, compareSync} from "bcrypt"
-import {sign, decode} from "jsonwebtoken"
+import { hashSync, compareSync } from "bcrypt"
+import { sign, decode } from "jsonwebtoken"
 import PasswordReset from "../entities/PasswordReset"
 import RefreshTokenService from "./RefreshTokenService"
 import Lock from "../entities/Lock"
-import {v4 as uuid} from "uuid"
-import {UserModel} from "../models/UserModel"
+import { v4 as uuid } from "uuid"
+import { UserModel } from "../models/UserModel"
 import {
   CreateDBAdapter,
   DatabaseImpl,
-  convert
+  convert,
 } from "./Database/DatabaseFactory"
-import {CreateUserResponse} from "./Database/Responses"
-import {LoginUserResponse} from "./Responses/LoginUserResponse"
-import {DBConnectionException} from "../exceptions/DBConncetionException"
-import {UserDoesNotExistException} from "../exceptions/UserDoesNotExistException"
-import {PasswordResetModel} from "../models/PasswordResetModel"
+import { CreateUserResponse } from "./Database/Responses"
+import { LoginUserResponse } from "./Responses/LoginUserResponse"
+import { DBConnectionException } from "../exceptions/DBConncetionException"
+import { UserDoesNotExistException } from "../exceptions/UserDoesNotExistException"
+import { PasswordResetModel } from "../models/PasswordResetModel"
 import VerificationService from "./Verification"
 import * as logg from "loglevel"
 
@@ -32,12 +32,12 @@ export default class UserService {
         ok: 0,
         data: {
           error: "Password is too weak",
-          message: "Password is too weak"
-        }
+          message: "Password is too weak",
+        },
       }
     }
     if (password1 != password2) {
-      return {ok: 0, data: {message: "Passwords do not match!"}}
+      return { ok: 0, data: { message: "Passwords do not match!" } }
     }
 
     const DBImpl: DatabaseImpl = CreateDBAdapter(
@@ -52,12 +52,12 @@ export default class UserService {
       const diffTime: number = Math.abs(createdDate.getTime() - now.getTime())
       const diffDays: number = diffTime / (1000 * 60 * 60 * 24)
       if (diffDays > 1) {
-        return {ok: 0, data: {message: "Password reset link expired"}}
+        return { ok: 0, data: { message: "Password reset link expired" } }
       }
       const username: string = passwordResetModel.username
       const passwordHash = hashSync(password1, 10)
       await DBImpl.updatePasswordHash(username, passwordHash)
-      return {ok: 1, data: {message: "Password successfully changed"}}
+      return { ok: 1, data: { message: "Password successfully changed" } }
     } catch (e) {
       throw e
     }
@@ -74,8 +74,8 @@ export default class UserService {
         data: {
           error: "Password is too weak",
           username,
-          message: "Password is too weak"
-        }
+          message: "Password is too weak",
+        },
       }
     }
     const passwordHash: string = hashSync(password, 10)
@@ -92,7 +92,7 @@ export default class UserService {
       email,
       emailVerified,
       userId,
-      scopes: ["default", "root"]
+      scopes: ["default", "root"],
     }
 
     const DBImpl: DatabaseImpl = CreateDBAdapter(
@@ -104,8 +104,8 @@ export default class UserService {
         ok: 0,
         data: {
           username,
-          message: "Username taken"
-        }
+          message: "Username taken",
+        },
       }
     }
     console.log("Creating user")
@@ -117,7 +117,7 @@ export default class UserService {
     log.debug("Create verification link")
     await VerificationService.createVerificationLink({
       email,
-      username
+      username,
     })
 
     const createUserAPIResponse: SaveUserResponse = {
@@ -126,8 +126,8 @@ export default class UserService {
         userId,
         username,
         message: createUserResponse.data.error,
-        error: createUserResponse.data.message
-      }
+        error: createUserResponse.data.message,
+      },
     }
 
     return createUserAPIResponse
@@ -148,8 +148,8 @@ export default class UserService {
           data: {
             error: "Email not verified.",
             username,
-            message: "Email not verified."
-          }
+            message: "Email not verified.",
+          },
         }
       }
       if (user.lockId) {
@@ -158,21 +158,21 @@ export default class UserService {
           data: {
             error: "User is locked.",
             username,
-            message: "User is locked."
-          }
+            message: "User is locked.",
+          },
         }
       }
       if (compareSync(password, user.passwordHash)) {
         const token: string = sign(
           {
             username,
-            scopes: user.scopes
+            scopes: user.scopes,
           },
           process.env.JWT_SECRET,
-          {expiresIn: process.env.EXPIRATION_TIME}
+          { expiresIn: process.env.EXPIRATION_TIME }
         )
 
-        const {exp} = decode(token) as {
+        const { exp } = decode(token) as {
           [key: string]: number
         }
         const refreshTokenString: string = RefreshTokenService.generateRefreshToken()
@@ -184,8 +184,8 @@ export default class UserService {
             message: "Login successful.",
             refreshToken: refreshTokenString,
             token,
-            expiry: exp
-          }
+            expiry: exp,
+          },
         }
       } else {
         return {
@@ -193,20 +193,23 @@ export default class UserService {
           data: {
             error: "Login failed.",
             username,
-            message: "Login failed."
-          }
+            message: "Login failed.",
+          },
         }
       }
     } catch (e) {
       if (e instanceof DBConnectionException) {
         return {
           ok: 0,
-          data: {message: "DB connection error", error: "DB connection error"}
+          data: {
+            message: "DB connection error",
+            error: "DB connection error",
+          },
         }
       } else if (e instanceof UserDoesNotExistException) {
         return {
           ok: 0,
-          data: {message: "User not found", error: "User not found"}
+          data: { message: "User not found", error: "User not found" },
         }
       } else if (e instanceof Error) {
         throw e
@@ -216,55 +219,36 @@ export default class UserService {
     }
   }
 
-  static async renewJWTToken(userId: string) {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne(
-        {id: userId},
-        {relations: ["scopes"]}
-      )
-      if (!user) {
-        return {
-          ok: 0,
-          data: {
-            error: "User doesn't exist.",
-            userId,
-            message: "User doesn't exist."
-          }
-        }
-      }
-
-      const scopeArray: Scope[] = user.scopes
-      const scopes: string[] = scopeArray.map((item) => {
-        return item.scope
-      })
-      const username = user.username
+  static async renewJWTToken(username: string) {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
+    try {
+      const scopes: string[] = await DBImpl.getScopes(username)
       const token: string = sign(
         {
-          userId,
           username,
-          scopes
+          scopes,
         },
         process.env.JWT_SECRET,
-        {expiresIn: process.env.EXPIRATION_TIME}
+        { expiresIn: process.env.EXPIRATION_TIME }
       )
 
-      const {exp} = decode(token) as {
+      const { exp } = decode(token) as {
         [key: string]: number
       }
 
       return {
         ok: 1,
         data: {
-          userId,
           username,
           message: "JWT renewed succesfully.",
           token,
-          expiry: exp
-        }
+          expiry: exp,
+        },
       }
-    } else {
-      throw "Connection problem"
+    } catch (e) {
+      throw "renewJWTToken fail"
     }
   }
 
@@ -286,19 +270,19 @@ export default class UserService {
         convert(process.env.DB_PROVIDER)
       )
       const userList: UserObject[] = await DBImpl.getUserList()
-      return userList 
+      return userList
     } catch (e) {
       throw e
     }
   }
 
-  async getUser(username:string): Promise<UserObject | null> {
+  async getUser(username: string): Promise<UserObject | null> {
     try {
       const DBImpl: DatabaseImpl = CreateDBAdapter(
         convert(process.env.DB_PROVIDER)
       )
       const user: UserObject = await DBImpl.getUser(username)
-      return user 
+      return user
     } catch (e) {
       throw e
     }
@@ -307,7 +291,7 @@ export default class UserService {
   async deleteUser(id: string): Promise<boolean> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
-      const user: User = await User.findOne({id})
+      const user: User = await User.findOne({ id })
       if (!user) {
         return false
       }
@@ -329,7 +313,7 @@ export default class UserService {
   ): Promise<boolean> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
-      const user: User = await User.findOne({id})
+      const user: User = await User.findOne({ id })
       if (!user) {
         return false
       }
