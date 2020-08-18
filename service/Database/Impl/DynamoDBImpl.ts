@@ -414,6 +414,27 @@ export class DynamoDBImpl implements DatabaseImpl {
     }
   }
 
+  async lockUser(
+    username: string,
+    lockedBy: string,
+    reason: string | null
+  ): Promise<boolean> {
+    const lock = {
+      pk: "LOCK#" + username,
+      sk: "LOCK#" + username,
+      lockedBy,
+      reason,
+    }
+    const params = { TableName: "kuka-users", Item: lock }
+    try {
+      await docClient.put(params).promise()
+      return true
+    } catch (e) {
+      console.log(e)
+      return false
+    }
+  }
+
   private userModelToDynamoDBModel(user: UserModel): UserModelForDynamoDB {
     const {
       username,
@@ -456,6 +477,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       lockId,
     }
   }
+
   private verificationModelToDynamoDBModel(
     verification: VerificationModel
   ): VerificationModelForDynamoDB {
@@ -465,6 +487,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       emailVerified: verification.clicked,
     }
   }
+
   private dynamoDBToPasswordResetModel(
     reset: PasswordResetModelForDynamoDB
   ): PasswordResetModel {

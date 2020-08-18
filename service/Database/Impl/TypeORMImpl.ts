@@ -83,12 +83,14 @@ export class TypeORMImpl implements DatabaseImpl {
   async deleteUser(username: string): Promise<void> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
-      const user: User = await User.findOne({username })
+      const user: User = await User.findOne({ username })
       if (!user) {
-      throw new UserDoesNotExistException()}
+        throw new UserDoesNotExistException()
+      }
       const userRemoveResponse: User = await User.remove(user)
       if (!userRemoveResponse) {
-      throw new DBConnectionException()} 
+        throw new DBConnectionException()
+      }
     } else {
       throw "Connection problem"
     }
@@ -98,8 +100,7 @@ export class TypeORMImpl implements DatabaseImpl {
     username: string,
     lockedBy: string,
     reason: string | null
-  ): Promise<boolean>
-  {
+  ): Promise<boolean> {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const user: User = await User.findOne({ username })
@@ -110,7 +111,7 @@ export class TypeORMImpl implements DatabaseImpl {
       lock.lockedBy = lockedBy
       lock.lockedAt = new Date()
       lock.reason = reason
-      lock.username = username 
+      lock.username = username
       const lockResult: Lock = await Lock.save(lock)
       const lockId: number = lockResult.id
       user.lockId = lockId
@@ -167,10 +168,12 @@ export class TypeORMImpl implements DatabaseImpl {
     try {
       await ProjectConnection.connect()
       const user: User = await User.findOne({ username })
-      if (!user) {
+      if (user === undefined) {
+        console.log("User not found")
         return false
       } else {
-        true
+        console.log("User found")
+        return true
       }
     } catch (e) {
       throw new DBConnectionException()
@@ -415,5 +418,4 @@ export class TypeORMImpl implements DatabaseImpl {
       throw "Connection problem"
     }
   }
-
 }
