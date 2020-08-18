@@ -126,8 +126,8 @@ export default class UserService {
       data: {
         userId,
         username,
-        message: createUserResponse.data.error,
-        error: createUserResponse.data.message,
+        error: createUserResponse.data.error,
+        message: createUserResponse.data.message,
       },
     }
 
@@ -221,6 +221,7 @@ export default class UserService {
   }
 
   static async renewJWTToken(username: string): Promise<RenewJWTModel> {
+    console.log("renewJWT username: " + username)
     const DBImpl: DatabaseImpl = CreateDBAdapter(
       convert(process.env.DB_PROVIDER)
     )
@@ -246,7 +247,8 @@ export default class UserService {
         expiry: exp,
       }
     } catch (e) {
-      throw "renewJWTToken fail"
+      console.log("renewJWT failLLLLLLLLLLL")
+      throw new Error()
     }
   }
 

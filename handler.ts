@@ -16,7 +16,7 @@ import BaseErrorResponse from "./responses/BaseErrorResponse"
 import UserResponse from "./responses/UserResponse"
 import * as logg from "loglevel"
 
-const log = logg.getLogger("DynamoDBImpl")
+const log = logg.getLogger("handler")
 log.setLevel("debug")
 
 export const register: Handler = async (event: APIGatewayEvent) => {
