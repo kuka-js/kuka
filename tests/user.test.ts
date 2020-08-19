@@ -72,9 +72,17 @@ describe("user tests", () => {
 
   it("renewJWTToken_ExpectFailure", async () => {
     const renewUsername = "usernotexist@gmail.com"
-    expect(async () => {
-      await UserService.renewJWTToken("asasd@asdsad.com")
-    }).toThrow()
+    let thrown = false
+    try {
+      await UserService.renewJWTToken(renewUsername)
+    } catch (e) {
+      thrown = true
+    }
+    expect(thrown).toBe(true)
+    // Cant get the following to work. That is why I use catch and use thrown boolean
+    // expect(async () => {
+    //  await UserService.renewJWTToken("asasd@asdsad.com")
+    //}).toThrowError(Error)
   })
 
   it("getUserList_test", async () => {
@@ -82,7 +90,6 @@ describe("user tests", () => {
     const userListResult: UserObject[] = await us.getUserList()
     expect(Array.isArray(userListResult)).toBe(true)
     expect(userListResult.length).toBe(2)
-    expect(userListResult[0].userId).toBe(1)
     expect(userListResult[0].username).toBe("nake89@gmail.com")
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
@@ -92,14 +99,19 @@ describe("user tests", () => {
     const userResponse: UserObject = (await us.getUser(
       "nake89@gmail.com"
     )) as UserObject
-    expect(userResponse.userId).toBe(1)
     expect(userResponse.username).toBe("nake89@gmail.com")
     expect(userResponse.scopes.includes("root")).toBe(true)
   })
 
   it("getUser_ExpectFailure", async () => {
     const us = new UserService()
-    expect(await us.getUser("usernotexist@gmail.com")).toThrow()
+    let thrown = false
+    try {
+      await us.getUser("usernotexist@gmail.com")
+    } catch (e) {
+      thrown = true
+    }
+    expect(thrown).toBe(true)
   })
 
   it("lockUser_ExpectSuccess", async () => {

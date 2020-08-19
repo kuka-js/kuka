@@ -169,10 +169,8 @@ export class TypeORMImpl implements DatabaseImpl {
       await ProjectConnection.connect()
       const user: User = await User.findOne({ username })
       if (user === undefined) {
-        console.log("User not found")
         return false
       } else {
-        console.log("User found")
         return true
       }
     } catch (e) {
