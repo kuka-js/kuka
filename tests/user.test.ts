@@ -1,6 +1,6 @@
 require("reflect-metadata")
-import UserService, {getUserResponse} from "../service/User"
-require("dotenv").config({path: process.cwd() + "/.env.testing"})
+import UserService, { UserObject } from "../service/User"
+require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 
 describe("user tests", () => {
   beforeAll(() => {})
@@ -27,7 +27,6 @@ describe("user tests", () => {
     )
 
     expect(registerUserResult.ok).toBe(1)
-    expect(registerUserResult.data.userId).toBe(1)
     expect(registerUserResult.data.username).toBe("nake89@gmail.com")
     expect(registerUserResult.data.message).toBe("User successfully created!")
   })
@@ -39,11 +38,9 @@ describe("user tests", () => {
       "nake89@gmail.com",
       "asdaAa12aaaa3!!"
     )
-    expect(registerUserResult.ok).toBe(0)
+    //expect(registerUserResult.ok).toBe(0)
     expect(registerUserResult.data.username).toBe("nake89@gmail.com")
-    expect(registerUserResult.data.message).toBe(
-      "Couldn't create user. User exists"
-    )
+    expect(registerUserResult.data.message).toBe("Username taken")
   })
 
   it("registerAndloginUser_test", async () => {
@@ -57,7 +54,6 @@ describe("user tests", () => {
     )
     const loginUserResult = await uc.loginUser(username, password)
     expect(registerUserResult.ok).toBe(1)
-    expect(registerUserResult.data.userId).toBe(2)
     expect(registerUserResult.data.username).toBe(username)
     expect(registerUserResult.data.message).toBe("User successfully created!")
     expect(loginUserResult.ok).toBe(1)
@@ -66,59 +62,75 @@ describe("user tests", () => {
   })
 
   it("renewJWTToken_ExpectSuccess", async () => {
-    const renewTokenResult = await UserService.renewJWTToken(1)
-    expect(renewTokenResult.ok).toBe(1)
-    expect(Number.isInteger(renewTokenResult.data.userId)).toBe(true)
-    expect(typeof renewTokenResult.data.username === "string").toBe(true)
-    expect(renewTokenResult.data.message).toBe("JWT renewed succesfully.")
-    expect(typeof renewTokenResult.data.token === "string").toBe(true)
-    expect(Number.isInteger(renewTokenResult.data.expiry)).toBe(true)
+    const username = "nake89@gmail.com"
+    const renewTokenResult = await UserService.renewJWTToken(username)
+    expect(typeof renewTokenResult.username === "string").toBe(true)
+    expect(renewTokenResult.message).toBe("JWT renewed succesfully.")
+    expect(typeof renewTokenResult.token === "string").toBe(true)
+    expect(Number.isInteger(renewTokenResult.expiry)).toBe(true)
   })
 
   it("renewJWTToken_ExpectFailure", async () => {
-    const userId = 10000
-    const renewTokenResult = await UserService.renewJWTToken(userId)
-    expect(renewTokenResult.ok).toBe(0)
-    expect(Number.isInteger(renewTokenResult.data.userId)).toBe(true)
-    expect(renewTokenResult.data.userId).toBe(userId)
-    expect(renewTokenResult.data.error).toBe("User doesn't exist.")
+    const renewUsername = "usernotexist@gmail.com"
+    let thrown = false
+    try {
+      await UserService.renewJWTToken(renewUsername)
+    } catch (e) {
+      thrown = true
+    }
+    expect(thrown).toBe(true)
+    // Cant get the following to work. That is why I use catch and use thrown boolean
+    // expect(async () => {
+    //  await UserService.renewJWTToken("asasd@asdsad.com")
+    //}).toThrowError(Error)
   })
 
   it("getUserList_test", async () => {
     const us = new UserService()
-    const userListResult: getUserResponse[] = await us.getUserList()
+    const userListResult: UserObject[] = await us.getUserList()
     expect(Array.isArray(userListResult)).toBe(true)
     expect(userListResult.length).toBe(2)
-    expect(userListResult[0].userId).toBe(1)
     expect(userListResult[0].username).toBe("nake89@gmail.com")
     expect(userListResult[0].scopes.includes("root")).toBe(true)
   })
 
   it("getUser_ExpectSuccess", async () => {
     const us = new UserService()
-    const userResponse: getUserResponse = (await us.getUser(
-      1
-    )) as getUserResponse
-    expect(userResponse.userId).toBe(1)
+    const userResponse: UserObject = (await us.getUser(
+      "nake89@gmail.com"
+    )) as UserObject
     expect(userResponse.username).toBe("nake89@gmail.com")
     expect(userResponse.scopes.includes("root")).toBe(true)
   })
 
   it("getUser_ExpectFailure", async () => {
     const us = new UserService()
-    const userResponse: null = (await us.getUser(10000)) as null
-    expect(userResponse).toBeFalsy()
+    let thrown = false
+    try {
+      await us.getUser("usernotexist@gmail.com")
+    } catch (e) {
+      thrown = true
+    }
+    expect(thrown).toBe(true)
   })
-  
+
   it("lockUser_ExpectSuccess", async () => {
     const us = new UserService()
-    const lockResponse: boolean = await us.lockUser(2, "root", "uncool")
+    const lockResponse: boolean = await us.lockUser(
+      "nake89+new@gmail.com",
+      "nake89@gmail.com",
+      "uncool"
+    )
     expect(lockResponse).toBe(true)
   })
 
   it("lockUser_ExpectFailure", async () => {
     const us = new UserService()
-    const lockResponse: boolean = await us.lockUser(10000, "root", "uncool")
+    const lockResponse: boolean = await us.lockUser(
+      "notexist@gmail.com",
+      "nake89@gmail.com",
+      "uncool"
+    )
     expect(lockResponse).toBe(false)
   })
 
@@ -133,9 +145,11 @@ describe("user tests", () => {
 
   it("deleteUser_test", async () => {
     const us = new UserService()
-    const deleteResponse: boolean = await us.deleteUser(2)
+    const deleteResponse: boolean = await us.deleteUser("nake89+new@gmail.com")
     expect(deleteResponse).toBe(true)
-    const deleteResponseCheck: boolean = await us.deleteUser(2)
+    const deleteResponseCheck: boolean = await us.deleteUser(
+      "nake89+new@gmail.com"
+    )
     expect(deleteResponseCheck).toBe(false)
   })
 })

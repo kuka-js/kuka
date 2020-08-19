@@ -1,14 +1,30 @@
 import User from "../entities/User"
 import Scope from "../entities/Scope"
-import {Connection} from "typeorm"
+import { Connection } from "typeorm"
 import ProjectConnection from "./Connection"
-import {hashSync, compareSync} from "bcrypt"
-import {sign, decode} from "jsonwebtoken"
-import VerificationService from "./Verification"
+import { hashSync, compareSync } from "bcrypt"
+import { sign, decode } from "jsonwebtoken"
 import PasswordReset from "../entities/PasswordReset"
-import {OurMailResponse} from "./Email"
 import RefreshTokenService from "./RefreshTokenService"
 import Lock from "../entities/Lock"
+import { v4 as uuid } from "uuid"
+import { UserModel } from "../models/UserModel"
+import {
+  CreateDBAdapter,
+  DatabaseImpl,
+  convert,
+} from "./Database/DatabaseFactory"
+import { CreateUserResponse } from "./Database/Responses"
+import { LoginUserResponse } from "./Responses/LoginUserResponse"
+import { DBConnectionException } from "../exceptions/DBConncetionException"
+import { UserDoesNotExistException } from "../exceptions/UserDoesNotExistException"
+import { PasswordResetModel } from "../models/PasswordResetModel"
+import VerificationService from "./Verification"
+import { RenewJWTModel } from "../models/RenewJWTModel"
+import * as logg from "loglevel"
+
+const log = logg.getLogger("User")
+log.setLevel("debug")
 
 export default class UserService {
   async changePassword(passwordResetId, password1, password2) {
@@ -17,53 +33,34 @@ export default class UserService {
         ok: 0,
         data: {
           error: "Password is too weak",
-          message: "Password is too weak"
-        }
+          message: "Password is too weak",
+        },
       }
     }
     if (password1 != password2) {
-      return {ok: 0, data: {message: "Passwords do not match!"}}
+      return { ok: 0, data: { message: "Passwords do not match!" } }
     }
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const passwordReset: PasswordReset = await PasswordReset.findOne({
+
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
+    try {
+      const passwordResetModel: PasswordResetModel = await DBImpl.getPasswordReset(
         passwordResetId
-      })
-      if (!passwordReset) {
-        return {ok: 0}
-      }
-      const createdDate: Date = passwordReset.createdDate
+      )
+      const createdDate: Date = new Date(passwordResetModel.creationDate)
       const now: Date = new Date()
       const diffTime: number = Math.abs(createdDate.getTime() - now.getTime())
       const diffDays: number = diffTime / (1000 * 60 * 60 * 24)
-
       if (diffDays > 1) {
-        return {ok: 0, data: {message: "Password reset link expired"}}
+        return { ok: 0, data: { message: "Password reset link expired" } }
       }
-
-      const userId: number = passwordReset.userId
-      const user: User = await User.findOne({id: userId})
-      if (!user) {
-        return {
-          ok: 0,
-          data: {
-            error: "User doesn't exist.",
-            message: "User doesn't exist."
-          }
-        }
-      } else {
-        user.passwordHash = hashSync(password1, 10)
-        try {
-          await User.save(user)
-          return {ok: 1, data: {message: "Password successfully changed"}}
-        } catch (e) {
-          console.log(e)
-          return {
-            ok: 0,
-            data: {message: "Password change failed. DB issue. Check logs"}
-          }
-        }
-      }
+      const username: string = passwordResetModel.username
+      const passwordHash = hashSync(password1, 10)
+      await DBImpl.updatePasswordHash(username, passwordHash)
+      return { ok: 1, data: { message: "Password successfully changed" } }
+    } catch (e) {
+      throw e
     }
   }
 
@@ -71,178 +68,113 @@ export default class UserService {
     username: string,
     email: string,
     password: string
-  ): Promise<saveUserResponse> {
+  ): Promise<SaveUserResponse> {
     if (!this.passwordStrengthCheck(password)) {
       return {
         ok: 0,
         data: {
           error: "Password is too weak",
           username,
-          message: "Password is too weak"
-        }
+          message: "Password is too weak",
+        },
       }
     }
-    try {
-      let connection: Connection = await ProjectConnection.connect()
-      if (connection) {
-        const findCount: [User[], number] = await User.findAndCount()
-        const userCount: number = findCount[1]
-        let firstUser: boolean
-        if (!userCount || userCount == 0) {
-          firstUser = true
-        } else {
-          firstUser = false
-        }
-        if (await this.userExists(username)) {
-          return {
-            ok: 0,
-            data: {
-              error: "Couldn't create user. User exists",
-              username,
-              message: "Couldn't create user. User exists"
-            }
-          }
-        }
-        const hash: string = hashSync(password, 10)
-        const user: User = new User()
-        user.username = username
-        user.passwordHash = hash
-        user.email = email
-        if (process.env.AUTO_VERIFY_MAIL) {
-          user.emailVerified = true
-        } else {
-          user.emailVerified = false
-        }
-        const defaultScope: Scope = new Scope()
-        defaultScope.scope = "default"
-        await Scope.save(defaultScope)
-        user.scopes = [defaultScope]
-        // Give the first user created root scope
-        if (firstUser) {
-          const rootScope: Scope = new Scope()
-          rootScope.scope = "root"
-          await Scope.save(rootScope)
-          user.scopes.push(rootScope)
-        }
-        const userResponse: User = await User.save(user)
-        const verificationLinkResult: OurMailResponse = await VerificationService.createVerificationLink(
-          email
-        )
-        if (verificationLinkResult.ok == 0) {
-          return {
-            ok: 0,
-            data: {username, message: "createVerificationLink failed"}
-          }
-        } else {
-          return {
-            ok: 1,
-            data: {
-              userId: userResponse.id,
-              username,
-              message: "User successfully created!"
-            }
-          }
-        }
-      } else {
-        console.log(connection)
-        return {
-          ok: 0,
-          data: {
-            error: "Couldn't create user.",
-            username,
-            message: "Couldn't create user."
-          }
-        }
-      }
-    } catch (error) {
-      console.log(error)
+    const passwordHash: string = hashSync(password, 10)
+    const userId: string = uuid()
+    let emailVerified
+    if (process.env.AUTO_VERIFY_MAIL) {
+      emailVerified = true
+    } else {
+      emailVerified = false
+    }
+    let userModel: UserModel = {
+      passwordHash,
+      username,
+      email,
+      emailVerified,
+      userId,
+      scopes: ["default", "root"],
+    }
+
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
+    const existsBool = await DBImpl.userExists(username)
+    if (existsBool) {
       return {
         ok: 0,
         data: {
-          error,
           username,
-          message: "Couldn't create user."
-        }
+          message: "Username taken",
+        },
       }
     }
-  }
+    const createUserResponse: CreateUserResponse = await DBImpl.createUser(
+      userModel
+    )
 
-  async userExists(username: string): Promise<boolean> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const findUser: User = await User.findOne({username})
-      if (findUser) {
-        return true
-      } else {
-        return false
-      }
-    } else {
-      throw "Connection problem"
+    await VerificationService.createVerificationLink({
+      email,
+      username,
+    })
+
+    const createUserAPIResponse: SaveUserResponse = {
+      ok: createUserResponse.ok,
+      data: {
+        userId,
+        username,
+        error: createUserResponse.data.error,
+        message: createUserResponse.data.message,
+      },
     }
+
+    return createUserAPIResponse
   }
 
-  async loginUser(username: string, password: string) {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne({username}, {relations: ["scopes"]})
-      if (!user) {
-        return {
-          ok: 0,
-          data: {
-            error: "User doesn't exist.",
-            username,
-            message: "User doesn't exist."
-          }
-        }
-      }
-
+  async loginUser(
+    username: string,
+    password: string
+  ): Promise<LoginUserResponse> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
+    try {
+      const user: UserModel = await DBImpl.getUser(username)
       if (!user.emailVerified) {
         return {
           ok: 0,
           data: {
             error: "Email not verified.",
             username,
-            message: "Email not verified."
-          }
+            message: "Email not verified.",
+          },
         }
       }
-
       if (user.lockId) {
         return {
           ok: 0,
           data: {
             error: "User is locked.",
             username,
-            message: "User is locked."
-          }
+            message: "User is locked.",
+          },
         }
       }
-
       if (compareSync(password, user.passwordHash)) {
-        const scopeArray: Scope[] = user.scopes
-        const scopes: string[] = scopeArray.map(item => {
-          return item.scope
-        })
-        const userId: number = user.id
         const token: string = sign(
           {
-            userId,
             username,
-            scopes
+            scopes: user.scopes,
           },
           process.env.JWT_SECRET,
-          {expiresIn: process.env.EXPIRATION_TIME}
+          { expiresIn: process.env.EXPIRATION_TIME }
         )
 
-        const {exp} = decode(token) as {
+        const { exp } = decode(token) as {
           [key: string]: number
         }
-
-        // Save refresh token to db
         const refreshTokenString: string = RefreshTokenService.generateRefreshToken()
-        user.refreshToken = refreshTokenString
-        await User.save(user)
-
+        DBImpl.updateRefreshToken(username, refreshTokenString)
         return {
           ok: 1,
           data: {
@@ -250,8 +182,8 @@ export default class UserService {
             message: "Login successful.",
             refreshToken: refreshTokenString,
             token,
-            expiry: exp
-          }
+            expiry: exp,
+          },
         }
       } else {
         return {
@@ -259,169 +191,126 @@ export default class UserService {
           data: {
             error: "Login failed.",
             username,
-            message: "Login failed."
-          }
+            message: "Login failed.",
+          },
         }
       }
-    } else {
-      throw "Connection problem"
-    }
-  }
-
-  static async renewJWTToken(userId: number) {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne(
-        {id: userId},
-        {relations: ["scopes"]}
-      )
-      if (!user) {
+    } catch (e) {
+      if (e instanceof DBConnectionException) {
         return {
           ok: 0,
           data: {
-            error: "User doesn't exist.",
-            userId,
-            message: "User doesn't exist."
-          }
+            message: "DB connection error",
+            error: "DB connection error",
+          },
         }
+      } else if (e instanceof UserDoesNotExistException) {
+        return {
+          ok: 0,
+          data: { message: "User not found", error: "User not found" },
+        }
+      } else if (e instanceof Error) {
+        throw e
+      } else {
+        throw e
       }
+    }
+  }
 
-      const scopeArray: Scope[] = user.scopes
-      const scopes: string[] = scopeArray.map(item => {
-        return item.scope
-      })
-      const username = user.username
+  static async renewJWTToken(username: string): Promise<RenewJWTModel> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
+    try {
+      const scopes: string[] = await DBImpl.getScopes(username)
       const token: string = sign(
         {
-          userId,
           username,
-          scopes
+          scopes,
         },
         process.env.JWT_SECRET,
-        {expiresIn: process.env.EXPIRATION_TIME}
+        { expiresIn: process.env.EXPIRATION_TIME }
       )
 
-      const {exp} = decode(token) as {
+      const { exp } = decode(token) as {
         [key: string]: number
       }
 
       return {
-        ok: 1,
-        data: {
-          userId,
-          username,
-          message: "JWT renewed succesfully.",
-          token,
-          expiry: exp
-        }
+        username,
+        message: "JWT renewed succesfully.",
+        token,
+        expiry: exp,
       }
-    } else {
-      throw "Connection problem"
+    } catch (e) {
+      throw new Error()
     }
   }
 
-  async emailToUserId(email: string): Promise<number> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const findUser: User = await User.findOne({email})
-      if (findUser) {
-        return findUser.id
-      } else {
-        throw "Cannot find user id. Email might not exist."
-      }
-    } else {
-      throw "Connection problem"
-    }
-  }
-
-  async getUserList(): Promise<getUserResponse[]> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const users: User[] = await User.find({relations: ["scopes"]})
-      const userList: getUserResponse[] = users.map(item => {
-        const userId: number = item.id
-        const username: string = item.username
-        const scopes: string[] = item.scopes.map(scope => {
-          return scope.scope
-        })
-        const user: getUserResponse = {
-          userId,
-          username,
-          scopes
-        }
-        return user
-      })
-      return userList
-    } else {
-      throw "Connection problem"
-    }
-  }
-
-  async getUser(userId: number): Promise<getUserResponse | null> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne(
-        {id: userId},
-        {relations: ["scopes"]}
+  async emailToUsername(email: string): Promise<string> {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
       )
-      if (!user) {
-        return null
-      }
-      const scopes: string[] = user.scopes.map(scope => {
-        return scope.scope
-      })
-      const userResponse: getUserResponse = {
-        userId,
-        username: user.username,
-        scopes
-      }
-      return userResponse
-    } else {
-      throw "Connections problem"
+      const username = await DBImpl.emailToUsername(email)
+      return username
+    } catch (e) {
+      throw e
     }
   }
 
-  async deleteUser(id: number): Promise<boolean> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne({id})
-      if (!user) {
-        return false
-      }
-      const userRemoveResponse: User = await User.remove(user)
-      if (userRemoveResponse) {
-        return true
-      } else {
-        return false
-      }
-    } else {
-      throw "Connection problem"
+  async getUserList(): Promise<UserObject[]> {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      const userList: UserObject[] = await DBImpl.getUserList()
+      return userList
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async getUser(username: string): Promise<UserObject | null> {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      const user: UserObject = await DBImpl.getUser(username)
+      return user
+    } catch (e) {
+      throw e
+    }
+  }
+
+  async deleteUser(username: string): Promise<boolean> {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      await DBImpl.deleteUser(username)
+      return true
+    } catch (e) {
+      return false
     }
   }
 
   async lockUser(
-    id: number,
+    username: string,
     lockedBy: string,
     reason: string | null
   ): Promise<boolean> {
-    let connection: Connection = await ProjectConnection.connect()
-    if (connection) {
-      const user: User = await User.findOne({id})
-      if (!user) {
+    try {
+      const DBImpl: DatabaseImpl = CreateDBAdapter(
+        convert(process.env.DB_PROVIDER)
+      )
+      if (await DBImpl.lockUser(username, lockedBy, reason)) {
+        return true
+      } else {
         return false
       }
-      const lock: Lock = new Lock()
-      lock.lockedBy = lockedBy
-      lock.lockedAt = new Date()
-      lock.reason = reason
-      lock.userId = id
-      const lockResult: Lock = await Lock.save(lock)
-      const lockId: number = lockResult.id
-      user.lockId = lockId
-      await User.save(user)
-      return true
-    } else {
-      throw "Connection problem"
+    } catch (e) {
+      return false
     }
   }
 
@@ -437,18 +326,19 @@ export default class UserService {
   }
 }
 
-interface saveUserResponse {
+interface SaveUserResponse {
   ok: number
   data: {
-    userId?: number
+    userId?: string
     error?: string
     username: string
     message: string
   }
 }
 
-export interface getUserResponse {
-  userId: number
+export interface UserObject {
+  userId?: string
   username: string
   scopes: string[]
+  isLocked?: string
 }

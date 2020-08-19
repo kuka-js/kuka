@@ -1,16 +1,10 @@
-import {
-  BaseEntity,
-  Column,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn
-} from "typeorm"
+import {BaseEntity, Column, Entity, OneToMany, PrimaryColumn} from "typeorm"
 import Scope from "./Scope"
 
 @Entity()
 export default class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number
+  @PrimaryColumn()
+  id: string
 
   @Column()
   username: string
@@ -27,10 +21,7 @@ export default class User extends BaseEntity {
   @Column({nullable: true})
   refreshToken: string
 
-  @OneToMany(
-    type => Scope,
-    scope => scope.user
-  )
+  @OneToMany((type) => Scope, (scope) => scope.user)
   scopes: Scope[]
 
   @Column({nullable: true})

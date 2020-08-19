@@ -1,12 +1,12 @@
 require("reflect-metadata")
-import Email, {OurMailResponse} from "../service/Email"
-require("dotenv").config({path: process.cwd() + "/.env.testing"})
+import Email from "../service/Email"
+require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 const sendMailMock = jest.fn()
 
 jest.mock("nodemailer")
 
 const nodemailer = require("nodemailer")
-nodemailer.createTransport.mockReturnValue({sendMail: sendMailMock})
+nodemailer.createTransport.mockReturnValue({ sendMail: sendMailMock })
 
 describe("email tests", () => {
   beforeEach(() => {
@@ -16,14 +16,12 @@ describe("email tests", () => {
 
   it("sendEmail_smtp_success", async () => {
     const email = new Email()
-    const sendMailResult = await email.sendEmail(
-      "email@address.com",
-      "subject",
-      "message",
-      "smtp"
-    )
-
-    expect(sendMailResult.ok).toBe(1)
-    expect(sendMailResult.emailService).toBe("smtp")
+    let thrown = false
+    try {
+      await email.sendEmail("email@address.com", "subject", "message", "smtp")
+    } catch (e) {
+      thrown = true
+    }
+    expect(thrown).toBe(false)
   })
 })

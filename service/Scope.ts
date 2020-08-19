@@ -1,66 +1,40 @@
-import User from "../entities/User"
-import Scope from "../entities/Scope"
-import ProjectConnection from "./Connection"
-
+import {
+  CreateDBAdapter,
+  DatabaseImpl,
+  convert,
+} from "./Database/DatabaseFactory"
 export default class ScopeService {
-  async getScopes(userId: number): Promise<string[] | boolean> {
+  async getScopes(username: string): Promise<string[] | boolean> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
     try {
-      await ProjectConnection.connect()
-    } catch (e) {
-      console.log(e)
-      return false
-    }
-    const user: User = await User.findOne({id: userId})
-    if (user) {
-      const scopeArray: Scope[] = await Scope.find({user})
-      const scopes: string[] = scopeArray.map(item => {
-        return item.scope
-      })
+      const scopes: string[] = await DBImpl.getScopes(username)
       return scopes
-    } else {
+    } catch (e) {
       return false
     }
   }
 
-  async addScope(userId: number, scope: string): Promise<boolean> {
+  async addScope(username: string, scope: string): Promise<void> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
     try {
-      await ProjectConnection.connect()
+      await DBImpl.addScope(username, scope)
     } catch (e) {
-      console.log(e)
-      return false
-    }
-    const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
-    if (user) {
-      for (let item of user.scopes) {
-        if (item.scope == scope) {
-          return false
-        }
-      }
-      const newScope: Scope = new Scope()
-      newScope.scope = scope
-      await Scope.save(newScope)
-      user.scopes.push(newScope)
-      await User.save(user)
-      return true
-    } else {
-      return false
+      throw "Could not add scope"
     }
   }
 
-  async removeScope(userId: number, scope: string) {
+  async removeScope(username: string, scope: string): Promise<void> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
     try {
-      await ProjectConnection.connect()
+      await DBImpl.removeScope(username, scope)
     } catch (e) {
-      console.log(e)
-      return false
-    }
-    const user: User = await User.findOne({id: userId}, {relations: ["scopes"]})
-    if (user) {
-      user.scopes = user.scopes.filter(e => e.scope !== scope)
-      await User.save(user)
-      return true
-    } else {
-      return false
+      throw "Could not remove scope"
     }
   }
 }

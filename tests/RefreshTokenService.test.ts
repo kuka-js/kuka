@@ -1,10 +1,10 @@
 import RefreshTokenService, {
-  RefreshTokenServiceError
+  RefreshTokenServiceError,
 } from "../service/RefreshTokenService"
 import UserService from "../service/User"
 
 require("reflect-metadata")
-require("dotenv").config({path: process.cwd() + "/.env.testing"})
+require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 
 describe("RefreshTokenService_tests", () => {
   beforeAll(async () => {
@@ -22,7 +22,10 @@ describe("RefreshTokenService_tests", () => {
     RefreshTokenService.compareRefreshTokens = mockCompareRefreshTokens.bind(
       RefreshTokenService
     )
-    const result = await RefreshTokenService.refreshToken(1, "old")
+    const result = await RefreshTokenService.refreshToken(
+      "nake89@gmail.com",
+      "old"
+    )
     expect(result.ok).toBe(1)
     expect(typeof result.refreshToken === "string").toBe(true)
   })
@@ -33,7 +36,10 @@ describe("RefreshTokenService_tests", () => {
     RefreshTokenService.compareRefreshTokens = mockCompareRefreshTokens.bind(
       RefreshTokenService
     )
-    const result = await RefreshTokenService.refreshToken(1, "old")
+    const result = await RefreshTokenService.refreshToken(
+      "nake89@gmail.com",
+      "old"
+    )
     expect(result.ok).toBe(0)
     expect(result.errorCode).toBe(
       RefreshTokenServiceError.REFRESH_TOKEN_INVALID
