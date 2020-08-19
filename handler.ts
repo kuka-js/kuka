@@ -1,4 +1,4 @@
-import {APIGatewayEvent, Context, Handler, Callback} from "aws-lambda"
+import { APIGatewayEvent, Context, Handler, Callback } from "aws-lambda"
 import RegisterResponse from "./responses/RegisterResponse"
 import UserService from "./service/User"
 import LoginResponse from "./responses/LoginResponse"
@@ -10,10 +10,14 @@ import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
 import UserListResponse from "./responses/UserListResponse"
 import RefreshTokenService, {
-  CookieFromHeader
+  CookieFromHeader,
 } from "./service/RefreshTokenService"
 import BaseErrorResponse from "./responses/BaseErrorResponse"
 import UserResponse from "./responses/UserResponse"
+import * as logg from "loglevel"
+
+const log = logg.getLogger("handler")
+log.setLevel("debug")
 
 export const register: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
@@ -22,9 +26,13 @@ export const register: Handler = async (event: APIGatewayEvent) => {
     } catch (e) {
       return new RegisterResponse(500, 0, "JSON invalid").response()
     }
-    const {username, email, password} = JSON.parse(event.body)
+    const { username, email, password } = JSON.parse(event.body)
     const userService = new UserService()
-    const {ok, data} = await userService.registerUser(username, email, password)
+    const { ok, data } = await userService.registerUser(
+      username,
+      email,
+      password
+    )
 
     if (ok == 0) {
       return new RegisterResponse(500, 0, data.message).response()
@@ -38,9 +46,9 @@ export const register: Handler = async (event: APIGatewayEvent) => {
 
 export const login: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
-    const {username, password} = JSON.parse(event.body)
+    const { username, password } = JSON.parse(event.body)
     const userService = new UserService()
-    const {ok, data} = await userService.loginUser(username, password)
+    const { ok, data } = await userService.loginUser(username, password)
     if (ok == 0) {
       return new LoginResponse(400, 0, data.message).response()
     } else {
@@ -59,33 +67,25 @@ export const login: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const verify: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const { id } = event.pathParameters
   const verification = new VerificationService()
-  if (await verification.markEmailVerified(id)) {
+  try {
+    await verification.markEmailVerified(id)
     return new BaseResponse(200, 1, `Email verified`).response()
-  } else {
+  } catch (e) {
     return new BaseResponse(500, 0, `Unable to verify email`).response()
   }
 }
 
 export const reset: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
-    const {email} = JSON.parse(event.body)
+    const { email } = JSON.parse(event.body)
 
     const passwordReset = new PasswordResetService()
 
-    let passwordResetResult: string
-    if (process.env.AUTO_SEND_PASSWORD_RESET_ID) {
-      passwordResetResult = await passwordReset.createPasswordResetLink(
-        email,
-        true
-      )
-    } else {
-      passwordResetResult = await passwordReset.createPasswordResetLink(
-        email,
-        false
-      )
-    }
+    let passwordResetResult: string = await passwordReset.createPasswordResetLink(
+      email
+    )
 
     if (passwordResetResult == "true") {
       return new BaseResponse(200, 1, `Password Reset email sent`).response()
@@ -109,7 +109,7 @@ export const reset: Handler = async (event: APIGatewayEvent) => {
 
 export const password: Handler = async (event: APIGatewayEvent) => {
   if (event.body != null) {
-    const {passwordResetId, password1, password2} = JSON.parse(event.body)
+    const { passwordResetId, password1, password2 } = JSON.parse(event.body)
 
     const user = new UserService()
     const changePasswordResult = await user.changePassword(
@@ -131,39 +131,55 @@ export const password: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const addScope: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
   if (event.body != null) {
     const body = JSON.parse(event.body)
+    const username = body.username
     const newScope = body.scope
     const scopes = new ScopeService()
-    const scopeResponse = await scopes.addScope(parseInt(id), newScope)
-    if (scopeResponse) {
+    try {
+      await scopes.addScope(username, newScope)
       return new BaseResponse(200, 1, `Scope added succesfully`).response()
-    } else {
+    } catch (e) {
       return new BaseResponse(500, 0, "Failed to add scope").response()
     }
   }
 }
 
 export const removeScope: Handler = async (event: APIGatewayEvent) => {
-  const {id, scopeName} = event.pathParameters
+  log.debug(event)
+  const username = event.headers["X-Custom-Username"]
+  if (!username) {
+    return new BaseResponse(400, 0, "Give username in headers").response()
+  }
+  log.debug("Username: " + username)
+  const { scopeName } = event.pathParameters
   const scopes = new ScopeService()
-  const scopeResponse = await scopes.removeScope(parseInt(id), scopeName)
-  if (scopeResponse) {
+  try {
+    await scopes.removeScope(username, scopeName)
     return new BaseResponse(200, 1, `Scope removed succesfully`).response()
-  } else {
+  } catch (e) {
+    log.debug(e)
     return new BaseResponse(500, 0, "Failed to remove scope").response()
   }
 }
 
 export const getScopes: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
-  const scopes = new ScopeService()
-  const scopeResponse = await scopes.getScopes(parseInt(id))
-  if (Array.isArray(scopeResponse)) {
-    return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
+  log.debug("handler getScopes")
+  log.debug(event)
+  const username = event.headers["X-Custom-Username"]
+  //  const username = event.requestContext.authorizer.principalId
+  log.debug("Username:")
+  log.debug(username)
+  if (username) {
+    const scopes = new ScopeService()
+    const scopeResponse = await scopes.getScopes(username)
+    if (Array.isArray(scopeResponse)) {
+      return new ScopeResponse(200, 1, `Your scopes`, scopeResponse).response()
+    } else {
+      return new BaseResponse(500, 0, "Something went wrong").response()
+    }
   } else {
-    return new BaseResponse(500, 0, "Something went wrong").response()
+    return new BaseResponse(400, 0, "Give username").response()
   }
 }
 
@@ -178,14 +194,14 @@ export const getUserList: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const getUser: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const username = event.headers["X-Custom-Username"]
   const userService = new UserService()
-  const userResponse = await userService.getUser(parseInt(id))
+  const userResponse = await userService.getUser(username)
   if (userResponse != null) {
     return new UserResponse(
       200,
       1,
-      `User data for ${id}`,
+      `User data for ${username}`,
       userResponse
     ).response()
   } else {
@@ -194,43 +210,48 @@ export const getUser: Handler = async (event: APIGatewayEvent) => {
 }
 
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
-  const id = parseInt(event.pathParameters.id)
-  console.log(event.headers)
-  console.log(event.multiValueHeaders)
+  const username = event.headers["X-Custom-Username"]
   const cookie = RefreshTokenService.getCookiesFromHeader(
     event.headers
   ) as CookieFromHeader
-  const {RefreshToken} = cookie
+  const { RefreshToken } = cookie
 
-  const tokenResponse = await RefreshTokenService.refreshToken(id, RefreshToken)
-  const renewJWTResponse = await UserService.renewJWTToken(id)
-  if (tokenResponse.ok == 1 && renewJWTResponse.ok == 1) {
-    return new LoginResponse(
-      200,
-      1,
-      "JWT renewed succesfully",
-      renewJWTResponse.data.token,
-      renewJWTResponse.data.expiry,
-      tokenResponse.refreshToken
-    ).response()
+  const tokenResponse = await RefreshTokenService.refreshToken(
+    username,
+    RefreshToken
+  )
+  if (tokenResponse.ok == 1) {
+    try {
+      const renewJWTResponse = await UserService.renewJWTToken(username)
+      return new LoginResponse(
+        200,
+        1,
+        "JWT renewed succesfully",
+        renewJWTResponse.token,
+        renewJWTResponse.expiry,
+        tokenResponse.refreshToken
+      ).response()
+    } catch (e) {
+      return new BaseErrorResponse("Could not renew refresh token").response()
+    }
   } else {
     return new BaseErrorResponse("Could not renew refresh token").response()
   }
 }
 
 export const deleteUser: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const username = event.headers["X-Custom-Username"]
   const user = new UserService()
-  const userResponse: boolean = await user.deleteUser(parseInt(id))
+  const userResponse: boolean = await user.deleteUser(username)
   if (userResponse) {
-    return new BaseResponse(200, 1, `Removed user by id ${id}`).response()
+    return new BaseResponse(200, 1, `Removed user: ${username}`).response()
   } else {
     return new BaseResponse(500, 0, "Something went wrong").response()
   }
 }
 
 export const lockUser: Handler = async (event: APIGatewayEvent) => {
-  const {id} = event.pathParameters
+  const username = event.headers["X-Custom-Username"]
   const lockedBy = event.requestContext.authorizer.principalId
   let reason: string | null
   if (event.body != null) {
@@ -238,15 +259,10 @@ export const lockUser: Handler = async (event: APIGatewayEvent) => {
     reason = body.reason
   }
   const user = new UserService()
-  const lockResponse: boolean = await user.lockUser(
-    parseInt(id),
-    lockedBy,
-    reason
-  )
+  const lockResponse: boolean = await user.lockUser(username, lockedBy, reason)
   if (lockResponse) {
-    return new BaseResponse(200, 1, `User ${id} locked `).response()
+    return new BaseResponse(200, 1, `User ${username} locked `).response()
   } else {
     return new BaseResponse(500, 0, "Failed to lock user").response()
   }
 }
-

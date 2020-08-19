@@ -1,35 +1,40 @@
 import ProjectConnection from "./Connection"
 import User from "../entities/User"
-import {v4 as uuid} from "uuid"
+import { v4 as uuid } from "uuid"
+import {
+  CreateDBAdapter,
+  DatabaseImpl,
+  convert,
+} from "./Database/DatabaseFactory"
 
 export default class RefreshTokenService {
   public static async refreshToken(
-    userId: number,
+    username: string,
     oldRefreshToken: string
   ): Promise<RefreshTokenServiceResponse> {
+    const DBImpl: DatabaseImpl = CreateDBAdapter(
+      convert(process.env.DB_PROVIDER)
+    )
     try {
-      await ProjectConnection.connect()
+      const refreshToken = await DBImpl.getRefreshToken(username)
+
+      if (this.compareRefreshTokens(oldRefreshToken, refreshToken)) {
+        const newRefreshToken = this.generateRefreshToken()
+        await DBImpl.updateRefreshToken(username, newRefreshToken)
+        return { ok: 1, refreshToken: newRefreshToken }
+      } else {
+        return {
+          ok: 0,
+          errorCode: RefreshTokenServiceError.REFRESH_TOKEN_INVALID,
+          errorMessage: "Given refresh token does not match",
+        }
+      }
     } catch (e) {
       console.log(e)
       return {
         ok: 0,
         errorCode: RefreshTokenServiceError.CONNECTION_PROBLEM,
-        errorMessage: "Connection problem"
-      }
-    }
-    const user: User = await User.findOne({id: userId})
-    const refreshTokenFromDB: string = user.refreshToken
-
-    if (this.compareRefreshTokens(oldRefreshToken, refreshTokenFromDB)) {
-      const newRefreshToken = this.generateRefreshToken()
-      user.refreshToken = newRefreshToken
-      await User.save(user)
-      return {ok: 1, refreshToken: newRefreshToken}
-    } else {
-      return {
-        ok: 0,
-        errorCode: RefreshTokenServiceError.REFRESH_TOKEN_INVALID,
-        errorMessage: "Given refresh token does not match"
+        errorMessage: "Connection problem",
       }
     }
   }
@@ -63,7 +68,7 @@ export default class RefreshTokenService {
       rc = headers.Cookie
 
     rc &&
-      rc.split(";").forEach(function(cookie) {
+      rc.split(";").forEach(function (cookie) {
         var parts = cookie.split("=")
         var key = parts.shift().trim()
         var value = decodeURI(parts.join("="))
@@ -76,7 +81,7 @@ export default class RefreshTokenService {
   }
 }
 
-interface RefreshTokenServiceResponse {
+export interface RefreshTokenServiceResponse {
   ok: number
   errorCode?: RefreshTokenServiceError
   errorMessage?: string
@@ -85,7 +90,7 @@ interface RefreshTokenServiceResponse {
 
 export enum RefreshTokenServiceError {
   CONNECTION_PROBLEM,
-  REFRESH_TOKEN_INVALID
+  REFRESH_TOKEN_INVALID,
 }
 
 export interface CookieFromHeader {

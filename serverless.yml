@@ -1,4 +1,8 @@
-service: sls-jwt-boilerplate
+service: kuka-js 
+
+custom:
+  serverless-offline:
+    httpPort: 4000
 
 plugins:
   - serverless-plugin-typescript
@@ -55,37 +59,28 @@ functions:
     handler: handler.getScopes
     events:
       - http:
-          path: user/scopes/{id}
+          path: user/scopes
           method: get
           authorizer: authGetScopes
-          request:
-            parameters:
-              paths:
-                id: true
-
+ 
   addScope:
     handler: handler.addScope
     events:
       - http:
-          path: user/scopes/{id}
+          path: user/scopes
           method: post
           authorizer: authAddScope
-          request:
-            parameters:
-              paths:
-                id: true
 
   removeScope:
     handler: handler.removeScope
     events:
       - http:
-          path: user/scopes/{id}/{scopeName}
+          path: user/scopes/{scopeName}
           method: delete
           authorizer: authRemoveScope
           request:
             parameters:
               paths:
-                id: true
                 scopeName: true
 
   getUserList:
@@ -100,48 +95,32 @@ functions:
     handler: handler.getUser
     events:
       - http:
-          path: user/{id}
+          path: user
           method: get
           authorizer: authGetUserData
-          request:
-            parameters:
-              paths:
-                id: true
 
   refreshToken:
     handler: handler.refreshToken
     events:
       - http:
-          path: user/token/{id}
+          path: user/token
           method: put
-          request:
-            parameters:
-              paths:
-                id: true
 
   deleteuser:
     handler: handler.deleteUser
     events:
       - http:
-          path: user/{id}
+          path: user
           method: delete
           authorizer: authDeleteUser
-          request:
-            parameters:
-              paths:
-                id: true
 
   lockUser:
     handler: handler.lockUser
     events:
       - http:
-          path: user/lock/{id}
+          path: user/lock
           method: put
           authorizer: authLockUser
-          request:
-            parameters:
-              paths:
-                id: true
 
   authGetScopes:
     handler: service/Auth.getScopes
