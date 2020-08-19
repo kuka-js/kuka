@@ -109,13 +109,10 @@ export default class UserService {
         },
       }
     }
-    console.log("Creating user")
-    log.debug("Creating user")
     const createUserResponse: CreateUserResponse = await DBImpl.createUser(
       userModel
     )
 
-    log.debug("Create verification link")
     await VerificationService.createVerificationLink({
       email,
       username,
@@ -221,7 +218,6 @@ export default class UserService {
   }
 
   static async renewJWTToken(username: string): Promise<RenewJWTModel> {
-    console.log("renewJWT username: " + username)
     const DBImpl: DatabaseImpl = CreateDBAdapter(
       convert(process.env.DB_PROVIDER)
     )
@@ -247,7 +243,6 @@ export default class UserService {
         expiry: exp,
       }
     } catch (e) {
-      console.log("renewJWT failLLLLLLLLLLL")
       throw new Error()
     }
   }
@@ -309,8 +304,11 @@ export default class UserService {
       const DBImpl: DatabaseImpl = CreateDBAdapter(
         convert(process.env.DB_PROVIDER)
       )
-      await DBImpl.lockUser(username, lockedBy, reason)
-      return true
+      if (await DBImpl.lockUser(username, lockedBy, reason)) {
+        return true
+      } else {
+        return false
+      }
     } catch (e) {
       return false
     }

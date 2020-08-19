@@ -211,8 +211,6 @@ export const getUser: Handler = async (event: APIGatewayEvent) => {
 
 export const refreshToken: Handler = async (event: APIGatewayEvent) => {
   const username = event.headers["X-Custom-Username"]
-  console.log(event.headers)
-  console.log(event.multiValueHeaders)
   const cookie = RefreshTokenService.getCookiesFromHeader(
     event.headers
   ) as CookieFromHeader
