@@ -20,8 +20,10 @@ import * as logg from "loglevel"
 const log = logg.getLogger("DynamoDBImpl")
 log.setLevel("debug")
 
-const credentials = new SharedIniFileCredentials({ profile: "kuka-dynamo" })
-config.credentials = credentials
+if (process.env.STAGE == "local") {
+  const credentials = new SharedIniFileCredentials({ profile: "kuka-dynamo" })
+  config.credentials = credentials
+}
 
 config.update({ region: "eu-north-1" })
 
