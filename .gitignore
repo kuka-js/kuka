@@ -3,6 +3,7 @@ node_modules
 database.sqlite
 test.sqlite
 .serverless
+.env.localdev
 .env.local
 .env.development
 .env.staging
