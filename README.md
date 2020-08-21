@@ -1,8 +1,8 @@
 [![Travis CI](https://travis-ci.org/nake89/serverless-jwt-boilerplate.svg?branch=master)](https://travis-ci.org/nake89/serverless-jwt-boilerplate) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/nake89/serverless-jwt-boilerplate/graphs/commit-activity) [![GitHub license](https://img.shields.io/github/license/nake89/serverless-jwt-boilerplate.svg)](https://github.com/nake89/serverless-jwt-boilerplate/blob/master/LICENSE) [![GitHub issues-closed](https://img.shields.io/github/issues-closed/nake89/serverless-jwt-boilerplate.svg)](https://GitHub.com/nake89/serverless-jwt-boilerplate/issues?q=is%3Aissue+is%3Aclosed) [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/nake89/serverless-jwt-boilerplate.svg)](https://isitmaintained.com/project/nake89/serverless-jwt-boilerplate "Average time to resolve an issue")[![dependencies Status](https://david-dm.org/nake89/serverless-jwt-boilerplate/status.svg)](https://david-dm.org/nake89/serverless-jwt-boilerplate)
 
-# serverless_jwt_boilerplate
+# kuka.js
 
-A Typescript jwt boilerplate using the Serverless framework
+A Typescript jwt boilerplate using the Serverless framework. Currently in alpha stage, but basic functionality working. Pull requests and issues are appreciated!
 
 [API Documentation](https://kuka-js.github.io/kuka/apidocs.html)
 
