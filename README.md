@@ -1,17 +1,24 @@
 [![Travis CI](https://travis-ci.org/nake89/serverless-jwt-boilerplate.svg?branch=master)](https://travis-ci.org/nake89/serverless-jwt-boilerplate) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/nake89/serverless-jwt-boilerplate/graphs/commit-activity) [![GitHub license](https://img.shields.io/github/license/nake89/serverless-jwt-boilerplate.svg)](https://github.com/nake89/serverless-jwt-boilerplate/blob/master/LICENSE) [![GitHub issues-closed](https://img.shields.io/github/issues-closed/nake89/serverless-jwt-boilerplate.svg)](https://GitHub.com/nake89/serverless-jwt-boilerplate/issues?q=is%3Aissue+is%3Aclosed) [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/nake89/serverless-jwt-boilerplate.svg)](https://isitmaintained.com/project/nake89/serverless-jwt-boilerplate "Average time to resolve an issue")[![dependencies Status](https://david-dm.org/nake89/serverless-jwt-boilerplate/status.svg)](https://david-dm.org/nake89/serverless-jwt-boilerplate)
 
-# kuka.js
+# Kuka.js (/'kuka/ KOO-kah) 
 
-A Typescript jwt boilerplate using the Serverless framework. Currently in alpha stage, but basic functionality working. Pull requests and issues are appreciated!
+A Typescript JWT boilerplate using the Serverless framework. Runs as a separate microservice in AWS Lambda independent of the app you want use authentication in. All you need to do is contact the necessary endpoints (login/register etc). You need to share the secret used here with your app. So you your app can decrypt the JWT token. Currently in alpha stage, but basic functionality working. Pull requests and issues are appreciated!
 
 [API Documentation](https://kuka-js.github.io/kuka/apidocs.html)
+
+## Features
+
+- Login
+- Register
+- Add and remove scopes
+- Supports multiple databases types (DynamoDB, MySQL, MariaDB, Postgres, SQLite)
 
 ## Development
 
 - `npm i -g serverless`
 - `npm i -D`
-- `cp .env.local.template .env.local`. Then modify .env.local with your details.
-- `sls offline start --env local`
+- `cp .env.localdev.template .env.localdev`. Then modify .env.local with your details.
+- `sls offline start --env localdev`
 - Start modifying your ts files. Hot reload, ie. every save will automatically restart the server :)
 
 ### .env variables
@@ -19,6 +26,7 @@ A Typescript jwt boilerplate using the Serverless framework. Currently in alpha 
 In local and maybe even in dev, you might want to have email addresses to be auto-verified.
 In that case, have this in your .env.local: `AUTO_VERIFY_MAIL=true`
 To reset passwords in dev without email sending capability, you can put this in .env.local: `AUTO_SEND_PASSWORD_RESET_ID=true`. Then the reset endpoint will return the password reset ID immediately. DO NOT USE THIS IN ANYTHING BUT LOCAL OR DEV MODE! Otherwise anyone can reset your password through this endpoint. This is for testing purposes only.
+If you want to use DynamoDB. In your .env file, set DB_PROVIDER to dynamodb. If you want to use any of the other databases, set it to typeorm and set TYPEORM_CONNECTION to the database you want to use. More info here: [TypeORM .env documentation](https://github.com/typeorm/typeorm/blob/master/docs/using-ormconfig.md#using-environment-variables). If you want to use DynamoDB, make sure your AWS Lambda function has access to your DynamoDB table. You can do this in AWS IAM.
 
 ### Email
 
