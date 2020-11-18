@@ -1,0 +1,16 @@
+{
+  "name": "@kuka/serverless",
+  "version": "1.0.0",
+  "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
+  "main": "handler.js",
+  "scripts": {
+    "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.736.0",
+    "loglevel": "^1.7.0"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.61"
+  }
+}

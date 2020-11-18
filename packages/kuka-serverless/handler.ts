@@ -1,17 +1,11 @@
 import { APIGatewayEvent, Context, Handler, Callback } from "aws-lambda"
+import {UserService, RefreshTokenService, CookieFromHeader, VerificationService,PasswordResetService, ScopeService} from "@kuka/core"
 import RegisterResponse from "./responses/RegisterResponse"
-import UserService from "./service/User"
 import LoginResponse from "./responses/LoginResponse"
 import BaseResponse from "./responses/BaseResponse"
-import VerificationService from "./service/Verification"
-import PasswordResetService from "./service/Reset"
-import ScopeService from "./service/Scope"
 import ResetResponse from "./responses/ResetResponse"
 import ScopeResponse from "./responses/ScopeResponse"
 import UserListResponse from "./responses/UserListResponse"
-import RefreshTokenService, {
-  CookieFromHeader,
-} from "./service/RefreshTokenService"
 import BaseErrorResponse from "./responses/BaseErrorResponse"
 import UserResponse from "./responses/UserResponse"
 import * as logg from "loglevel"
