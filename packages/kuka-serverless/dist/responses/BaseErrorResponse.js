@@ -13,12 +13,23 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.DBQueryFailedException = void 0;
-var DBQueryFailedException = /** @class */ (function (_super) {
-    __extends(DBQueryFailedException, _super);
-    function DBQueryFailedException() {
-        return _super.call(this, "DBQueryFailedException") || this;
+var BaseResponse_1 = require("./BaseResponse");
+var BaseErrorResponse = /** @class */ (function (_super) {
+    __extends(BaseErrorResponse, _super);
+    function BaseErrorResponse(message) {
+        return _super.call(this, 500, 0, message) || this;
     }
-    return DBQueryFailedException;
-}(Error));
-exports.DBQueryFailedException = DBQueryFailedException;
+    BaseErrorResponse.prototype.response = function () {
+        return {
+            statusCode: this.statusCode,
+            body: JSON.stringify({
+                ok: this.ok,
+                data: {
+                    message: this.message
+                }
+            }, null, 2)
+        };
+    };
+    return BaseErrorResponse;
+}(BaseResponse_1.default));
+exports.default = BaseErrorResponse;

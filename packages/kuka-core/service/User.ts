@@ -81,7 +81,7 @@ export default class UserService {
     }
     const passwordHash: string = hashSync(password, 10)
     const userId: string = uuid()
-    let emailVerified
+    let emailVerified: boolean
     if (process.env.AUTO_VERIFY_MAIL) {
       emailVerified = true
     } else {
@@ -95,7 +95,6 @@ export default class UserService {
       userId,
       scopes: ["default", "root"],
     }
-
     const DBImpl: DatabaseImpl = CreateDBAdapter(
       convert(process.env.DB_PROVIDER)
     )
