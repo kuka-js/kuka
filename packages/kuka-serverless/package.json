@@ -1,6 +1,6 @@
 {
-  "name": "@kuka/serverless",
-  "version": "1.0.0",
+  "name": "@kuka-js/serverless",
+  "version": "0.0.0-development",
   "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
   "main": "handler.js",
   "scripts": {

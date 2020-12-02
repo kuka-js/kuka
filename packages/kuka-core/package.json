@@ -1,11 +1,12 @@
 {
-  "name": "@kuka/core",
-  "version": "1.0.0",
+  "name": "@kuka-js/core",
+  "version": "0.0.0-development",
   "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D",
+    "build": "./node_modules/typescript/bin/tsc",
     "test": "jest"
   },
   "dependencies": {
