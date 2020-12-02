@@ -123,22 +123,22 @@ functions:
           authorizer: authLockUser
 
   authGetScopes:
-    handler: service/Auth.getScopes
+    handler: Auth.getScopes
 
   authAddScope:
-    handler: service/Auth.addScope
+    handler: Auth.addScope
 
   authRemoveScope:
-    handler: service/Auth.removeScope
+    handler: Auth.removeScope
 
   authGetUserList:
-    handler: service/Auth.getUserList
+    handler: Auth.getUserList
 
   authGetUserData:
-    handler: service/Auth.getUserData
+    handler: Auth.getUserData
 
   authDeleteUser:
-    handler: service/Auth.deleteUser
+    handler: Auth.deleteUser
 
   authLockUser:
-    handler: service/Auth.lockUser
+    handler: Auth.lockUser
