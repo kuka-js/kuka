@@ -15,6 +15,8 @@
     "serverless-dotenv-plugin": "^3.0.0",
     "serverless-offline": "^6.5.0",
     "serverless-plugin-typescript": "1.1.9",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "semantic-release": "^17.3.0",
+    "semantic-release-monorepo": "^7.0.3"
   }
 }
