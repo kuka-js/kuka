@@ -4,7 +4,8 @@
   "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
   "main": "handler.js",
   "scripts": {
-    "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D"
+    "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "aws-sdk": "^2.736.0",
