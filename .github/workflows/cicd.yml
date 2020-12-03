@@ -1,0 +1,36 @@
+name: kuka
+env:
+  NPM_TOKEN: ${{secrets.NPM_TOKEN}}
+  GH_TOKEN: ${{secrets.GH_TOKEN}}
+  NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
+  COMMIT_RANGE: "${{github.event.before}}..${{github.event.after}}"
+  
+on:
+  push:
+    branches: 
+      - main
+
+jobs:
+  core:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: "packages/kuka-core"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+      - run: |
+          if .ci/build.sh $COMMIT_RANGE $TARGET; then echo "Building '$TARGET' ..." && cd $TARGET && scripts/ci.sh; else echo "No changes detected in '$TARGET'; skipping build."; fi
+
+  serverless:
+    runs-on: ubuntu-latest
+    env:
+      TARGET: "packages/kuka-serverless"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v1
+      - run: |
+          if .ci/build.sh $COMMIT_RANGE $TARGET; then echo "Building '$TARGET' ..." && cd $TARGET && scripts/ci.sh; else echo "No changes detected in '$TARGET'; skipping build."; fi
