@@ -43,5 +43,7 @@
     "semantic-release-monorepo": "^7.0.3"
   },
   "manualBuild": "edit this string to cause manual build. 1",
-  "private": false
+  "publishConfig": {
+    "access": "public"
+  }
 }
