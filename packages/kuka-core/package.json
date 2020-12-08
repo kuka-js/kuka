@@ -1,49 +1,62 @@
 {
-  "name": "@kuka-js/core",
-  "version": "0.0.0-development",
-  "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "scripts": {
-    "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D",
-    "build": "./node_modules/typescript/bin/tsc",
-    "test": "jest",
-    "semantic-release": "semantic-release"
-  },
-  "dependencies": {
-    "aws-sdk": "^2.804.0",
-    "bcrypt": "^5.0.0",
-    "jsonwebtoken": "^8.5.1",
-    "lodash": "^4.17.20",
-    "loglevel": "^1.7.1",
-    "mysql2": "^2.2.5",
-    "nodemailer": "^6.4.16",
-    "reflect-metadata": "^0.1.13",
-    "sequelize": "^6.3.5",
-    "sqlite3": "^5.0.0",
-    "typeorm": "^0.2.29",
-    "uuid": "^8.3.1"
-  },
-  "devDependencies": {
-    "@types/aws-lambda": "^8.10.64",
-    "@types/bcrypt": "^3.0.0",
-    "@types/bluebird": "^3.5.33",
-    "@types/debug": "^4.1.5",
-    "@types/jest": "^26.0.16",
-    "@types/jsonwebtoken": "^8.5.0",
-    "@types/lodash": "4.14.165",
-    "@types/node": "^14.14.10",
-    "@types/nodemailer": "^6.4.0",
-    "@types/uuid": "^8.3.0",
-    "@types/validator": "^13.1.1",
-    "jest": "^26.6.3",
-    "ts-jest": "^26.4.4",
-    "typescript": "^4.1.2",
-    "semantic-release": "^17.3.0",
-    "semantic-release-monorepo": "^7.0.3"
-  },
-  "manualBuild": "edit this string to cause manual build. 1",
-  "publishConfig": {
-    "access": "public"
-  }
+    "name": "@kuka-js/core",
+    "version": "0.0.0-development",
+    "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "scripts": {
+        "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D",
+        "build": "./node_modules/typescript/bin/tsc",
+        "test": "jest",
+        "semantic-release": "semantic-release"
+    },
+    "dependencies": {
+        "aws-sdk": "^2.804.0",
+        "bcrypt": "^5.0.0",
+        "jsonwebtoken": "^8.5.1",
+        "lodash": "^4.17.20",
+        "loglevel": "^1.7.1",
+        "mysql2": "^2.2.5",
+        "nodemailer": "^6.4.16",
+        "reflect-metadata": "^0.1.13",
+        "sequelize": "^6.3.5",
+        "sqlite3": "^5.0.0",
+        "typeorm": "^0.2.29",
+        "uuid": "^8.3.1"
+    },
+    "devDependencies": {
+        "@types/aws-lambda": "^8.10.64",
+        "@types/bcrypt": "^3.0.0",
+        "@types/bluebird": "^3.5.33",
+        "@types/debug": "^4.1.5",
+        "@types/jest": "^26.0.16",
+        "@types/jsonwebtoken": "^8.5.0",
+        "@types/lodash": "4.14.165",
+        "@types/node": "^14.14.10",
+        "@types/nodemailer": "^6.4.0",
+        "@types/uuid": "^8.3.0",
+        "@types/validator": "^13.1.1",
+        "husky": "^4.3.5",
+        "jest": "^26.6.3",
+        "lint-staged": "^10.5.3",
+        "prettier": "^2.2.1",
+        "semantic-release": "^17.3.0",
+        "semantic-release-monorepo": "^7.0.3",
+        "ts-jest": "^26.4.4",
+        "typescript": "^4.1.2"
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "*.{js,json,yml,yaml,css,scss,ts,tsx,md}": [
+            "prettier --write"
+        ]
+    },
+    "manualBuild": "edit this string to cause manual build. 1",
+    "publishConfig": {
+        "access": "public"
+    }
 }
