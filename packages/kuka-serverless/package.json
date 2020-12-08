@@ -4,12 +4,12 @@
     "author": "Kevin Kivi <nake89@gmail.com> (https://kevinkivi.com)",
     "main": "handler.js",
     "scripts": {
-        "rebuild": "rm -rf node_modules/ && rm -rf dist/ && npm i -D",
+        "rebuild": "rm -rf node_modules/ && rm -rf .build/ && npm i -D",
         "semantic-release": "semantic-release"
     },
     "dependencies": {
-        "@kuka-js/core": "^1.0.2",
-        "aws-sdk": "^2.804.0",
+        "@kuka-js/core": "^1.0.3",
+        "aws-sdk": "^2.806.0",
         "loglevel": "^1.7.1"
     },
     "devDependencies": {
