@@ -6,6 +6,10 @@ A Typescript JWT boilerplate using the Serverless framework. Runs as a separate 
 
 [API Documentation](https://kuka-js.github.io/kuka/apidocs.html)
 
+## Versioning and status of project
+
+Version 2 when released will fully adhere to Semantic Versioning. During the current version (v1) every minor (0.X.X) and patch (0.0.X) version can result in breaking changes. Version 1 can be considered a beta version.
+
 ## Features
 
 - Login
