@@ -9,18 +9,18 @@
     },
     "dependencies": {
         "@kuka-js/core": "^1.0.3",
-        "aws-sdk": "^2.806.0",
+        "aws-sdk": "^2.845.0",
         "loglevel": "^1.7.1"
     },
     "devDependencies": {
-        "@types/aws-lambda": "^8.10.64",
+        "@types/aws-lambda": "^8.10.72",
         "prettier": "^2.2.1",
-        "semantic-release": "^17.3.0",
-        "semantic-release-monorepo": "^7.0.3",
-        "serverless-dotenv-plugin": "^3.1.0",
+        "semantic-release": "^17.3.9",
+        "semantic-release-monorepo": "^7.0.4",
+        "serverless-dotenv-plugin": "^3.5.1",
         "serverless-offline": "^6.8.0",
         "serverless-plugin-typescript": "1.1.9",
-        "typescript": "^4.1.2"
+        "typescript": "^4.1.5"
     },
     "husky": {
         "hooks": {
