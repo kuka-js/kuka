@@ -1,568 +1,405 @@
 {
-	"info": {
-		"_postman_id": "9178dcb8-7e52-c19b-868a-cffe49903b71",
-		"name": "Kuka.js",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Create user - Success",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"",
-							"pm.test(\"should create user\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});",
-							"",
-							"pm.test(\"should return status code 201\", function () {",
-							"    pm.response.to.have.status(201);",
-							"});",
-							"",
-							"pm.test(\"data.message should be string\", function () {",
-							"  pm.expect(jsonData.data.message).to.be.a(\"string\");",
-							"});",
-							"",
-							"postman.setEnvironmentVariable(\"verifyId\", jsonData.data.userId);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"email\": \"nake89+1@gmail.com\",\n    \"password\": \"nake89@gmail.COM\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/register",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Create user - Fail",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"",
-							"pm.test(\"should fail to create user\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(0);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"email\": \"nake89+1@gmail.com\",\n    \"password\": \"nake89@gmail.COM\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/register",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login - Success",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"pm.test(\"should login succesfully\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});",
-							"",
-							"postman.setEnvironmentVariable(\"bearerToken\", jsonData.data.token);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"password\": \"nake89@gmail.COM\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login - Fail",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"pm.test(\"should fail login\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(0);",
-							"});",
-							"",
-							"pm.test(\"should say 'Login failed.'\", function () {",
-							"    pm.expect(jsonData.data.message).to.eql(\"Login failed.\");",
-							"});",
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"password\": \"fail\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/login",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "getScopes",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"",
-							"pm.test(\"should be ok\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});",
-							"",
-							"pm.test(\"should return scopes as array\", function () {",
-							"    pm.expect(jsonData.data.scopes).to.be.a(\"array\");",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{bearerToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "GET",
-				"header": [
-					{
-						"key": "X-Custom-Username",
-						"value": "nake89+1@gmail.com",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://localhost:4000/test/user/scopes",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"scopes"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Add Scope - Success",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"pm.test(\"should add scope\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{bearerToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"username\": \"nake89+1@gmail.com\",\n\"scope\": \"newScopeYo\"}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/scopes",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"scopes"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Add Scope - Fail",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"pm.test(\"should fail to add scope\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(0);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{bearerToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\"username\": \"nake89+1@gmail.com\",\n\"scope\": \"newScopeYo\"}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/scopes",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"scopes"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Delete Scope",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = JSON.parse(responseBody);",
-							"",
-							"pm.test(\"should delete scope\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"auth": {
-					"type": "bearer",
-					"bearer": [
-						{
-							"key": "token",
-							"value": "{{bearerToken}}",
-							"type": "string"
-						}
-					]
-				},
-				"method": "DELETE",
-				"header": [
-					{
-						"key": "X-Custom-Username",
-						"value": "nake89+1@gmail.com",
-						"type": "text"
-					}
-				],
-				"url": {
-					"raw": "http://localhost:4000/test/user/scopes/newScopeYo",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"scopes",
-						"newScopeYo"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Verify",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.test(\"should verify email\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:4000/test/user/verify/{{verifyId}}",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"verify",
-						"{{verifyId}}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Request Password Reset",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.test(\"should be ok\", function () {",
-							"    pm.expect(jsonData.ok).to.eql(1);",
-							"});",
-							"pm.test(\"data.resetId should be string\", function () {",
-							"  pm.expect(jsonData.data.resetId).to.be.a(\"string\");",
-							"});",
-							"postman.setEnvironmentVariable(\"resetId\", jsonData.data.resetId);"
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							"postman.setNextRequest(null);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "POST",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"email\": \"nake89+1@gmail.com\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/reset",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"reset"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Reset Password",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				},
-				{
-					"listen": "prerequest",
-					"script": {
-						"exec": [
-							""
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
-			"request": {
-				"method": "PUT",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"resetId\": \"{{resetId}}\",\n    \"password1\": \"z6B%zT1AGUWTXU%d1jI6\",\n    \"password2\": \"z6B%zT1AGUWTXU%d1jI6\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4000/test/user/password",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4000",
-					"path": [
-						"test",
-						"user",
-						"password"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+    "info": {
+        "_postman_id": "9178dcb8-7e52-c19b-868a-cffe49903b71",
+        "name": "Kuka.js",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Create user - Success",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "pm.test(\"should create user\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(1);",
+                            "});",
+                            "",
+                            "pm.test(\"should return status code 201\", function () {",
+                            "    pm.response.to.have.status(201);",
+                            "});",
+                            "",
+                            "pm.test(\"data.message should be string\", function () {",
+                            "  pm.expect(jsonData.data.message).to.be.a(\"string\");",
+                            "});",
+                            "",
+                            "postman.setEnvironmentVariable(\"verifyId\", jsonData.data.userId);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"email\": \"nake89+1@gmail.com\",\n    \"password\": \"nake89@gmail.COM\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:4000/test/user/register",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "register"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Create user - Fail",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "pm.test(\"should fail to create user\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(0);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"email\": \"nake89+1@gmail.com\",\n    \"password\": \"nake89@gmail.COM\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:4000/test/user/register",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "register"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Login - Success",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = JSON.parse(responseBody);",
+                            "",
+                            "pm.test(\"should login succesfully\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(1);",
+                            "});",
+                            "",
+                            "postman.setEnvironmentVariable(\"bearerToken\", jsonData.data.token);"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"password\": \"nake89@gmail.COM\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:4000/test/user/login",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "login"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Login - Fail",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = JSON.parse(responseBody);",
+                            "",
+                            "pm.test(\"should fail login\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(0);",
+                            "});",
+                            "",
+                            "pm.test(\"should say 'Login failed.'\", function () {",
+                            "    pm.expect(jsonData.data.message).to.eql(\"Login failed.\");",
+                            "});",
+                            ""
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"username\": \"nake89+1@gmail.com\",\n    \"password\": \"fail\"\n}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:4000/test/user/login",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "login"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "getScopes",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "",
+                            "pm.test(\"should be ok\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(1);",
+                            "});",
+                            "",
+                            "pm.test(\"should return scopes as array\", function () {",
+                            "    pm.expect(jsonData.data.scopes).to.be.a(\"array\");",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{bearerToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "X-Custom-Username",
+                        "value": "nake89+1@gmail.com",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:4000/test/user/scopes",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "scopes"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Add Scope - Success",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = JSON.parse(responseBody);",
+                            "",
+                            "pm.test(\"should add scope\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(1);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{bearerToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"username\": \"nake89+1@gmail.com\",\n\"scope\": \"newScopeYo\"}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:4000/test/user/scopes",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "scopes"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Add Scope - Fail",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = JSON.parse(responseBody);",
+                            "",
+                            "pm.test(\"should fail to add scope\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(0);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{bearerToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\"username\": \"nake89+1@gmail.com\",\n\"scope\": \"newScopeYo\"}",
+                    "options": {
+                        "raw": {
+                            "language": "json"
+                        }
+                    }
+                },
+                "url": {
+                    "raw": "http://localhost:4000/test/user/scopes",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "scopes"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Delete Scope",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = JSON.parse(responseBody);",
+                            "",
+                            "pm.test(\"should delete scope\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(1);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "auth": {
+                    "type": "bearer",
+                    "bearer": [
+                        {
+                            "key": "token",
+                            "value": "{{bearerToken}}",
+                            "type": "string"
+                        }
+                    ]
+                },
+                "method": "DELETE",
+                "header": [
+                    {
+                        "key": "X-Custom-Username",
+                        "value": "nake89+1@gmail.com",
+                        "type": "text"
+                    }
+                ],
+                "url": {
+                    "raw": "http://localhost:4000/test/user/scopes/newScopeYo",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "scopes", "newScopeYo"]
+                }
+            },
+            "response": []
+        },
+        {
+            "name": "Verify",
+            "event": [
+                {
+                    "listen": "test",
+                    "script": {
+                        "exec": [
+                            "var jsonData = pm.response.json();",
+                            "pm.test(\"should verify email\", function () {",
+                            "    pm.expect(jsonData.ok).to.eql(1);",
+                            "});"
+                        ],
+                        "type": "text/javascript"
+                    }
+                }
+            ],
+            "request": {
+                "method": "POST",
+                "header": [],
+                "url": {
+                    "raw": "http://localhost:4000/test/user/verify/{{verifyId}}",
+                    "protocol": "http",
+                    "host": ["localhost"],
+                    "port": "4000",
+                    "path": ["test", "user", "verify", "{{verifyId}}"]
+                }
+            },
+            "response": []
+        }
+    ]
 }
