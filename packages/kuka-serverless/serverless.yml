@@ -1,4 +1,4 @@
-service: kuka-js 
+service: kuka-js
 
 custom:
   serverless-offline:
@@ -62,7 +62,7 @@ functions:
           path: user/scopes
           method: get
           authorizer: authGetScopes
- 
+
   addScope:
     handler: handler.addScope
     events:
