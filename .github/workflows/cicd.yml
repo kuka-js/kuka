@@ -15,12 +15,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [10, 12]
     env:
       TARGET: "packages/kuka-core"
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v1
@@ -33,12 +32,11 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [12.x]
+        node-version: [12]
     env:
       TARGET: "packages/kuka-serverless"
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v1
