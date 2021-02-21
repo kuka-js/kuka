@@ -6,7 +6,7 @@
     "scripts": {
         "rebuild": "rm -rf node_modules/ && rm -rf .build/ && npm i -D",
         "semantic-release": "semantic-release",
-        "test": "newman run .newman/postman_collection.json -e .newman/postman_environment.json --delay-request 2000 --verbose"
+        "test": "newman run .newman/postman_collection.json -e .newman/postman_environment.json --verbose"
     },
     "dependencies": {
         "@kuka-js/core": "^1.0.4",
