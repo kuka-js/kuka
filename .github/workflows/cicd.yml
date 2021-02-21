@@ -4,10 +4,10 @@ env:
   GH_TOKEN: ${{secrets.GH_TOKEN}}
   NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
   COMMIT_RANGE: "${{github.event.before}}..${{github.event.after}}"
-  
+
 on:
   push:
-    branches: 
+    branches:
       - main
 
 jobs:
