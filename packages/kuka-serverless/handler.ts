@@ -1,5 +1,12 @@
 import { APIGatewayEvent, Context, Handler, Callback } from "aws-lambda"
-import {UserService, RefreshTokenService, CookieFromHeader, VerificationService,PasswordResetService, ScopeService} from "@kuka-js/core"
+import {
+  UserService,
+  RefreshTokenService,
+  CookieFromHeader,
+  VerificationService,
+  PasswordResetService,
+  ScopeService,
+} from "@kuka-js/core"
 import RegisterResponse from "./responses/RegisterResponse"
 import LoginResponse from "./responses/LoginResponse"
 import BaseResponse from "./responses/BaseResponse"
@@ -21,11 +28,20 @@ export const register: Handler = async (event: APIGatewayEvent) => {
       return new RegisterResponse(500, 0, "JSON invalid").response()
     }
     const { username, email, password } = JSON.parse(event.body)
+    const skipEmailVerification =
+      event.headers["X-Custom-Skip-Email-Verification"] === "true"
+    const adminTokenValid =
+      event.headers["X-Custom-Admin-Token"] === "secure-string-here"
+    const config =
+      skipEmailVerification && adminTokenValid
+        ? { skipEmailVerification: true }
+        : { skipEmailVerification: false }
     const userService = new UserService()
     const { ok, data } = await userService.registerUser(
       username,
       email,
-      password
+      password,
+      config
     )
 
     if (ok == 0) {
