@@ -4,7 +4,7 @@ custom:
   serverless-offline:
     httpPort: 4000
   customDomain:
-    domainName: api.dev.rurumi.com
+    domainName: api.yourdomain.com
     basePath: user
     endpointType: edge
 
@@ -157,3 +157,4 @@ functions:
 
   authLockUser:
     handler: Auth.lockUser
+
