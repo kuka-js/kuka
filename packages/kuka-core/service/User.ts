@@ -23,6 +23,9 @@ import VerificationService from "./Verification"
 import { RenewJWTModel } from "../models/RenewJWTModel"
 import * as logg from "loglevel"
 
+interface RegisterUserConfig {
+  skipEmailVerification: boolean
+}
 const log = logg.getLogger("User")
 log.setLevel("debug")
 
@@ -53,7 +56,10 @@ export default class UserService {
       const diffTime: number = Math.abs(createdDate.getTime() - now.getTime())
       const diffDays: number = diffTime / (1000 * 60 * 60 * 24)
       if (diffDays > 1) {
-        return { ok: 0, data: { message: "Password reset link expired" } }
+        return {
+          ok: 0,
+          data: { message: "Password reset link expired" },
+        }
       }
       const username: string = passwordResetModel.username
       const passwordHash = hashSync(password1, 10)
@@ -67,7 +73,8 @@ export default class UserService {
   async registerUser(
     username: string,
     email: string,
-    password: string
+    password: string,
+    config?: RegisterUserConfig
   ): Promise<SaveUserResponse> {
     if (!this.passwordStrengthCheck(password)) {
       return {
@@ -82,7 +89,7 @@ export default class UserService {
     const passwordHash: string = hashSync(password, 10)
     const userId: string = uuid()
     let emailVerified: boolean
-    if (process.env.AUTO_VERIFY_MAIL) {
+    if (process.env.AUTO_VERIFY_MAIL || config.skipEmailVerification) {
       emailVerified = true
     } else {
       emailVerified = false
@@ -206,7 +213,10 @@ export default class UserService {
       } else if (e instanceof UserDoesNotExistException) {
         return {
           ok: 0,
-          data: { message: "User not found", error: "User not found" },
+          data: {
+            message: "User not found",
+            error: "User not found",
+          },
         }
       } else if (e instanceof Error) {
         throw e
