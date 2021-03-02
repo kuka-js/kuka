@@ -35,7 +35,7 @@
             "prettier --write"
         ]
     },
-    "manualBuild": "edit this string to cause manual build. 1",
+    "manualBuild": "edit this string to cause manual build. 3",
     "publishConfig": {
         "access": "public"
     }

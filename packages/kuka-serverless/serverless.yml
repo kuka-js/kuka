@@ -3,38 +3,53 @@ service: kuka-js
 custom:
   serverless-offline:
     httpPort: 4000
+  customDomain:
+    domainName: api.dev.rurumi.com
+    basePath: user
+    endpointType: edge
 
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-dotenv-plugin
+  - serverless-domain-manager
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   stage: ${env:STAGE}
   region: ${env:REGION}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:eu-north-1:289298663714:table/kuka-users"
 
 functions:
   register:
     handler: handler.register
     events:
       - http:
-          path: user/register
+          path: register
           method: post
 
   login:
     handler: handler.login
     events:
       - http:
-          path: user/login
+          path: login
           method: post
 
   verify:
     handler: handler.verify
     events:
       - http:
-          path: user/verify/{id}
+          path: verify/{id}
           method: post
           request:
             parameters:
@@ -45,21 +60,21 @@ functions:
     handler: handler.reset
     events:
       - http:
-          path: user/reset
+          path: reset
           method: post
 
   password:
     handler: handler.password
     events:
       - http:
-          path: user/password
+          path: password
           method: put
 
   getScopes:
     handler: handler.getScopes
     events:
       - http:
-          path: user/scopes
+          path: scopes
           method: get
           authorizer: authGetScopes
 
@@ -67,7 +82,7 @@ functions:
     handler: handler.addScope
     events:
       - http:
-          path: user/scopes
+          path: scopes
           method: post
           authorizer: authAddScope
 
@@ -75,7 +90,7 @@ functions:
     handler: handler.removeScope
     events:
       - http:
-          path: user/scopes/{scopeName}
+          path: scopes/{scopeName}
           method: delete
           authorizer: authRemoveScope
           request:
@@ -87,7 +102,7 @@ functions:
     handler: handler.getUserList
     events:
       - http:
-          path: user/list
+          path: list
           method: get
           authorizer: authGetUserList
 
@@ -95,7 +110,7 @@ functions:
     handler: handler.getUser
     events:
       - http:
-          path: user
+          path: /
           method: get
           authorizer: authGetUserData
 
@@ -103,14 +118,14 @@ functions:
     handler: handler.refreshToken
     events:
       - http:
-          path: user/token
+          path: token
           method: put
 
   deleteuser:
     handler: handler.deleteUser
     events:
       - http:
-          path: user
+          path: /
           method: delete
           authorizer: authDeleteUser
 
@@ -118,7 +133,7 @@ functions:
     handler: handler.lockUser
     events:
       - http:
-          path: user/lock
+          path: lock
           method: put
           authorizer: authLockUser
 
