@@ -4,7 +4,7 @@ custom:
   serverless-offline:
     httpPort: 4000
   customDomain:
-    domainName: api.yourdomain.com
+    domainName: ${env:KUKA_DOMAIN}
     basePath: user
     endpointType: edge
 
@@ -28,8 +28,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: "arn:aws:dynamodb:eu-north-1:289298663714:table/kuka-users"
-
+      Resource: ${env:DYNAMODB_ARN}
 functions:
   register:
     handler: handler.register
@@ -157,4 +156,3 @@ functions:
 
   authLockUser:
     handler: Auth.lockUser
-
