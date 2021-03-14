@@ -1,6 +1,7 @@
+![banner](https://user-images.githubusercontent.com/6876030/111069985-46c43c00-84d8-11eb-9d2b-fedd988c15f1.png)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/kuka-js/kuka/kuka) [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/kuka-js/kuka/graphs/commit-activity) [![GitHub license](https://img.shields.io/github/license/kuka-js/kuka.svg)](https://github.com/kuka-js/kuka/blob/master/LICENSE) [![GitHub issues-closed](https://img.shields.io/github/issues-closed/kuka-js/kuka.svg)](https://GitHub.com/kuka-js/kuka/issues?q=is%3Aissue+is%3Aclosed) [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/kuka-js/kuka.svg)](https://isitmaintained.com/project/kuka-js/kuka "Average time to resolve an issue") [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat)](https://github.com/prettier/prettier) [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
-# Kuka.js (/'kuka/ KOO-kah) 
+# Kuka.js (/'kuka/ KOO-kah)
 
 A Typescript JWT boilerplate using the Serverless framework. Runs as a separate microservice in AWS Lambda independent of the app you want use authentication in. All you need to do is contact the necessary endpoints (login/register etc). You need to share the secret used here with your app. So you your app can decrypt the JWT token. Currently in alpha stage, but basic functionality working. Pull requests and issues are appreciated!
 
