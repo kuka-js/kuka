@@ -3,13 +3,22 @@
 
 # Kuka.js (/'kuka/ KOO-kah)
 
-A Typescript JWT boilerplate using the Serverless framework. Runs as a separate microservice in AWS Lambda independent of the app you want use authentication in. All you need to do is contact the necessary endpoints (login/register etc). You need to share the secret used here with your app. So you your app can decrypt the JWT token. Currently in alpha stage, but basic functionality working. Pull requests and issues are appreciated!
+A serverless user management system using JWT. Runs as a separate microservice in AWS Lambda independent of the app you want use authentication in. You need to share the secret used here with your app and it can decrypt the JWT. Currently in alpha stage, but basic functionality working (register, login, etc). Pull requests and issues are appreciated!
 
-[API Documentation](https://kuka-js.github.io/kuka/apidocs.html)
+### Why?
+
+* User management that scales indepenedent of your app.
+
+### How?
+
+* AWS Lambda (fast infinitely scalable stateless functions)
+* DynamoDB (infinitely scalable database)
+
+[API Documentation](https://kuka-js.github.io/kuka/apidocs.html) - Out of date
 
 ## Versioning and status of project
 
-Version 2 when released will fully adhere to Semantic Versioning. During the current version (v1) every minor (0.X.X) and patch (0.0.X) version can result in breaking changes. Version 1 can be considered a beta version.
+Version 2 when released will fully adhere to Semantic Versioning. During the current version (v1) every minor (1.X.X) and patch (1.0.X) version can result in breaking changes.
 
 ## Features
 
@@ -21,6 +30,7 @@ Version 2 when released will fully adhere to Semantic Versioning. During the cur
 ## Development
 
 - `npm i -g serverless`
+- `cd packages/kuka-serverless`
 - `npm i -D`
 - `cp .env.localdev.template .env.localdev`. Then modify .env.local with your details.
 - `sls offline start --env localdev`
@@ -77,7 +87,3 @@ Also read the openapi.yml for more information about the endpoints.
 - Password reset
 - Local dev uses sqlite for DB (no config needed)
 - Deployment works. Connects to the DB. Put your DB settings in the .env._staging_
-
-## Status
-
-This boilerplate is usable as a user authentication service.
