@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "aws-sdk": "^2.910.0",
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.1",
     "cosmiconfig": "^7.0.0",
     "jsonwebtoken": "^8.5.1",

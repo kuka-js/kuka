@@ -18,7 +18,7 @@ describe("email tests", () => {
     const email = new Email()
     let thrown = false
     try {
-      await email.sendEmail("email@address.com", "subject", "message", "smtp")
+      await email.sendEmail("email@address.com", "subject", "message")
     } catch (e) {
       thrown = true
     }

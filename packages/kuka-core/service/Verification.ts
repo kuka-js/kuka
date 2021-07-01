@@ -46,14 +46,13 @@ export default class VerificationService {
       throw e
     }
     if (!(process.env.STAGE == "test")) {
-      if (!(process.env.AUTO_VERIFY_MAIL == "true") ) {
+      if (!(process.env.AUTO_VERIFY_MAIL == "true")) {
         try {
           const emailInstance = new Email()
           await emailInstance.sendEmail(
             email,
             "Verify your email address",
-            `Please verify your email address by clicking this link: ${process.env.VERIFICATION_LINK_URL}${verifyLinkId}`,
-            process.env.EMAIL_SERVICE
+            `Please verify your email address by clicking this link: ${process.env.VERIFICATION_LINK_URL}${verifyLinkId}`
           )
         } catch (e) {
           // throws EmailSendException, UnkownEmailServiceException

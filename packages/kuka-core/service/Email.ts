@@ -3,10 +3,14 @@ import { SendEmailRequest, SendEmailResponse } from "aws-sdk/clients/ses"
 import * as nodemailer from "nodemailer"
 import { EmailSendException } from "../exceptions/EmailSendException"
 import { UnkownEmailServiceException } from "../exceptions/UnknownEmailServiceException"
-import { PlugLoad } from "plugload"
+import { cosmiconfigSync } from "cosmiconfig"
+const axios = require("axios").default
 
-const provider = new PlugLoad("pluginloader", "../plugins")
-const defaultMailProviders = ["AWSSES", "SMTP"]
+const moduleName = "kuka"
+const explorer = cosmiconfigSync(moduleName)
+const result = explorer.search()
+if (result === null) throw new Error("Cant find config file.")
+const defaultMailProviders = ["AWSSES", "SMTP", "REST"]
 interface EmailPlugin {
   pluginName: string
   pluginType: string
@@ -17,11 +21,22 @@ interface EmailPlugin {
     message: string
   ): Promise<void>
 }
+
 interface KukaConfig {
   mailProvider: string
   plugins: string[]
+  restMailClientConfig: {
+    url: string
+    method: string
+    body?: string
+    headers?: Headers
+  }
 }
-    const config = provider.config as KukaConfig
+
+interface Headers {
+  [key: string]: string
+}
+const config = result.config as KukaConfig
 export default class Email {
   async sendEmail(
     email: string,
@@ -37,18 +52,6 @@ export default class Email {
         ? VER_RECIPIENT
         : email
 
-    if (defaultMailProviders.indexOf(config.mailProvider) === -1) {
-      await provider.getPlugins()
-      for (let plugin of provider.loadedPlugins) {
-        const initPlugin = new plugin()
-        if (initPlugin.pluginName == config.mailProvider) {
-          const castPlugin = initPlugin as EmailPlugin
-          const sender: string = VER_SENDER
-          await castPlugin.sendEmail(recipient, sender, subject, message)
-        }
-      }
-      return
-    }
     if (config.mailProvider === "AWSSES") {
       const ses = new SES({ region: "eu-central-1" })
       const sender: string = VER_SENDER
@@ -85,7 +88,7 @@ export default class Email {
         console.log(e)
         throw new EmailSendException()
       }
-    } else if (config.mailProvider === "SMTP") {
+    } else if (config.mailProvider === "SMTP" || STAGE == "test") {
       try {
         let transporter
         transporter = nodemailer.createTransport({
@@ -110,6 +113,21 @@ export default class Email {
         })
       } catch (e) {
         console.log(e)
+        throw new EmailSendException()
+      }
+    } else if (config.mailProvider === "REST") {
+      const result = await axios({
+        method: config.restMailClientConfig.method,
+        url: config.restMailClientConfig.url,
+        data: config.restMailClientConfig.body
+          ? JSON.parse(config.restMailClientConfig.body)
+          : null,
+        headers: config.restMailClientConfig.headers
+          ? config.restMailClientConfig.headers
+          : null,
+      })
+      console.log(result)
+      if (result.statusText !== "OK") {
         throw new EmailSendException()
       }
     } else {
