@@ -1,5 +1,8 @@
 module.exports = {
+  setupFiles: ["<rootDir>/tests/dotenv-config.js"],
   preset: "ts-jest",
   testEnvironment: "node",
-  verbose: true
+  testMatch: ["**/*.test.(ts|tsx)"],
+  collectCoverageFrom: ["src/**/*.{ts,tsx}"],
+  verbose: true,
 }

@@ -2,7 +2,7 @@ require("reflect-metadata")
 import ScopeService from "../service/Scope"
 import UserService from "../service/User"
 
-require("dotenv").config({ path: process.cwd() + "/.env.testing" })
+//require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 
 const user1 = "nake89@gmail.com"
 const user2 = "nake89+1@gmail.com"

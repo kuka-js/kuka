@@ -1,6 +1,19 @@
 require("reflect-metadata")
 import UserService, { UserObject } from "../service/User"
-require("dotenv").config({ path: process.cwd() + "/.env.testing" })
+//require("dotenv").config({ path: process.cwd() + "/.env.testing" })
+//require("dotenv").config({ path: __dirname + "/../.env.testing" })
+// const path = require("path")
+// const fullPath = path.resolve(__dirname, "./../.env.testing")
+// console.log(
+//   "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+// )
+// console.log(fullPath)
+// console.log(
+//   "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+// )
+// require("dotenv").config({
+//   path: path.resolve(__dirname, "./../.env.testing"),
+// })
 
 describe("user tests", () => {
   beforeAll(() => {})

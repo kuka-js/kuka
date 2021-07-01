@@ -1,6 +1,6 @@
 require("reflect-metadata")
 import Email from "../service/Email"
-require("dotenv").config({ path: process.cwd() + "/.env.testing" })
+//require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 const sendMailMock = jest.fn()
 
 jest.mock("nodemailer")

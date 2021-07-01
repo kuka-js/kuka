@@ -9,23 +9,18 @@ const axios = require("axios").default
 const moduleName = "kuka"
 const explorer = cosmiconfigSync(moduleName)
 const result = explorer.search()
-if (result === null) throw new Error("Cant find config file.")
-const defaultMailProviders = ["AWSSES", "SMTP", "REST"]
-interface EmailPlugin {
-  pluginName: string
-  pluginType: string
-  sendEmail(
-    email: string,
-    sender: string,
-    subject: string,
-    message: string
-  ): Promise<void>
+const STAGE = process.env.STAGE
+let config
+if (STAGE !== "test") {
+  if (result === null) throw new Error("Cant find config file.")
+  config = result.config as KukaConfig
+} else {
+  config = { mailProvider: "SMTP" }
 }
 
 interface KukaConfig {
   mailProvider: string
-  plugins: string[]
-  restMailClientConfig: {
+  restMailClientConfig?: {
     url: string
     method: string
     body?: string
@@ -36,7 +31,6 @@ interface KukaConfig {
 interface Headers {
   [key: string]: string
 }
-const config = result.config as KukaConfig
 export default class Email {
   async sendEmail(
     email: string,
@@ -44,7 +38,6 @@ export default class Email {
     message: string
   ): Promise<void> {
     // TODO refactor and make it so that you mail plugins abide by settings
-    const STAGE = process.env.STAGE
     const VER_RECIPIENT = process.env.VER_RECIPIENT
     const VER_SENDER = process.env.VER_SENDER
     const recipient: string =
