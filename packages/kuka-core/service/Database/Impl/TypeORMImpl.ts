@@ -125,7 +125,7 @@ export class TypeORMImpl implements DatabaseImpl {
   async getUser(username: string): Promise<UserModel> {
     const convert = (user: User): UserModel => {
       const scopeArray: Scope[] = user.scopes
-      const scopes: string[] = scopeArray.map(item => {
+      const scopes: string[] = scopeArray.map((item) => {
         return item.scope
       })
       const {
@@ -174,6 +174,7 @@ export class TypeORMImpl implements DatabaseImpl {
         return true
       }
     } catch (e) {
+      console.log(e)
       throw new DBConnectionException()
     }
   }
@@ -328,7 +329,7 @@ export class TypeORMImpl implements DatabaseImpl {
     const user: User = await User.findOne({ username })
     if (user) {
       const scopeArray: Scope[] = await Scope.find({ user })
-      const scopes: string[] = scopeArray.map(item => {
+      const scopes: string[] = scopeArray.map((item) => {
         return item.scope
       })
       return scopes
@@ -377,7 +378,7 @@ export class TypeORMImpl implements DatabaseImpl {
       { relations: ["scopes"] }
     )
     if (user) {
-      user.scopes = user.scopes.filter(e => e.scope !== scope)
+      user.scopes = user.scopes.filter((e) => e.scope !== scope)
       await User.save(user)
     } else {
       throw new DBQueryFailedException()
@@ -388,11 +389,11 @@ export class TypeORMImpl implements DatabaseImpl {
     let connection: Connection = await ProjectConnection.connect()
     if (connection) {
       const users: User[] = await User.find({ relations: ["scopes"] })
-      const userList: UserObject[] = users.map(item => {
+      const userList: UserObject[] = users.map((item) => {
         const userId: string = item.id
         const username: string = item.username
 
-        const scopes: string[] = item.scopes.map(scope => {
+        const scopes: string[] = item.scopes.map((scope) => {
           return scope.scope
         })
 
