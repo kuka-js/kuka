@@ -1,6 +1,6 @@
 require("reflect-metadata")
 import Email from "../service/Email"
-require("dotenv").config({ path: process.cwd() + "/.env.testing" })
+//require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 const sendMailMock = jest.fn()
 
 jest.mock("nodemailer")
@@ -18,7 +18,7 @@ describe("email tests", () => {
     const email = new Email()
     let thrown = false
     try {
-      await email.sendEmail("email@address.com", "subject", "message", "smtp")
+      await email.sendEmail("email@address.com", "subject", "message")
     } catch (e) {
       thrown = true
     }

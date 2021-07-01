@@ -1,0 +1,8 @@
+# yamllint disable-line rule:document-start
+mailProvider: REST
+restMailClientConfig:
+  url: "https://mockbin.org/request/whaddup"
+  method: POST
+  body: '{"name":"morpheus","job":"leader"}'
+  headers:
+    whaddup: yoyoyo

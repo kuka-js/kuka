@@ -4,7 +4,7 @@ import RefreshTokenService, {
 import UserService from "../service/User"
 
 require("reflect-metadata")
-require("dotenv").config({ path: process.cwd() + "/.env.testing" })
+//require("dotenv").config({ path: process.cwd() + "/.env.testing" })
 
 describe("RefreshTokenService_tests", () => {
   beforeAll(async () => {
@@ -19,9 +19,8 @@ describe("RefreshTokenService_tests", () => {
   it("refreshToken_ExpectSuccess", async () => {
     const mockCompareRefreshTokens = jest.fn()
     mockCompareRefreshTokens.mockReturnValue(true)
-    RefreshTokenService.compareRefreshTokens = mockCompareRefreshTokens.bind(
-      RefreshTokenService
-    )
+    RefreshTokenService.compareRefreshTokens =
+      mockCompareRefreshTokens.bind(RefreshTokenService)
     const result = await RefreshTokenService.refreshToken(
       "nake89@gmail.com",
       "old"
@@ -33,9 +32,8 @@ describe("RefreshTokenService_tests", () => {
   it("refreshToken_ExpectFailure", async () => {
     const mockCompareRefreshTokens = jest.fn()
     mockCompareRefreshTokens.mockReturnValue(false)
-    RefreshTokenService.compareRefreshTokens = mockCompareRefreshTokens.bind(
-      RefreshTokenService
-    )
+    RefreshTokenService.compareRefreshTokens =
+      mockCompareRefreshTokens.bind(RefreshTokenService)
     const result = await RefreshTokenService.refreshToken(
       "nake89@gmail.com",
       "old"
