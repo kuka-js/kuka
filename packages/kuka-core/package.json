@@ -20,7 +20,6 @@
     "loglevel": "^1.7.1",
     "mysql2": "^2.2.5",
     "nodemailer": "^6.6.2",
-    "plugload": "^1.0.3",
     "reflect-metadata": "^0.1.13",
     "sequelize": "^6.6.4",
     "sqlite3": "^5.0.2",
