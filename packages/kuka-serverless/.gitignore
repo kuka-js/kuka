@@ -1,2 +1,4 @@
 dist
 .build
+database.sqlite-journal
+database.sqlite
