@@ -4,8 +4,10 @@ npm config set @kuka-js:registry http://registry.npmjs.org
 npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
 npm whoami
 npm ci --also=dev
-serverless offline start --env test > /tmp/sls-offline.log 2>&1 &
-node start-tests.js
+sls config credentials --provider aws --key $AWS_KEY --secret $AWS_SECRET
+serverless deploy --stage test
+#serverless offline start --env test > /tmp/sls-offline.log 2>&1 &
+#node start-tests.js
 #curl --verbose -X POST -H 'Content-Type: application/json' -d '{"username":"nake89+debug1@gmail.com","email":"nake89+debug1@gmail.com","password":"nake89@gmail.COM"}' http://localhost:4000/test/register
 # Disabled currently because this script now runs start-tests.js. We'll see how this goes.
 #npm test
