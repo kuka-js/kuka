@@ -4,7 +4,7 @@ npm config set @kuka-js:registry http://registry.npmjs.org
 npm config set //registry.npmjs.org/:_authToken $NPM_TOKEN
 npm whoami
 npm ci --also=dev
-sls config credentials --provider aws --key $AWS_KEY --secret $AWS_SECRET
+serverless config credentials --provider aws --key $AWS_KEY --secret $AWS_SECRET
 serverless deploy --stage test
 #serverless offline start --env test > /tmp/sls-offline.log 2>&1 &
 #node start-tests.js
