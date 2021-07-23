@@ -10,6 +10,6 @@ npm ci --also=dev
 #node start-tests.js
 #curl --verbose -X POST -H 'Content-Type: application/json' -d '{"username":"nake89+debug1@gmail.com","email":"nake89+debug1@gmail.com","password":"nake89@gmail.COM"}' http://localhost:4000/test/register
 # Disabled currently because this script now runs start-tests.js. We'll see how this goes.
-#npm test
+npm test
 # Gotta disable semantic release because I'm trying to fix CICD currently
 #npm run semantic-release
