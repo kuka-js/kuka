@@ -14,6 +14,13 @@ plugins:
   - serverless-dotenv-plugin
   - serverless-domain-manager
 
+# When this gets merged https://github.com/prisma-labs/serverless-plugin-typescript/issues/231
+# Update serverless-plugin-typescript and update serverless dep from 2.31.0 to newer.
+# And replace 'include' with new 'pattern' syntax: https://www.serverless.com/framework/docs/providers/aws/guide/packaging/
+package:
+  include:
+    - ./.kukarc.yaml
+
 provider:
   name: aws
   runtime: nodejs12.x
