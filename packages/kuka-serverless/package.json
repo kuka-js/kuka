@@ -14,6 +14,7 @@
     "loglevel": "^1.7.1"
   },
   "devDependencies": {
+    "@aws-sdk/client-api-gateway": "^3.23.0",
     "@types/aws-lambda": "^8.10.77",
     "newman": "^5.2.4",
     "prettier": "^2.3.2",
@@ -33,7 +34,9 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,yml,yaml,css,scss,ts,tsx,md}": ["prettier --write"]
+    "*.{js,json,yml,yaml,css,scss,ts,tsx,md}": [
+      "prettier --write"
+    ]
   },
   "manualBuild": "edit this string to cause manual build.",
   "publishConfig": {

@@ -2,6 +2,8 @@ name: kuka
 env:
   AWS_KEY: ${{secrets.AWS_KEY}}
   AWS_SECRET: ${{secrets.AWS_SECRET}}
+  APIGW_KEY: ${{secrets.APIGW_KEY}}
+  APIGW_SECRET: ${{secrets.APIGW_SECRET}}
   DYNAMODB_ARN: ${{secrets.DYNAMODB_ARN}}
   NPM_TOKEN: ${{secrets.NPM_TOKEN}}
   GH_TOKEN: ${{secrets.GH_TOKEN}}
