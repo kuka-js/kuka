@@ -8,8 +8,6 @@ custom:
     basePath: user
     endpointType: edge
 
-environment:
-  CI_URL: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}/" ] ]  }
 
 
 plugins:
@@ -30,6 +28,8 @@ provider:
   runtime: nodejs12.x
   stage: ${env:STAGE}
   region: ${env:REGION}
+  environment:
+    CI_URL: { "Fn::Join" : ["", [" https://", { "Ref" : "ApiGatewayRestApi" }, ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}/" ] ]  }
   iamRoleStatements:
     - Effect: "Allow"
       Action:

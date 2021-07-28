@@ -12,6 +12,8 @@ npm ci --also=dev
 # Disabled currently because this script now runs start-tests.js. We'll see how this goes.
 pwd
 sed -i -e "s|URL_PREFIX|$CI_URL|g" ./.newman/postman_environment.json
+echo "CI_URL:"
+echo $CI_URL
 cat ./.newman/postman_environment.json
 npm test
 # Gotta disable semantic release because I'm trying to fix CICD currently
