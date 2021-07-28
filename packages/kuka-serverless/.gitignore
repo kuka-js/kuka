@@ -2,3 +2,4 @@ dist
 .build
 database.sqlite-journal
 database.sqlite
+node_modules

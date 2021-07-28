@@ -41,7 +41,10 @@ export default class Email {
     const VER_RECIPIENT = process.env.VER_RECIPIENT
     const VER_SENDER = process.env.VER_SENDER
     const recipient: string =
-      STAGE == "development" || STAGE == "test" || STAGE == "local"
+      STAGE == "development" ||
+      STAGE == "test" ||
+      STAGE == "local" ||
+      STAGE == "CI"
         ? VER_RECIPIENT
         : email
 
