@@ -37,7 +37,7 @@
   "lint-staged": {
     "*.{js,json,yml,yaml,css,scss,ts,tsx,md}": ["prettier --write"]
   },
-  "manualBuild": "edit this string to cause manual build",
+  "manualBuild": "edit this string to cause manual build.",
   "publishConfig": {
     "access": "public"
   }
