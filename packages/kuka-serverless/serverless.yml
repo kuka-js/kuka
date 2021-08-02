@@ -8,7 +8,34 @@ custom:
     basePath: user
     endpointType: edge
 
-
+resources: # CloudFormation template syntax
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:TABLE_NAME}-${env:STAGE}
+        AttributeDefinitions:
+          - AttributeName: "PK"
+            AttributeType: S
+          - AttributeName: "SK"
+            AttributeType: S
+        KeySchema:
+          - AttributeName: "PK"
+            KeyType: "HASH"
+          - AttributeName: "SK"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+            IndexName: "sk-pk-index"
+            KeySchema:
+              - AttributeName: "SK"
+                KeyType: "HASH"
+              - AttributeName: "PK"
+                KeyType: "RANGE"
+            Projection:
+              ProjectionType: "ALL"
 
 plugins:
   - serverless-plugin-typescript
@@ -41,13 +68,14 @@ provider:
   iamRoleStatements:
     - Effect: "Allow"
       Action:
+        - dynamodb:DescribeTable
         - dynamodb:Query
         - dynamodb:Scan
         - dynamodb:GetItem
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: ${env:DYNAMODB_ARN}
+      Resource: "arn:aws:dynamodb:${env:REGION}:*:table/${env:TABLE_NAME}-${env:STAGE}"
 functions:
   register:
     handler: handler.register
