@@ -12,6 +12,7 @@ env:
   STAGE: ci
   REGION: "eu-north-1"
   KUKA_DOMAIN: "api.kuka.kivi.ws"
+  TABLE_NAME: "ci-kuka-users"
 
 on:
   push:
