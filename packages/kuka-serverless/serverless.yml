@@ -28,7 +28,7 @@ resources: # CloudFormation template syntax
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         GlobalSecondaryIndexes:
-            IndexName: "sk-pk-index"
+          - IndexName: "sk-pk-index"
             KeySchema:
               - AttributeName: "SK"
                 KeyType: "HASH"
