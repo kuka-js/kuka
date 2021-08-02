@@ -34,6 +34,9 @@ resources: # CloudFormation template syntax
                 KeyType: "HASH"
               - AttributeName: "PK"
                 KeyType: "RANGE"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
             Projection:
               ProjectionType: "ALL"
 
