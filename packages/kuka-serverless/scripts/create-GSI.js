@@ -1,7 +1,16 @@
-const { DynamoDB } = require("@aws-sdk/client-dynamodb")
+const {
+  DynamoDBClient,
+  UpdateTableCommand,
+} = require("@aws-sdk/client-dynamodb")
 
 ;(async () => {
-  const client = new DynamoDB({ region: process.env.REGION })
+  const client = new DynamoDBClient({
+    region: process.env.REGION,
+    credentials: {
+      AccessKeyId: process.env.AWS_KEY,
+      SecretAccessKey: process.env.AWS_SECRET,
+    },
+  })
   const params = {
     TableName: process.env.TABLE_NAME + "-" + process.env.STAGE,
     GlobalSecondaryIndexUpdates: {
@@ -16,8 +25,9 @@ const { DynamoDB } = require("@aws-sdk/client-dynamodb")
       },
     },
   }
+  const command = new UpdateTableCommand(params)
   try {
-    await client.updateTable(params)
+    await client.send(command)
   } catch (e) {
     console.error(e)
   }
