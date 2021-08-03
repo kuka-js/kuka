@@ -25,6 +25,11 @@ const {
       },
     },
   }
+  console.log("WWWWWWWWWWWWWWWWWWWWWw")
+  console.log(params)
+  console.log("WWWWWWWWWWWWWWWWWWWWWw")
+  console.log(process.env)
+  console.log("WWWWWWWWWWWWWWWWWWWWWw")
   const command = new UpdateTableCommand(params)
   try {
     await client.send(command)
