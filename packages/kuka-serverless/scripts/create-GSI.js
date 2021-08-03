@@ -16,5 +16,9 @@ const { DynamoDB } = require("@aws-sdk/client-dynamodb")
       },
     },
   }
-  await client.updateTable(params)
+  try {
+    await client.updateTable(params)
+  } catch (e) {
+    console.error(e)
+  }
 })()
