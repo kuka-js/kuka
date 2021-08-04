@@ -13,6 +13,10 @@ const {
   })
   const params = {
     TableName: process.env.TABLE_NAME + "-" + process.env.STAGE,
+    // AttributeDefinitions: [
+    //   { AttributeName: "pk", AttributeType: "S" },
+    //   { AttributeName: "sk", AttributeType: "S" },
+    // ],
     GlobalSecondaryIndexUpdates: [
       {
         Create: {
