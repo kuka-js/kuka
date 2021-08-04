@@ -13,17 +13,22 @@ const {
   })
   const params = {
     TableName: process.env.TABLE_NAME + "-" + process.env.STAGE,
-    GlobalSecondaryIndexUpdates: {
-      Create: {
-        IndexName: "email-pk-index",
-        KeySchema: [
-          { AttributeName: "email", KeyType: "HASH" },
-          { AttributeName: "pk", KeyType: "RANGE" },
-        ],
-        Projection: "ALL",
-        ProvisionedThroughput: { ReadCapacityUnits: 1, WriteCapacityUnits: 1 },
+    GlobalSecondaryIndexUpdates: [
+      {
+        Create: {
+          IndexName: "email-pk-index",
+          KeySchema: [
+            { AttributeName: "email", KeyType: "HASH" },
+            { AttributeName: "pk", KeyType: "RANGE" },
+          ],
+          Projection: "ALL",
+          ProvisionedThroughput: {
+            ReadCapacityUnits: 1,
+            WriteCapacityUnits: 1,
+          },
+        },
       },
-    },
+    ],
   }
   console.log("WWWWWWWWWWWWWWWWWWWWWw")
   console.log(params)
