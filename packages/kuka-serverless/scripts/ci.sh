@@ -6,8 +6,6 @@ npm whoami
 npm ci --also=dev
 ./node_modules/serverless/bin/serverless.js config credentials --provider aws --key $AWS_KEY --secret $AWS_SECRET
 ./node_modules/serverless/bin/serverless.js deploy
-# Need to create new GSI, because during deployment only one GSI can be added. https://github.com/kuka-js/kuka/issues/165
-node ./scripts/create-GSI.js
 CI_URL="https://$(node ./get-api-id.js).execute-api.eu-north-1.amazonaws.com/ci/"
 sed -i -e "s|URL_PREFIX|$CI_URL|g" ./.newman/postman_environment.json
 npm test
