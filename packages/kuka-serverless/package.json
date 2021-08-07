@@ -9,7 +9,7 @@
     "test": "newman run .newman/postman_collection.json -e .newman/postman_environment.json --verbose"
   },
   "dependencies": {
-    "@kuka-js/core": "^1.2.0",
+    "@kuka-js/core": "^1.2.1",
     "aws-sdk": "^2.938.0",
     "loglevel": "^1.7.1"
   },
