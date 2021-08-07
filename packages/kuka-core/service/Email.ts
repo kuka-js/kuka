@@ -11,7 +11,7 @@ const explorer = cosmiconfigSync(moduleName)
 const result = explorer.search()
 const STAGE = process.env.STAGE
 let config
-if (STAGE !== "test") {
+if (STAGE !== "test" && STAGE !== "ci") {
   if (result === null) throw new Error("Cant find config file.")
   config = result.config as KukaConfig
 } else {
