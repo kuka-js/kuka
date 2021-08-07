@@ -59,18 +59,6 @@ provider:
   stage: ${env:STAGE}
   region: ${env:REGION}
   environment:
-    CI_URL:
-      {
-        "Fn::Join":
-          [
-            "",
-            [
-              " https://",
-              { "Ref": "ApiGatewayRestApi" },
-              ".execute-api.${self:provider.region}.amazonaws.com/${self:provider.stage}/",
-            ],
-          ],
-      }
     DB_PROVIDER: "dynamodb"
     STAGE: "ci"
     VER_RECIPIENT: "nake89@gmail.com"
@@ -79,6 +67,7 @@ provider:
     AUTO_VERIFY_MAIL: "true"
     JWT_SECRET: "super-secret"
     EXPIRATION_TIME: "15min"
+    TABLE_NAME: ${env:TABLE_NAME}
   iamRoleStatements:
     - Effect: "Allow"
       Action:

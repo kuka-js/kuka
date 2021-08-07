@@ -28,13 +28,14 @@ if (process.env.STAGE == "local") {
 config.update({ region: "eu-north-1" })
 
 const docClient = new DynamoDB.DocumentClient()
+const tableName = process.env.TABLE_NAME
 
 export class DynamoDBImpl implements DatabaseImpl {
   async createUser(user: UserModel): Promise<CreateUserResponse> {
     const userModel: UserModelForDynamoDB = this.userModelToDynamoDBModel(user)
-    const params = { TableName: "kuka-users", Item: userModel }
+    const params = { TableName: tableName, Item: userModel }
     const addEmailSK = {
-      TableName: "kuka-users",
+      TableName: tableName,
       Item: { pk: userModel.pk, sk: "EMAIL#" + userModel.email },
     }
     try {
@@ -55,7 +56,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   async getUser(username: string): Promise<UserModel> {
     const pksk = "USER#" + username
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       Key: { pk: pksk, sk: pksk },
     }
 
@@ -78,7 +79,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   async userExists(username: string): Promise<boolean> {
     const key = "USER#" + username
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       Key: { pk: key, sk: key },
     }
 
@@ -104,7 +105,7 @@ export class DynamoDBImpl implements DatabaseImpl {
     try {
       const key = "USER#" + username
       const params = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Key: { pk: key, sk: key },
         UpdateExpression: "set refreshToken = :r",
         ExpressionAttributeValues: {
@@ -121,7 +122,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   async deleteUser(username: string): Promise<void> {
     const pksk = "USER#" + username
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       Key: { pk: pksk, sk: pksk },
     }
     try {
@@ -134,7 +135,7 @@ export class DynamoDBImpl implements DatabaseImpl {
 
   async createVerificationLink(verifyObject: VerificationModel): Promise<void> {
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       Item: this.verificationModelToDynamoDBModel(verifyObject),
     }
     try {
@@ -149,7 +150,7 @@ export class DynamoDBImpl implements DatabaseImpl {
     const sk = "VER#" + verifyLinkId
     try {
       let getVerifyParams = {
-        TableName: "kuka-users",
+        TableName: tableName,
         IndexName: "sk-pk-index",
         KeyConditionExpression: "sk = :sk AND begins_with(pk, :pk)",
         ExpressionAttributeValues: {
@@ -165,7 +166,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       }
       const pk = verifyItem.Items[0].pk
       const emailVerifiedToUserItem = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Key: {
           pk,
           sk,
@@ -177,7 +178,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       }
       await docClient.update(emailVerifiedToUserItem).promise()
       const emailVerifiedToVerifyItem = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Key: {
           pk,
           sk: pk,
@@ -211,7 +212,7 @@ export class DynamoDBImpl implements DatabaseImpl {
         creationDate,
       }
       const params = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Item: passwordResetItem,
       }
       await docClient.put(params).promise()
@@ -223,7 +224,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   async getPasswordReset(passwordResetId: string): Promise<PasswordResetModel> {
     try {
       let params = {
-        TableName: "kuka-users",
+        TableName: tableName,
         IndexName: "sk-pk-index",
         KeyConditionExpression: "sk = :sk AND begins_with(pk, :pk)",
         ExpressionAttributeValues: {
@@ -256,7 +257,7 @@ export class DynamoDBImpl implements DatabaseImpl {
     const pksk = "USER#" + username
     try {
       const params = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Key: {
           pk: pksk,
           sk: pksk,
@@ -277,7 +278,7 @@ export class DynamoDBImpl implements DatabaseImpl {
 
   async emailToUsername(email: string): Promise<string> {
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       IndexName: "sk-pk-index",
       KeyConditionExpression: "sk  = :email",
       ExpressionAttributeValues: {
@@ -304,7 +305,7 @@ export class DynamoDBImpl implements DatabaseImpl {
     log.debug("getScopes username: " + username)
     const pksk = "USER#" + username
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       Key: { pk: pksk, sk: pksk },
       ProjectionExpression: "scopes",
     }
@@ -334,7 +335,7 @@ export class DynamoDBImpl implements DatabaseImpl {
     const pksk = "USER#" + username
     try {
       const params = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Key: {
           pk: pksk,
           sk: pksk,
@@ -352,11 +353,11 @@ export class DynamoDBImpl implements DatabaseImpl {
 
   async removeScope(username: string, scope: string): Promise<void> {
     const scopes: string[] = await this.getScopes(username)
-    const newScopes = scopes.filter(e => e !== scope)
+    const newScopes = scopes.filter((e) => e !== scope)
     const pksk = "USER#" + username
     try {
       const params = {
-        TableName: "kuka-users",
+        TableName: tableName,
         Key: {
           pk: pksk,
           sk: pksk,
@@ -374,7 +375,7 @@ export class DynamoDBImpl implements DatabaseImpl {
 
   async getUserList(): Promise<UserObject[]> {
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       ProjectionExpression: "pk, scopes, locked",
       FilterExpression: "begins_with(sk, :sk) AND begins_with(pk, :pk)",
       ExpressionAttributeValues: {
@@ -398,7 +399,7 @@ export class DynamoDBImpl implements DatabaseImpl {
   async getRefreshToken(username: string): Promise<string> {
     const pksk = "USER#" + username
     const params = {
-      TableName: "kuka-users",
+      TableName: tableName,
       ProjectionExpression: "refreshToken",
       Key: { pk: pksk, sk: pksk },
     }
@@ -427,7 +428,7 @@ export class DynamoDBImpl implements DatabaseImpl {
       lockedBy,
       reason,
     }
-    const params = { TableName: "kuka-users", Item: lock }
+    const params = { TableName: tableName, Item: lock }
     try {
       await docClient.put(params).promise()
       return true
