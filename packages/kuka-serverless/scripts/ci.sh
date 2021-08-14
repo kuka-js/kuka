@@ -9,6 +9,4 @@ npm ci --also=dev
 CI_URL="https://$(node ./get-api-id.js).execute-api.eu-north-1.amazonaws.com/ci/"
 sed -i -e "s|URL_PREFIX|$CI_URL|g" ./.newman/postman_environment.json
 npm test
-node ./scripts/delete-table.js
-./node_modules/serverless/bin/serverless.js remove
 npm run semantic-release
