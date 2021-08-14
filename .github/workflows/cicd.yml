@@ -12,7 +12,13 @@ env:
   STAGE: ci
   REGION: "eu-north-1"
   KUKA_DOMAIN: "api.kuka.kivi.ws"
-  TABLE_NAME: "ci-kuka-users"
+  TABLE_NAME: "kuka-users"
+  VER_RECIPIENT: "nake89@gmail.com"
+  VER_SENDER: "nake89@gmail.com"
+  AUTO_SEND_PASSWORD_RESET_ID: "true"
+  AUTO_VERIFY_MAIL: "true"
+  JWT_SECRET: ${{secrets.JWT_SECRET}}
+  EXPIRATION_TIME: "15min"
 
 on:
   push:
@@ -51,5 +57,11 @@ jobs:
       - uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: |
+      - name: Build and Test
+        run: |
           if .ci/build.sh $COMMIT_RANGE $TARGET; then echo "Building '$TARGET' ..." && cd $TARGET && scripts/ci.sh; else echo "No changes detected in '$TARGET'; skipping build."; fi
+      - name: Clean up
+        run: |
+          node ./packages/kuka-serverless/scripts/delete-table.js
+          ./packages/kuka-serverless/node_modules/serverless/bin/serverless.js remove
+
