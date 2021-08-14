@@ -67,4 +67,4 @@ jobs:
       - name: Clean up stack
         if: ${{ always() }}
         run: |
-          ./packages/kuka-serverless/node_modules/serverless/bin/serverless.js remove
+          cd $TARGET; ./node_modules/serverless/bin/serverless.js remove
