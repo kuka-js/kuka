@@ -60,13 +60,13 @@ provider:
   region: ${env:REGION}
   environment:
     DB_PROVIDER: "dynamodb"
-    STAGE: "ci"
-    VER_RECIPIENT: "nake89@gmail.com"
-    VER_SENDER: "nake89@gmail.com"
-    AUTO_SEND_PASSWORD_RESET_ID: "true"
-    AUTO_VERIFY_MAIL: "true"
-    JWT_SECRET: "super-secret"
-    EXPIRATION_TIME: "15min"
+    STAGE: ${env:STAGE}
+    VER_RECIPIENT: ${env:VER_RECIPIENT}
+    VER_SENDER: ${env:VER_SENDER}
+    AUTO_SEND_PASSWORD_RESET_ID: ${env:AUTO_SEND_PASSWORD_RESET_ID} #"true"
+    AUTO_VERIFY_MAIL: ${env:AUTO_VERIFY_MAIL} #"true"
+    JWT_SECRET: ${env:JWT_SECRET} #"super-secret"
+    EXPIRATION_TIME: ${env:EXPIRATION_TIME} #"15min"
     TABLE_NAME: ${env:TABLE_NAME}
   iamRoleStatements:
     - Effect: "Allow"
