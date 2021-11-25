@@ -1,5 +1,7 @@
 service: kuka-js
 
+useDotenv: true
+variablesResolutionMode: 20210326
 custom:
   serverless-offline:
     httpPort: 4000
@@ -7,6 +9,7 @@ custom:
     domainName: ${env:KUKA_DOMAIN}
     basePath: user
     endpointType: edge
+    certificateArn: ${env:CERTIFICATE_ARN}
 
 resources: # CloudFormation template syntax
   Resources:
@@ -43,7 +46,6 @@ resources: # CloudFormation template syntax
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
-  - serverless-dotenv-plugin
   - serverless-domain-manager
 
 # When this gets merged https://github.com/prisma-labs/serverless-plugin-typescript/issues/231
@@ -55,8 +57,8 @@ package:
 
 provider:
   name: aws
-  runtime: nodejs12.x
-  stage: ${env:STAGE}
+  runtime: nodejs14.x
+  #  stage: ${env:STAGE} https://github.com/serverless/serverless/issues/8364 . Use --stage for now. See if that is fixed in v3.
   region: ${env:REGION}
   environment:
     DB_PROVIDER: "dynamodb"

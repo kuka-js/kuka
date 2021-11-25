@@ -93,9 +93,8 @@ export const reset: Handler = async (event: APIGatewayEvent) => {
 
     const passwordReset = new PasswordResetService()
 
-    let passwordResetResult: string = await passwordReset.createPasswordResetLink(
-      email
-    )
+    let passwordResetResult: string =
+      await passwordReset.createPasswordResetLink(email)
 
     if (passwordResetResult == "true") {
       return new BaseResponse(200, 1, `Password Reset email sent`).response()
