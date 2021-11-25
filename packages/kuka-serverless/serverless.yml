@@ -50,7 +50,7 @@ plugins:
 # Update serverless-plugin-typescript and update serverless dep from 2.31.0 to newer.
 # And replace 'include' with new 'pattern' syntax: https://www.serverless.com/framework/docs/providers/aws/guide/packaging/
 package:
-  include:
+  patterns:
     - ./.kukarc.yaml
 
 provider:
