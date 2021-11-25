@@ -1,4 +1,5 @@
 import BaseResponse from "./BaseResponse"
+import { headers } from "./headers"
 import {UserObject} from "../service/User"
 
 export default class UserResponse extends BaseResponse {
@@ -20,6 +21,7 @@ export default class UserResponse extends BaseResponse {
   response() {
     return {
       statusCode: this.statusCode,
+      headers,
       body: JSON.stringify(
         {
           ok: this.ok,

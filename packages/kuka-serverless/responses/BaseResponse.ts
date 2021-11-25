@@ -1,3 +1,4 @@
+import { headers } from "./headers"
 export default class BaseResponse {
   statusCode: number
   ok: number
@@ -12,16 +13,17 @@ export default class BaseResponse {
   response() {
     return {
       statusCode: this.statusCode,
+      headers,
       body: JSON.stringify(
         {
           ok: this.ok,
           data: {
-            message: this.message
-          }
+            message: this.message,
+          },
         },
         null,
         2
-      )
+      ),
     }
   }
 }
