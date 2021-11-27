@@ -1,6 +1,6 @@
 import BaseResponse from "./BaseResponse"
 import { headers } from "./headers"
-import {UserObject} from "../service/User"
+import { UserObject } from "@kuka-js/core/service/User"
 
 export default class UserListResponse extends BaseResponse {
   statusCode: number
@@ -27,12 +27,12 @@ export default class UserListResponse extends BaseResponse {
           ok: this.ok,
           data: {
             message: this.message,
-            users: this.users
-          }
+            users: this.users,
+          },
         },
         null,
         2
-      )
+      ),
     }
   }
 }
