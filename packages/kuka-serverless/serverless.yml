@@ -1,4 +1,4 @@
-service: kuka-js
+service: ${env:KUKA_SERVICE_NAME}
 
 useDotenv: true
 variablesResolutionMode: 20210326
