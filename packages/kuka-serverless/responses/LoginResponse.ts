@@ -1,6 +1,9 @@
 import BaseResponse from "./BaseResponse"
-import { headers } from "./headers"
+import { headers as basicHeaders } from "./headers"
 
+const headersRefreshToken = (refreshToken) => {
+  return { "Set-Cookie": "RefreshToken=" + refreshToken + ";HttpOnly;" }
+}
 export default class LoginResponse extends BaseResponse {
   statusCode: number
   ok: number
@@ -26,22 +29,19 @@ export default class LoginResponse extends BaseResponse {
   response() {
     return {
       statusCode: this.statusCode,
-      headers,
+      headers: { ...basicHeaders, ...headersRefreshToken(this.refreshToken) },
       body: JSON.stringify(
         {
           ok: this.ok,
           data: {
             message: this.message,
             token: this.token,
-            tokenExpiry: this.tokenExpiry
-          }
+            tokenExpiry: this.tokenExpiry,
+          },
         },
         null,
         2
       ),
-      headers: {
-        "Set-Cookie": "RefreshToken=" + this.refreshToken + ";HttpOnly;"
-      }
     }
   }
 }
