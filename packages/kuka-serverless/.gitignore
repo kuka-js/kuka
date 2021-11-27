@@ -3,3 +3,4 @@ dist
 database.sqlite-journal
 database.sqlite
 node_modules
+.env
