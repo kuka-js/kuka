@@ -9,6 +9,7 @@ custom:
     domainName: ${env:KUKA_DOMAIN}
     basePath: user
     endpointType: edge
+    certificateArn: ${env:CERTIFICATE_ARN}
 
 resources: # CloudFormation template syntax
   Resources:

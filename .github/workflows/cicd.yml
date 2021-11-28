@@ -21,6 +21,7 @@ env:
   EXPIRATION_TIME: "15min"
   KUKA_SERVICE_NAME: "kuka-ci-test"
   CERTIFICATE_ARN: ""
+  FRONTEND_DOMAIN: "http://localhost:5000"
 
 on:
   push:
