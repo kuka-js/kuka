@@ -19,6 +19,8 @@ env:
   AUTO_VERIFY_MAIL: "true"
   JWT_SECRET: ${{secrets.JWT_SECRET}}
   EXPIRATION_TIME: "15min"
+  KUKA_SERVICE_NAME: "kuka-ci-test"
+  CERTIFICATE_ARN: ""
 
 on:
   push:
