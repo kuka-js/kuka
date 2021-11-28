@@ -88,6 +88,9 @@ functions:
       - http:
           path: register
           method: post
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   login:
     handler: handler.login
@@ -95,6 +98,9 @@ functions:
       - http:
           path: login
           method: post
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   verify:
     handler: handler.verify
@@ -106,6 +112,9 @@ functions:
             parameters:
               paths:
                 id: true
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   reset:
     handler: handler.reset
@@ -113,6 +122,9 @@ functions:
       - http:
           path: reset
           method: post
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   password:
     handler: handler.password
@@ -120,6 +132,9 @@ functions:
       - http:
           path: password
           method: put
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   getScopes:
     handler: handler.getScopes
@@ -128,6 +143,9 @@ functions:
           path: scopes
           method: get
           authorizer: authGetScopes
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   addScope:
     handler: handler.addScope
@@ -136,6 +154,9 @@ functions:
           path: scopes
           method: post
           authorizer: authAddScope
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   removeScope:
     handler: handler.removeScope
@@ -148,6 +169,9 @@ functions:
             parameters:
               paths:
                 scopeName: true
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   getUserList:
     handler: handler.getUserList
@@ -156,6 +180,9 @@ functions:
           path: list
           method: get
           authorizer: authGetUserList
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   getUserData:
     handler: handler.getUser
@@ -164,6 +191,9 @@ functions:
           path: /
           method: get
           authorizer: authGetUserData
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   refreshToken:
     handler: handler.refreshToken
@@ -171,6 +201,9 @@ functions:
       - http:
           path: token
           method: put
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   deleteuser:
     handler: handler.deleteUser
@@ -179,6 +212,9 @@ functions:
           path: /
           method: delete
           authorizer: authDeleteUser
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   lockUser:
     handler: handler.lockUser
@@ -187,6 +223,9 @@ functions:
           path: lock
           method: put
           authorizer: authLockUser
+          cors:
+            origin: ${env:FRONTEND_DOMAIN}
+            allowCredentials: true
 
   authGetScopes:
     handler: Auth.getScopes
