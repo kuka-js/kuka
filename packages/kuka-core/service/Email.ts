@@ -48,7 +48,8 @@ export default class Email {
         ? VER_RECIPIENT
         : email
 
-    if (config.mailProvider === "AWSSES") {
+    let mailProvider = process.env.MAIL_PROVIDER || config.mailProvider
+    if (mailProvider === "AWSSES") {
       const ses = new SES({ region: "eu-central-1" })
       const sender: string = VER_SENDER
       const charset: string = "UTF-8"

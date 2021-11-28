@@ -70,6 +70,8 @@ provider:
     EXPIRATION_TIME: ${env:EXPIRATION_TIME} #"15min"
     TABLE_NAME: ${env:TABLE_NAME}
     FRONTEND_DOMAIN: ${env:FRONTEND_DOMAIN}
+    VERIFICATION_LINK_URL: ${env:VERIFICATION_LINK_URL}
+    MAIL_PROVIDER: ${env:MAIL_PROVIDER}
   iamRoleStatements:
     - Effect: "Allow"
       Action:
