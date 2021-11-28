@@ -1,4 +1,5 @@
 import BaseResponse from "./BaseResponse"
+import { headers } from "./headers"
 
 export default class ScopeResponse extends BaseResponse {
   statusCode: number
@@ -19,6 +20,7 @@ export default class ScopeResponse extends BaseResponse {
   response() {
     return {
       statusCode: this.statusCode,
+      headers,
       body: JSON.stringify(
         {
           ok: this.ok,

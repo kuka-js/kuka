@@ -1,5 +1,7 @@
-service: kuka-js
+service: ${env:KUKA_SERVICE_NAME}
 
+useDotenv: true
+variablesResolutionMode: 20210326
 custom:
   serverless-offline:
     httpPort: 4000
@@ -7,6 +9,7 @@ custom:
     domainName: ${env:KUKA_DOMAIN}
     basePath: user
     endpointType: edge
+    certificateArn: ${env:CERTIFICATE_ARN}
 
 resources: # CloudFormation template syntax
   Resources:
@@ -43,20 +46,19 @@ resources: # CloudFormation template syntax
 plugins:
   - serverless-plugin-typescript
   - serverless-offline
-  - serverless-dotenv-plugin
   - serverless-domain-manager
 
 # When this gets merged https://github.com/prisma-labs/serverless-plugin-typescript/issues/231
 # Update serverless-plugin-typescript and update serverless dep from 2.31.0 to newer.
 # And replace 'include' with new 'pattern' syntax: https://www.serverless.com/framework/docs/providers/aws/guide/packaging/
 package:
-  include:
+  patterns:
     - ./.kukarc.yaml
 
 provider:
   name: aws
-  runtime: nodejs12.x
-  stage: ${env:STAGE}
+  runtime: nodejs14.x
+  #  stage: ${env:STAGE} https://github.com/serverless/serverless/issues/8364 . Use --stage for now. See if that is fixed in v3.
   region: ${env:REGION}
   environment:
     DB_PROVIDER: "dynamodb"
