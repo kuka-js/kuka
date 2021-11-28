@@ -1,0 +1,211 @@
+service: ${env:KUKA_SERVICE_NAME}
+
+useDotenv: true
+variablesResolutionMode: 20210326
+custom:
+  serverless-offline:
+    httpPort: 4000
+  customDomain:
+    domainName: ${env:KUKA_DOMAIN}
+    basePath: user
+    endpointType: edge
+    certificateArn: ${env:CERTIFICATE_ARN}
+
+resources: # CloudFormation template syntax
+  Resources:
+    usersTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:TABLE_NAME}-${env:STAGE}
+        AttributeDefinitions:
+          - AttributeName: "pk"
+            AttributeType: S
+          - AttributeName: "sk"
+            AttributeType: S
+        KeySchema:
+          - AttributeName: "pk"
+            KeyType: "HASH"
+          - AttributeName: "sk"
+            KeyType: "RANGE"
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        GlobalSecondaryIndexes:
+          - IndexName: "sk-pk-index"
+            KeySchema:
+              - AttributeName: "sk"
+                KeyType: "HASH"
+              - AttributeName: "pk"
+                KeyType: "RANGE"
+            ProvisionedThroughput:
+              ReadCapacityUnits: 1
+              WriteCapacityUnits: 1
+            Projection:
+              ProjectionType: "ALL"
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-domain-manager
+
+# When this gets merged https://github.com/prisma-labs/serverless-plugin-typescript/issues/231
+# Update serverless-plugin-typescript and update serverless dep from 2.31.0 to newer.
+# And replace 'include' with new 'pattern' syntax: https://www.serverless.com/framework/docs/providers/aws/guide/packaging/
+package:
+  patterns:
+    - ./.kukarc.yaml
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  #  stage: ${env:STAGE} https://github.com/serverless/serverless/issues/8364 . Use --stage for now. See if that is fixed in v3.
+  region: ${env:REGION}
+  environment:
+    DB_PROVIDER: "dynamodb"
+    STAGE: ${env:STAGE}
+    VER_RECIPIENT: ${env:VER_RECIPIENT}
+    VER_SENDER: ${env:VER_SENDER}
+    AUTO_SEND_PASSWORD_RESET_ID: ${env:AUTO_SEND_PASSWORD_RESET_ID} #"true"
+    AUTO_VERIFY_MAIL: ${env:AUTO_VERIFY_MAIL} #"true"
+    JWT_SECRET: ${env:JWT_SECRET} #"super-secret"
+    EXPIRATION_TIME: ${env:EXPIRATION_TIME} #"15min"
+    TABLE_NAME: ${env:TABLE_NAME}
+    FRONTEND_DOMAIN: ${env:FRONTEND_DOMAIN}
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: "arn:aws:dynamodb:${env:REGION}:*:table/${env:TABLE_NAME}-${env:STAGE}"
+functions:
+  register:
+    handler: handler.register
+    events:
+      - http:
+          path: register
+          method: post
+
+  login:
+    handler: handler.login
+    events:
+      - http:
+          path: login
+          method: post
+
+  verify:
+    handler: handler.verify
+    events:
+      - http:
+          path: verify/{id}
+          method: post
+          request:
+            parameters:
+              paths:
+                id: true
+
+  reset:
+    handler: handler.reset
+    events:
+      - http:
+          path: reset
+          method: post
+
+  password:
+    handler: handler.password
+    events:
+      - http:
+          path: password
+          method: put
+
+  getScopes:
+    handler: handler.getScopes
+    events:
+      - http:
+          path: scopes
+          method: get
+          authorizer: authGetScopes
+
+  addScope:
+    handler: handler.addScope
+    events:
+      - http:
+          path: scopes
+          method: post
+          authorizer: authAddScope
+
+  removeScope:
+    handler: handler.removeScope
+    events:
+      - http:
+          path: scopes/{scopeName}
+          method: delete
+          authorizer: authRemoveScope
+          request:
+            parameters:
+              paths:
+                scopeName: true
+
+  getUserList:
+    handler: handler.getUserList
+    events:
+      - http:
+          path: list
+          method: get
+          authorizer: authGetUserList
+
+  getUserData:
+    handler: handler.getUser
+    events:
+      - http:
+          path: /
+          method: get
+          authorizer: authGetUserData
+
+  refreshToken:
+    handler: handler.refreshToken
+    events:
+      - http:
+          path: token
+          method: put
+
+  deleteuser:
+    handler: handler.deleteUser
+    events:
+      - http:
+          path: /
+          method: delete
+          authorizer: authDeleteUser
+
+  lockUser:
+    handler: handler.lockUser
+    events:
+      - http:
+          path: lock
+          method: put
+          authorizer: authLockUser
+
+  authGetScopes:
+    handler: Auth.getScopes
+
+  authAddScope:
+    handler: Auth.addScope
+
+  authRemoveScope:
+    handler: Auth.removeScope
+
+  authGetUserList:
+    handler: Auth.getUserList
+
+  authGetUserData:
+    handler: Auth.getUserData
+
+  authDeleteUser:
+    handler: Auth.deleteUser
+
+  authLockUser:
+    handler: Auth.lockUser
