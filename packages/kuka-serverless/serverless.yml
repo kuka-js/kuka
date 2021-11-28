@@ -70,6 +70,7 @@ provider:
     JWT_SECRET: ${env:JWT_SECRET} #"super-secret"
     EXPIRATION_TIME: ${env:EXPIRATION_TIME} #"15min"
     TABLE_NAME: ${env:TABLE_NAME}
+    FRONTEND_DOMAIN: ${env:FRONTEND_DOMAIN}
   iamRoleStatements:
     - Effect: "Allow"
       Action:

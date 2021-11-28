@@ -7,12 +7,12 @@ A serverless user management system using JWT. Runs as a separate microservice i
 
 ### Why?
 
-* User management that scales indepenedent of your app.
+- User management that scales indepenedent of your app.
 
 ### How?
 
-* AWS Lambda (fast infinitely scalable stateless functions)
-* DynamoDB (infinitely scalable database)
+- AWS Lambda (fast infinitely scalable stateless functions)
+- DynamoDB (infinitely scalable database)
 
 [API Documentation](https://kuka-js.github.io/kuka/apidocs.html) - Out of date
 
@@ -66,6 +66,10 @@ To use AWS Simple Email Service read this: https://docs.aws.amazon.com/ses/lates
 * `sls deploy --env development`
 * `sls deploy --env staging`
 * `sls deploy --env production`
+
+### Known Issues
+
+Deployment does not work from Mac directly. This is due the the fact that during the npm install (I think) it compiles some bcrypt stuff and this does not run on Linux (AWS Lambda). Why it works like this is beyond me. Easy workaround is to just deploy from GitHub Actions or any Linux machine you have (EC2 or some VPS).
 
 ## How it works
 
