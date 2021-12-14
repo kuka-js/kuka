@@ -9,7 +9,7 @@
     "test": "newman run .newman/postman_collection.json -e .newman/postman_environment.json --verbose"
   },
   "dependencies": {
-    "@kuka-js/core": "^1.2.1",
+    "@kuka-js/core": "^1.2.3",
     "aws-sdk": "^2.1036.0",
     "loglevel": "^1.8.0"
   },
@@ -36,9 +36,7 @@
     }
   },
   "lint-staged": {
-    "*.{js,json,yml,yaml,css,scss,ts,tsx,md}": [
-      "prettier --write"
-    ]
+    "*.{js,json,yml,yaml,css,scss,ts,tsx,md}": ["prettier --write"]
   },
   "manualBuild": "edit this string to cause manual build.",
   "publishConfig": {
